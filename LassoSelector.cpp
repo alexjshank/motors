@@ -21,6 +21,7 @@ bool spirograph = false;
 LassoSelector::LassoSelector(void)
 {
 	enabled = true;
+	maxSelectionCount = 8;
 }
 
 LassoSelector::~LassoSelector(void)
@@ -28,6 +29,7 @@ LassoSelector::~LassoSelector(void)
 }
 
 void LassoSelector::Select(Entity *e) {
+	if (SelectedEntities.size() >= maxSelectionCount) return;
 	SelectedEntities.push_back(e);
 	e->onSelected();
 }
@@ -57,7 +59,7 @@ bool LassoSelector::init() {
 	return true;
 }
 
-extern int inputContext;
+
 void LassoSelector::run() {
 	if (!terrain || !enabled) return;
 

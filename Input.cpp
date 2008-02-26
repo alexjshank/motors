@@ -10,6 +10,7 @@ Input::Input(void)
 	mouseMovement = Vector(0,0,0);
 	mouseAbsolute = Vector(0,0,0);
 	mousePosition = Vector(0,0,0);
+	inputContext = 0;
 }
 
 Input::~Input(void)

@@ -42,6 +42,8 @@ public:
 	float runspeed;
 	float walkspeed;
 
+	float buildtime;
+
 	float frame;
 
 	float lastRepositionTime;

@@ -4,12 +4,16 @@
 #include "graphics.h"
 #include "Camera.h"
 #include "variables.h"
+#include "input.h"
+#include "timer.h"
 
+extern Timer * timer;
 extern gamevars *vars;
 extern Camera *camera;
 extern Library *library;
 extern Terrain *terrain;
 extern Graphics *renderer;
+extern Input *input;
 
 Building::Building(void)
 {
@@ -27,7 +31,6 @@ void Building::init() {
 	toolWindow = 0;
 }
 
-extern int inputContext;
 extern int currentID;
 
 void Building::onSelected() {
@@ -35,14 +38,14 @@ void Building::onSelected() {
 		currentID = id;
 		toolWindow->closeButton.pressed = false;
 		toolWindow->visible = true;
-		inputContext = 1;
+		input->inputContext = BuildMenu;
 	}
 }
 
 void Building::onUnSelected() {
 	if (toolWindow) {
 		toolWindow->closeButton.pressed = true;
-		inputContext = 0;
+		input->inputContext = NormalInput;
 	}
 }
 
@@ -61,6 +64,12 @@ void Building::SetModel(const char*mname, const char*tname) {
 void Building::process() {
 	Think();
 	if (health < 0) alive = false;
+
+	if (spawnQueue.size() > 0 && timer->time - startBuildTime >= 10) { 
+		startBuildTime = timer->time;
+		SpawnEntity(spawnQueue.front().c_str(),spawnPoint);
+		spawnQueue.pop();
+	}
 }
 
 void Building::render() {

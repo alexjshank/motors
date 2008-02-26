@@ -223,7 +223,7 @@ void Terrain::renderLand(int step, int maxd, int mind) {
 	float ysize=(float)height;
 	
 	Vector cp = RayTest(camera->GetPosition(),camera->GetView(),70,4,false);
-	int startX=cp.x - maxd,startY=cp.z - maxd,endX=cp.x + maxd,endY=cp.z + maxd;	
+	int startX=(int)cp.x - maxd,startY=(int)cp.z - maxd,endX=(int)cp.x + maxd,endY=(int)cp.z + maxd;	
 	if (startX < 1) startX = 1;
 	if (startY < 1) startY = 1;
 	if (endX > width-1) endX = width-1;

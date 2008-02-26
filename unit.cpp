@@ -39,6 +39,7 @@ Unit::Unit() {
 	modelAnimations.idleStart = 13;
 	modelAnimations.idleEnd = 13;
 
+	buildtime = 10;
 
 	calibratedModelPosition = calibratedModelRotation = Vector(0,0,0);
 }

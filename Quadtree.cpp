@@ -114,9 +114,12 @@ Node *Node::getLeaf(Vector p) {
 		return this;
 	}
 }
+Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int team) {
+	return getClosestEntity(pos,type,family,alive,team,-1);
+}
 
 extern Graphics *renderer;
-Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int team) {
+Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int team, int ignoreEntity) {
 	Entity *closestEntity=0;
 	float closestDistance=9999;				
 
@@ -128,7 +131,8 @@ Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int
 				(family != 0 && ent->family != family) || 
 				(alive && !ent->alive) || 
 				(team != 0 && ent->team != team) ||
-				(ent->position == pos)) {
+				(ent->position == pos) || 
+				(ignoreEntity != -1 && ent->id != ignoreEntity)) {
 				continue;
 			}
 
@@ -168,6 +172,53 @@ Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int
 	}
 }
 
+
+Entity *Node::getWaypoint(Vector pos, int lwp1, int lwp2, int lwp3) {
+	Entity *closestEntity=0;
+	float closestDistance=9999;				
+
+	if (leaf) {
+		for (std::list<Entity *>::iterator iter=contents.begin();iter!=contents.end();iter++) {
+			Entity *ent = *iter;
+			if (ent->type != E_WAYPOINT || (!ent->alive) || ent->id == lwp1 || ent->id == lwp2 || ent->id == lwp3) {
+				continue;
+			}
+
+			Vector delta = (*iter)->position - pos;
+			float distance = (float)delta.len();
+
+			if (distance < closestDistance) {	
+				closestDistance = distance;
+				closestEntity = (*iter);
+			}
+		}
+		return closestEntity;
+	} else {
+		int start;
+		if (pos.x > position.x) {
+			if (pos.z > position.z) {
+				start = 0;
+			} else {
+				start = 2;
+			}
+		} else {
+			if (pos.z > position.z) {
+				start = 1;
+			} else {
+				start = 3;
+			}
+		}	
+
+		for (int i=0;i<4;i++) {
+			int u = (start+i)%4;
+			Node *child = children[u];
+			closestEntity = child->getWaypoint(pos, lwp1, lwp2, lwp3);
+			if (closestEntity)
+				return closestEntity;
+		}	
+		return closestEntity;
+	}
+}
 
 
 Quadtree::Quadtree(void)

@@ -1,0 +1,4 @@
+window	WaypointEditor	600	25	200	200	 
+	button	newpath_button	25	40	50	50	spawn('waypoint')
+	button	delpath_button	130	40	50	50	killSelected()
+	button	tree_button	25	90	50	50	spawn('tree')

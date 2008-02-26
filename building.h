@@ -24,6 +24,9 @@ public:
 
 	UIWindow *toolWindow;
 	Vector spawnPoint;
+	std::queue<std::string> spawnQueue;
+	float startBuildTime;
+
 private:
 	Md2Object *model;
 	int texture;

@@ -143,7 +143,7 @@
 					RelativePath=".\unit.cpp">
 				</File>
 				<File
-					RelativePath=".\Vulture.cpp">
+					RelativePath=".\Waypoint.cpp">
 				</File>
 			</Filter>
 			<Filter
@@ -343,7 +343,7 @@
 				RelativePath=".\Vehicle.h">
 			</File>
 			<File
-				RelativePath=".\Vulture.h">
+				RelativePath=".\Waypoint.h">
 			</File>
 		</Filter>
 		<Filter
