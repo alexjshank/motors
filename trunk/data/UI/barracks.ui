@@ -1,0 +1,2 @@
+window	Barracks	25	25	200	200	 
+	button	soldier_button	130	40	50	50	spawn('soldier')

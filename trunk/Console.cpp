@@ -8,12 +8,14 @@
 #include "Camera.h"
 #include "variables.h"
 #include "building.h"
+#include "LassoSelector.h"
 
 extern gamevars *vars;
 extern Graphics *renderer;
 extern EntityContainer *ents;
 extern Input *input;
 extern Camera *camera;
+extern LassoSelector *selector;
 
 Console::Console(void)
 {
@@ -57,6 +59,8 @@ static PyObject * game_spawn(PyObject *self, PyObject *args) {
 
 	Entity *ent = SpawnEntity(entityName, camera->GetPosition().flat() + Vector(0,terrain->getInterpolatedHeight(camera->GetPosition().x,camera->GetPosition().z),0) );
 	
+	if (!ent) return NULL;
+
 	if (ent->family == EF_UNIT) {
 		if (currentID >= 0 && currentID < ents->entities.size()) {
 			Entity *parent = ents->entities[currentID];
@@ -66,10 +70,36 @@ static PyObject * game_spawn(PyObject *self, PyObject *args) {
 		}
 	} else {
 		PlaceEntity(ent);
+		if (input->inputContext != EditMode)
+			input->inputContext = NormalInput;
 	} 
 
-	extern int inputContext;
-	inputContext = 0;
+
+	return NULL;
+}
+
+static PyObject * game_QueueUnitForBuild(PyObject *self, PyObject *args) {
+    char *entityName;
+
+    if (!PyArg_ParseTuple(args, "s", &entityName))
+        return NULL;
+
+	if (currentID >= 0 && currentID < ents->entities.size()) {
+		Entity *parent = ents->entities[currentID];
+		if (parent) {
+			((Building*)parent)->spawnQueue.push(entityName);
+		}
+	}
+	
+	return NULL;
+}
+
+static PyObject * game_killSelected(PyObject *self, PyObject *args) {
+
+	for (int i=0;i<(int)selector->SelectedEntities.size();i++) {
+		Entity *SelectedEntity = selector->SelectedEntities[i];
+		SelectedEntity->Kill();
+	}
 
 	return NULL;
 }

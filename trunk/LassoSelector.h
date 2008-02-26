@@ -20,6 +20,7 @@ public:
 	void ClearSelection();
 
 	bool enabled;
+	int maxSelectionCount;
 
 	std::vector<Entity*> SelectedEntities;
 	std::vector<selectionPoint> selectionPoints;

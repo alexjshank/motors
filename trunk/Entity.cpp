@@ -11,12 +11,12 @@
 #include "terrain.h"
 #include "lumbermill.h"
 #include "EnvironmentObject.h"
-#include "vulture.h"
 #include "soldier.h"
 #include "barracks.h"
 #include "trigger.h"
 #include "ship.h"
 #include "lassoselector.h"
+#include "waypoint.h"
 //#include "storm.h"
 
 extern Graphics *renderer;
@@ -33,13 +33,14 @@ const char *entNames[E_NUMENTS] = {
 	"mill",
 	"sheep",
 	"lamp",
-	"vulture",
+	"removed1",
 	"woman",
 	"soldier",
 	"trigger",
 	"dock",
 	"ship",
-	"barracks"
+	"barracks",
+	"waypoint"
 };
 
 
@@ -55,13 +56,12 @@ Entity *SpawnEntity(ENT_TYPE type, Vector p) {
 		mcSpawnEntity(E_TREE,LumberTree,lt)
 		mcSpawnEntity(E_SHEEP,Sheep,sheep)
 		mcSpawnEntity(E_LAMPPOST,LampPost,lp)
-		mcSpawnEntity(E_VULTURE,Vulture,vulture)
 		mcSpawnEntity(E_SOLDIER,Soldier,soldier)
 		mcSpawnEntity(E_TRIGGER,Trigger,trigger)
 		mcSpawnEntity(E_DOCK,Dock,dock);
 		mcSpawnEntity(E_SHIP,Ship,ship);
 		mcSpawnEntity(E_BARRACKS,Barracks,barracks);
-//		mcSpawnEntity(E_STORM,Storm,storm) 
+		mcSpawnEntity(E_WAYPOINT,Waypoint,waypoint);
 	}
 	return 0;
 }
@@ -128,7 +128,7 @@ void Entity::render() {
 }
 
 void Entity::renderToolTip() {
-	if (tooltip.enabled && dist2(position,selector->LassoPosition) < 25*25) {
+	if (tooltip.enabled && dist2(position,selector->LassoPosition) < 10*10) {
 		renderer->text.printpositional(position + Vector(0,size.y+1,0),"%s",tooltip.tooltip.c_str());
 	}
 }

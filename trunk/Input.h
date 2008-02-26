@@ -4,6 +4,15 @@
 #ifndef _INPUT_
 #define _INPUT_
 
+enum possibleInputContexts {
+	NormalInput = 0,
+	ConsoleInput,
+	PersonelMenu,
+	BuildMenu,
+	EditMode,
+	Sailing
+};
+
 class Input : public Task
 {
 public:
@@ -35,9 +44,11 @@ public:
 	Vector mouse3dPosition;
 	Vector mouseVector;
 
+	int inputContext;
+
 #define LeftMouseClick 1
 #define MiddleMouseClick 2
-#define RightMouseClick 4
+#define RightMouseClick 3
 
 private:
 	int priority;

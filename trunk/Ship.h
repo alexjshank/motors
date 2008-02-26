@@ -14,4 +14,5 @@ public:
 	void process();
 	void Think();
 
+	Entity *waypointHistory[4];
 };

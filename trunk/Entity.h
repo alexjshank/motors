@@ -23,13 +23,14 @@ enum ENT_TYPE {
 	E_LUMBERMILL,
 	E_SHEEP,
 	E_LAMPPOST,
-	E_VULTURE,
+	E_REMOVED1,
 	E_VILLAGEWOMAN,
 	E_SOLDIER,
 	E_TRIGGER,
 	E_DOCK,
 	E_SHIP,
 	E_BARRACKS,
+	E_WAYPOINT,
 	E_NUMENTS
 };
 
@@ -229,6 +230,9 @@ public:
 	void MoveEntity(Entity *ent); 
 
 	Entity *getClosestEntity(Vector pos, int type, int family, bool alive, int team);
+	Entity *getClosestEntity(Vector pos, int type, int family, bool alive, int team, int ignoreEntity);
+	
+	Entity *getWaypoint(Vector pos, int lwp1, int lwp2, int lwp3);
 	
 	Vector getPosition() { return position; }
 	float getSize() { return size; }

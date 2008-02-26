@@ -58,14 +58,7 @@ bool PlaceEntity(Entity *ent) {
 }
 
 
-enum possibleInputContexts {
-	NormalInput = 0,
-	ConsoleInput,
-	PersonelMenu,
-	BuildMenu,
-	Sailing
-};
-int inputContext = 0;
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	srand(timeGetTime());
@@ -145,9 +138,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	LoadWorldState(vars->getValue("default_map")->value.c_str());
 
-	SpawnEntity(E_SHIP,Vector(120,0,120));
+	UIWindow *waypointEditor = (UIWindow*)ui->CreateFromFile("data/ui/waypointeditor.ui");
+	waypointEditor->visible = false;
 
-	bool camerafollowing = false;
+    bool camerafollowing = false;
 	input->mouseAbsolute.z = 100;
 
 	while (active) {
@@ -165,9 +159,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// TODO: make key binding system to replace hard-coded tests
 			
 		if (console->toggled) {
-			inputContext = ConsoleInput;
-		} else if (inputContext == ConsoleInput) {
-			inputContext = NormalInput;
+			input->inputContext = ConsoleInput;
+		} else if (input->inputContext == ConsoleInput) {
+			input->inputContext = NormalInput;
 		}
 
 		if (input->GetKeyDown(SDLK_ESCAPE)) {
@@ -175,13 +169,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 		static float moveSpeed = vars->getFloatValue("cameraSpeed");
 
-		switch (inputContext) {
+		switch (input->inputContext) {
 		case NormalInput: {
-
-
 			camera->StopFollowing();
 
 			selector->enabled = true;
+			selector->maxSelectionCount = 8;
 			if (input->GetKeyDown(SDLK_LEFT) || input->GetKeyDown('a') || (input->mouseAbsolute.x <= 30)) {
 				camera->MoveRelative(Vector(-moveSpeed,0,0)*timer->frameScalar);
 			}
@@ -194,7 +187,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (input->GetKeyDown(SDLK_DOWN) || input->GetKeyDown('s') || (input->mouseAbsolute.y >= 570)) {
 				camera->MoveRelative(Vector(0,0,-moveSpeed)*timer->frameScalar);
 			}
-
+			if (input->GetKeyReleased(SDLK_F1)) {
+				input->inputContext = EditMode;
+			}
 
 
 			if (entityToPlace) {
@@ -239,9 +234,65 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		case PersonelMenu: 
 			selector->enabled = false;
 			break;
+
+		case EditMode:
+			camera->StopFollowing();
+			waypointEditor->visible = true;
+			selector->enabled = true;
+			selector->maxSelectionCount = 1;
+
+			renderer->text.print(5,5,"---EDIT MODE---");
+
+			if (input->GetKeyDown(SDLK_LEFT)) {
+				camera->MoveRelative(Vector(-moveSpeed,0,0)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_RIGHT)) {
+				camera->MoveRelative(Vector(moveSpeed,0,0)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_UP)) {
+				camera->MoveRelative(Vector(0,0,moveSpeed)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_DOWN)) {
+				camera->MoveRelative(Vector(0,0,-moveSpeed)*timer->frameScalar);
+			}
+			if (input->GetKeyReleased(SDLK_F1)) {
+				input->inputContext = NormalInput;
+				waypointEditor->visible = false;
+			}
+
+
+			if (entityToPlace) {
+				if (placingEntity) {
+					entityToPlace->position = selector->gridAlignedLassoPosition;
+				} else if (rotatingEntity) {
+					entityToPlace->rotation.z += input->mouseMovement.x;
+				}
+			}
+
+			if (input->GetMButtonPushed(1)) {							// initial push
+				if (entityToPlace && timer->time - beginPlacingTime > 1) {
+					if (placingEntity) {
+						placingEntity = false;
+						rotatingEntity = true;
+						beginPlacingTime = timer->time;
+					} else if (rotatingEntity) {
+						rotatingEntity = false;
+						entityToPlace = 0;
+					}
+				}
+			}
+
+			if (input->GetMButtonReleased(3)) {
+				// right-click:
+				if (selector->SelectedEntities.size() > 0) {
+					Entity *SelectedEntity = selector->SelectedEntities[0];
+					PlaceEntity(SelectedEntity);
+				}
+			}
+			break;
 		case Sailing:
 			if (!entControlling) {
-				inputContext = 0;
+				input->inputContext = NormalInput;
 				break;
 			}
 
@@ -288,27 +339,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (ph+2 > cp.y) cp.y = ph+2;
 		camera->SetPosition(cp);
 
-		if (input->GetKeyDown(SDLK_LSHIFT) || input->GetKeyDown(SDLK_RSHIFT) || input->GetMButtonState(2)) {
+		if (input->GetKeyDown(SDLK_LCTRL) || input->GetKeyDown(SDLK_RCTRL) || input->GetMButtonState(2)) {
 			camera->RotateView(input->mouseMovement.y/2,input->mouseMovement.x/2,0);
-			if (camera->GetRotation().x < -20) 
-				camera->RotateView(-camera->GetRotation().x,0,0);
+			if (camera->GetRotation().x < -20) camera->RotateView(-camera->GetRotation().x,0,0);
 //			camera->MoveRelative(Vector(-input->mouseMovement.x/4,0,0));
-		}
-
-
-		
-/*
-		// this should really go through all the mills and get the total resources stored everywhere...
-		LumberMill *mill = (LumberMill*)ents->qtree.tree->getClosestEntity(Vector(120,0,120),E_LUMBERMILL,0,1,1);
-		if (mill) {
-			char lumberbuf[25];
-			text->value = "Lumber: ";
-			text->value += itoa(mill->lumber, lumberbuf,10);
-			text->value += " Food: ";
-			text->value += itoa(mill->food, lumberbuf,10);			
-		}
-*/		
-	
+		}	
 	}
 
 	tasks.Stop();
