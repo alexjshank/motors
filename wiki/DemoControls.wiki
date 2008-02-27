@@ -5,8 +5,8 @@
   * F1 - edit mode
 
 == Movement ==
-  * Arrow keys: move left,right,forward,backwards respectively
-  * Control: allows reorientation of the camera
+  * Arrow keys - move left,right,forward,backwards respectively
+  * (Hold) Control - allows reorientation of the camera
 
 == Unit Interaction ==
   * You can select units by drawing a selection lasso around the units you want to select (Left mouse button)
