@@ -6,7 +6,7 @@
   * [FoodHarvester] should return sheeps to the butchers shop instead of the lumber yard
   * resources should be able to be 'exported' from each lumber mill into a unit-carriable form (to be transportable on ships to new build locations)
   * should be an option on [Towers] to build a [Wall] between two towers
-  * [Towers] and [Walls] should be able to hold units
+  * [Towers] and [Wall]s should be able to hold units
   * [GrainSilos]
   * [GrainField]s (harvested by peasants every 2 minutes or so, stored in the grain silos)
 
