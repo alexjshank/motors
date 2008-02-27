@@ -3,17 +3,17 @@
 ==General==
   * selecting entities in edit mode should bring up a tool window to allow the user to modify settings about the entity
   * Butchers shop
-  * sheepharvester should return sheeps to the butchers shop instead of the lumber yard
+  * [FoodHarvester] should return sheeps to the butchers shop instead of the lumber yard
   * resources should be able to be 'exported' from each lumber mill into a unit-carriable form (to be transportable on ships to new build locations)
-  * should be an option on towers to build a wall between two towers
-  * towers and walls should be able to hold units
-  * Grain Silos
-  * wheet fields (harvested by peasants every 2 minutes or so, stored in the grain silos)
+  * should be an option on [Towers] to build a [Wall] between two towers
+  * [Towers] and [Walls] should be able to hold units
+  * [GrainSilos]
+  * [GrainField]s (harvested by peasants every 2 minutes or so, stored in the grain silos)
 
 
 
 ==Ships==
-  * ships should be able to carry units and resources, and drop them off somewhere else
+  * [Ships] should be able to carry units and resources, and drop them off somewhere else
   * ships should be able to fire their cannons
 
 
