@@ -9,11 +9,9 @@ PFNGLPOINTPARAMETERFARBPROC  glPointParameterfARB  = NULL;
 PFNGLPOINTPARAMETERFVARBPROC glPointParameterfvARB = NULL;
 
 void Particle::Process() {
-	return;
 	if (alive) {
 		if (timer->time - birthtime >= lifespan) {
 			alive = false;
-			return;
 		}
 
 		velocity += (acceleration/mass) * timer->frameScalar;
@@ -23,13 +21,13 @@ void Particle::Process() {
 
 		position += velocity * timer->frameScalar;
 
-		if (terrain) {
+/*		if (terrain) {
 			float ground = terrain->getHeight((int)position.x,(int)position.z);
 			if (position.y < ground + (size/100)) {
 				position.y = terrain->getInterpolatedHeight(position.x,position.z)+(size/100);
 			}
 		}
-		size += growthRate * timer->frameScalar;
+*/		size += growthRate * timer->frameScalar;
 		color += ((endcolor - startcolor)/lifespan) * timer->frameScalar;
 	}
 }
@@ -64,8 +62,6 @@ bool ParticleManager::init() {
 
 	particles = new Particle[MAX_PARTICLES];
 
-	float quadratic[] =  { 1.0f, 0.0f, 0.01f };
-//	glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
 	glGetFloatv( GL_POINT_SIZE_MAX_ARB, &spriteMaxSize );
 	glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 60.0f );
 	glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 0.5f );
@@ -78,8 +74,10 @@ bool ParticleManager::init() {
 }
 
 void ParticleManager::run() {
-	return;
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
+		float quadratic[] =  { 1.0f, 0.0f, 0.01f };
+		glPointParameterfvARB( GL_POINT_DISTANCE_ATTENUATION_ARB, quadratic );
+
 		glEnable(GL_POINT_SPRITE_ARB);
 
 		glDepthMask(0);
@@ -93,11 +91,13 @@ void ParticleManager::run() {
 		for( int i = 0; i < MAX_PARTICLES; i++) {
 			if (!particles[i].alive) continue;
 			if (particles[i].size > spriteMaxSize) particles[i].size = spriteMaxSize;
+				
+			particles[i].Process();
+
 			glPointSize(particles[i].size);	
 			glBegin(GL_POINTS);
 				float a = 1-(timer->time - particles[i].birthtime) / particles[i].lifespan;
 				glColor4f(particles[i].color.x*a,particles[i].color.y*a,particles[i].color.z*a,a*0.5f);
-				particles[i].Process();
 				particles[i].Render();		
 			glEnd();
 		}

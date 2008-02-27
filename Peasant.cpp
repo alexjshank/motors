@@ -44,6 +44,7 @@ void Peasant::init() {
 	runspeed = vars->getFloatValue("peasant_runspeed");
 	walkspeed = vars->getFloatValue("peasant_walkspeed");
 	damage = vars->getIntValue("peasant_damage");
+	lastPathTime = timer->time;
 }
 
 void Peasant::onAttacked(Entity *source) {
@@ -65,7 +66,7 @@ void Peasant::Think() {
 		}
 		break;
 	case WalkingToLumber:
-		if (state == Stopped && (timer->time - lastPathTime < 1) && (!tree || (tree && dist2(tree->position.flat(), position.flat()) > 4))) {
+		if (state == Stopped && (timer->time - lastPathTime > 1) && (!tree || (tree && dist2(tree->position.flat(), position.flat()) > 4))) {
 			lastPathTime = timer->time;
 			tree = PathToNearest(E_TREE,0,true,0);
 		} 

@@ -33,7 +33,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	fseek(fmap,0,SEEK_END);
 	DWORD filesize = ftell(fmap);
 	fseek(fmap,0,SEEK_SET);
-	int dimensions = (int)sqrtf(filesize);
+	int dimensions = (int)sqrtf((float)filesize);
 	width = dimensions;
 	height = dimensions;
 	int size = filesize;
