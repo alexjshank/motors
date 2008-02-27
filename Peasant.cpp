@@ -65,7 +65,8 @@ void Peasant::Think() {
 		}
 		break;
 	case WalkingToLumber:
-		if (state == Stopped) {
+		if (state == Stopped && (timer->time - lastPathTime < 1) && (!tree || (tree && dist2(tree->position.flat(), position.flat()) > 4))) {
+			lastPathTime = timer->time;
 			tree = PathToNearest(E_TREE,0,true,0);
 		} 
 		if (tree) {
@@ -79,8 +80,9 @@ void Peasant::Think() {
 			peasantState = Idle;
 			break;
 		}	
-		if (dist2(tree->position.flat(), position.flat()) > size.flat().len2() * 2) {
+		if (dist2(tree->position.flat(), position.flat()) > 4) {
 			peasantState = WalkingToLumber;
+			break;
 		}
 		if (timer->time - lastChopTime >= chopInterval) {
 			chops++;
@@ -101,7 +103,10 @@ void Peasant::Think() {
 		break;
 	case GatheringLumber: {
 			if (state == Stopped && timer->time - tree->deathTime > 3) {
-				mill = PathToNearest(E_LUMBERMILL,0,true,team);
+				if (timer->time - lastPathTime > 1) {
+					lastPathTime = timer->time;
+					mill = PathToNearest(E_LUMBERMILL,0,true,team);
+				}
 			}
 			
 			if (mill && dist(mill->position,position) <= vars->getFloatValue("mill_mincollectiondistance")) {

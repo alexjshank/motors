@@ -508,16 +508,16 @@ bool Terrain::CloseNode(AS_Node *openNode) {
 	for (int i=0;i<nSides;i++) {
 		switch (i) {
 		case 0:
-			p = openNode->position+Vector(1,0,0);
+			p = openNode->position+Vector(2,0,0);
 			break;
 		case 1:
-			p = openNode->position+Vector(0,0,1);
+			p = openNode->position+Vector(0,0,2);
 			break;
 		case 2:
-			p = openNode->position+Vector(-1,0,0);
+			p = openNode->position+Vector(-2,0,0);
 			break;
 		case 3:
-			p = openNode->position+Vector(0,0,-1);
+			p = openNode->position+Vector(0,0,-2);
 			break;
 		}
 		if (p.x < 0 || p.z < 0 || p.x > width || p.z > height) continue;

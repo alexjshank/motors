@@ -113,6 +113,7 @@ Entity::Entity(void) {
 	health = 100;
 	completed = 0;
 	tooltip.enabled = false;
+	lastPathTime = 0;
 }
 
 Entity::~Entity(void)

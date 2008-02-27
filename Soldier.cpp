@@ -16,7 +16,7 @@ Soldier::Soldier(void) {
 	
 	type=E_SOLDIER;
 	family=EF_UNIT;
-	size=Vector(0.2,0.75f,0.2);
+	size=Vector(0.5,0.75f,0.5);
 	runspeed = 4.0f;
 	walkspeed = 3.5f;
 	scale = 0.02f;

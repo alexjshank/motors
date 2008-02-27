@@ -175,6 +175,8 @@ public:
 	float scale;	
 	bool selected;
 
+	float lastPathTime;	// to keep units from hammering the path finding algorithms and killing the frame rate
+
 	Node *leaf;	// the leaf we're in
 	std::list<ENT_TASK*> taskQueue;
 	
