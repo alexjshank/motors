@@ -1,0 +1,12 @@
+#summary Overview of the control scheme used in the demos
+
+= General =
+* Escape - 
+
+= Movement =
+* Arrow keys: move left,right,forward,backwards respectively
+* Control: allows reorientation of the camera
+
+= Unit Interaction = 
+* You can select units by drawing a selection lasso around the units you want to select (Left mouse button)
+* Once at least one unit is selected, you can issue orders using the right mouse click
