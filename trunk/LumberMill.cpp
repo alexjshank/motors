@@ -42,7 +42,7 @@ void LumberMill::init() {
 
 void LumberMill::Think() {
 	if (timer->time - lastSpawnTime > 0.5f) {
-		particles->Spawn(1,Vector(1,1,1),Vector(0,0,0),position+Vector(0.5f,6,-0.7f),Vector(0.5f,0,0),Vector(0,2,0),Vector(0.2f,1,0.2f),20,5);
+		particles->Spawn(1,Vector(1,1,1),Vector(0,0,0),position+Vector(0.5f,6,-0.7f),Vector(0.5f,0,0),Vector(0,2,0),Vector(0.2f,1,0.2f),50,25);
 		lastSpawnTime = timer->time;
 	}
 	// if not built yet

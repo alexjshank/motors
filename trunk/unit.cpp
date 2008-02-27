@@ -86,27 +86,18 @@ void Unit::process() {
 		if (footprints && (state == WalkToTarget || state == RunToTarget)) {
 			if (timer->time - lastFootprintSpawn > 0.1f) {
 				if ((++foot)%2 == 1) 
-					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position+Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),5,0);
+					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position+Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),50,0);
 				else
-					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position-Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),5,0);
+					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position-Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),50,0);
 				lastFootprintSpawn = timer->time;
 			}
 		}
 
-		if (timer->time - lastRepositionTime > 2) {
-			Entity *closest = ents->qtree.tree->getClosestEntity(position,-1,0,0,0);
-			if (closest && (closest->position - position).len2() < 4) {
-//				if (position == closest->position) position += Vector(0.01f,0,0);
-				position += Normalize(position - closest->position)*timer->frameScalar;
-			}
-			lastRepositionTime = timer->time;
-		}
-
 		// if the terrain we're standing in is marked as unwalkable - ie: we're in an invalid piece of terrain
 		if (terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
- 			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,0,0,0);
+ 			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,EF_BUILDING,0,0);
 			if (stuckIn && dist2(stuckIn->position,position) < stuckIn->size.len2() + size.len2()) {	// if we're stuck in something
-				position += Normalize(position - stuckIn->position) * timer->frameScalar;
+				position -= Normalize(position - stuckIn->position) * timer->frameScalar;
 			}
 		}
 
@@ -135,10 +126,13 @@ void Unit::process() {
 			velocity = velocity + (targetvelocity - velocity) * 0.15f;
 
 			adjust = Vector(0,0,0);
-			nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
-			if (nearest && dist2(position,nearest->position) <= size.len2()) 
-				adjust = Normalize(nearest->position - position) * 0.25f * timer->frameScalar;
 
+			if (timer->time - lastRepositionTime > 0.25f) {
+				lastRepositionTime = timer->time;			
+				nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
+				if (nearest && dist2(position,nearest->position) <= size.len2()) 
+					adjust = Normalize(nearest->position - position) * 0.25f * timer->frameScalar;
+			}
 			position += (velocity + adjust) * timer->frameScalar;
 			break;	
 
@@ -146,10 +140,12 @@ void Unit::process() {
 			velocity = Normalize(target - p) * runspeed;
 
 			adjust = Vector(0,0,0);
-			nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
-			if (nearest && dist2(position,nearest->position) <= size.len2()) 
-				adjust = Normalize(nearest->position - position) * 0.25f * timer->frameScalar;
-
+			if (timer->time - lastRepositionTime > 0.25f) {
+				lastRepositionTime = timer->time;			
+				nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
+				if (nearest && dist2(position,nearest->position) <= size.len2()) 
+					adjust = Normalize(nearest->position - position) * 0.25f * timer->frameScalar;
+			}
 			position += (velocity + adjust) * timer->frameScalar;
 			break;
 
@@ -165,8 +161,10 @@ void Unit::process() {
 
 		case Stopped:
 			nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
-			if (nearest && dist2(position,nearest->position) <= size.len2()) 
-				position -= Vector((float)(rand()%10) / 100,(float)(rand()%10) / 100,(float)(rand()%10) / 100) + Normalize(nearest->position - position) * timer->frameScalar;
+			if (nearest && dist2(position,nearest->position) <= size.len2()) {
+				if (nearest->position == position) position += Vector(0.01f,0,0);			
+				position -= Normalize(nearest->position - position) * timer->frameScalar;
+			}
 			break;
 		} 
 
