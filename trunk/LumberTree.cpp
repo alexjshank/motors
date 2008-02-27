@@ -52,7 +52,7 @@ void LumberTree::process() {
 	if (alive) {
 		// eventually...: give that player lumber resources when the tree falls
 		float height = (0.1f*((timer->time - birthtime) / 100));
-		if (height > 0.06f) height = 0.06f;
+		if (height > 0.04f) height = 0.04f;
 		model->setScale(0.01f + height);
 
 		rotation /= 1+(2 * timer->frameScalar);

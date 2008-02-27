@@ -97,7 +97,7 @@ void Unit::process() {
 			Entity *closest = ents->qtree.tree->getClosestEntity(position,-1,0,0,0);
 			if (closest && (closest->position - position).len2() < 4) {
 //				if (position == closest->position) position += Vector(0.01f,0,0);
-				PathTo(position + (Normalize(position - closest->position)));
+				position += Normalize(position - closest->position)*timer->frameScalar;
 			}
 			lastRepositionTime = timer->time;
 		}
