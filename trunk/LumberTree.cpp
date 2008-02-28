@@ -15,7 +15,7 @@ extern Camera *camera;
 
 LumberTree::LumberTree(void)
 {
-	size = Vector(2,4,2);
+	size = Vector(1,4,1);
 	type = E_TREE;
 	family = EF_ENVIRONMENT;
 	team = 1;

@@ -56,7 +56,9 @@ void Peasant::Think() {
 	const float chopInterval = 2;
 
 	switch (peasantState) {
-	case Idle:
+	case Idle:		
+		tooltip.subtitle = "Idle";
+
 		// figure out what we should do!
 		peasantState = WalkingToLumber;
 		if (stress >= laziness) {
@@ -66,22 +68,26 @@ void Peasant::Think() {
 		}
 		break;
 	case WalkingToLumber:
-		if (state == Stopped && (timer->time - lastPathTime > 1) && (!tree || (tree && dist2(tree->position.flat(), position.flat()) > 4))) {
+		tooltip.subtitle = "WalkingToLumber";
+
+		if (state == Stopped && (timer->time - lastPathTime > 1) && (!tree || (tree && dist2(tree->position.flat(), position.flat()) > 8))) {
 			lastPathTime = timer->time;
 			tree = PathToNearest(E_TREE,0,true,0);
 		} 
 		if (tree) {
-			if (dist2(tree->position.flat(), position.flat()) < 4) {
+			if (dist2(tree->position.flat(), position.flat()) < 8) {
 				peasantState = ChoppingLumber;
 			}
 		}
 		break;
 	case ChoppingLumber:
+		tooltip.subtitle = "Chopping";
+
 		if (!tree) {
 			peasantState = Idle;
 			break;
 		}	
-		if (dist2(tree->position.flat(), position.flat()) > 4) {
+		if (dist2(tree->position.flat(), position.flat()) > 8) {
 			peasantState = WalkingToLumber;
 			break;
 		}
@@ -102,7 +108,9 @@ void Peasant::Think() {
 			}
 		}
 		break;
-	case GatheringLumber: {
+	case GatheringLumber: {		
+		tooltip.subtitle = "Gathering";
+
 			if (state == Stopped && timer->time - tree->deathTime > 3) {
 				if (timer->time - lastPathTime > 1) {
 					lastPathTime = timer->time;
@@ -125,7 +133,9 @@ void Peasant::Think() {
 			}
 		}
 		break;
-	case RunningAway:
+	case RunningAway:		
+		tooltip.subtitle = "OMG CRAP!";
+
 		if (state == Stopped) {
 			peasantState = Idle;
 		}
