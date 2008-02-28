@@ -150,9 +150,10 @@ void Camera::CalculateView() {
 	if (bViewCalculatedThisFrame) return;
 	Vector v;
 
-	v.y = (float)-sin((rotation.x)*(PI/180));
-	v.x = (float)sin(rotation.y*(PI/180)) / abs(v.y);
-	v.z = (float)-cos(rotation.y*(PI/180)) / abs(v.y);
+	float rx = (rotation.x)*(PI/180);
+	v.y = (float)-sin(rx);
+	v.x = (float)sin(rotation.y*(PI/180)) * cos(rx);
+	v.z = (float)-cos(rotation.y*(PI/180)) * cos(rx);
 
 	up = Vector(0,1,0);
 	view	= Normalize(v);	
