@@ -162,7 +162,8 @@ public:
 
 	struct tagtooltip {
 		bool enabled;
-		std::string tooltip;
+		std::string tooltip;	// main title
+		std::string subtitle;		// subtitle
 	} tooltip;
 
 	int id;

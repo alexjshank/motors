@@ -113,6 +113,8 @@ Entity::Entity(void) {
 	health = 100;
 	completed = 0;
 	tooltip.enabled = false;
+	tooltip.tooltip = "";
+	tooltip.subtitle = "";
 	lastPathTime = 0;
 }
 
@@ -130,7 +132,7 @@ void Entity::render() {
 
 void Entity::renderToolTip() {
 	if (tooltip.enabled && dist2(position,selector->LassoPosition) < 10*10) {
-		renderer->text.printpositional(position + Vector(0,size.y+1,0),"%s",tooltip.tooltip.c_str());
+		renderer->text.printpositional(position + Vector(0,size.y+1,0),"%s %s",tooltip.tooltip.c_str(), tooltip.subtitle.c_str());
 	}
 }
 
