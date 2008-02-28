@@ -97,7 +97,7 @@ void Unit::process() {
 		if (terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
  			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,EF_BUILDING,0,0);
 			if (stuckIn && dist2(stuckIn->position,position) < stuckIn->size.len2() + size.len2()) {	// if we're stuck in something
-				position -= Normalize(position - stuckIn->position) * timer->frameScalar;
+				position += Normalize(position - stuckIn->position) * timer->frameScalar;
 			}
 		}
 

@@ -29,7 +29,7 @@ LassoSelector::~LassoSelector(void)
 }
 
 void LassoSelector::Select(Entity *e) {
-	if (SelectedEntities.size() >= maxSelectionCount) return;
+	if (SelectedEntities.size() >= maxSelectionCount || !e->alive) return;
 	SelectedEntities.push_back(e);
 	e->onSelected();
 }
@@ -66,7 +66,7 @@ void LassoSelector::run() {
 	Node *node;
 	Entity *closestEntity;
 
-	LassoPosition = terrain->RayTest(camera->GetPosition(),input->mouseVector,300,4,true);
+	LassoPosition = terrain->RayTest(camera->GetActualPosition(),input->mouseVector,300,4,true);
 	gridAlignedLassoPosition = Vector(floor(LassoPosition.x),terrain->getHeight((int)LassoPosition.x,(int)LassoPosition.z),floor(LassoPosition.z));
 
 

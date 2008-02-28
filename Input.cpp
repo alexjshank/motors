@@ -60,7 +60,7 @@ void Input::run() {
 			gluUnProject( winX, winY, 0.999985f, modelview, projection, viewport, &posX, &posY, &posZ);
 			
 			mouse3dPosition = Vector((float)posX, (float)posY, (float)posZ);
-			mouseVector = mouse3dPosition - camera->GetPosition();
+			mouseVector = mouse3dPosition - camera->GetActualPosition();
 			mouseVector.normalize();
 			break;
 		case SDL_MOUSEBUTTONDOWN:

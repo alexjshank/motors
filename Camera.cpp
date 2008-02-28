@@ -71,12 +71,15 @@ void Camera::run() {
 	Vector cameraPush,a;
 	float h;
 
+	CalculateView();
+
 	glRotatef(rotation.x,1.0f,0,0);
 	glRotatef(rotation.y,0,1.0f,0);
-	glTranslatef(-position.x+view.x, -position.y+view.y, -position.z+view.z);
+	glTranslatef(-position.x+(view.x*zoom), -position.y+(view.y*zoom), -position.z+(view.z*zoom));
 	bViewCalculatedThisFrame = false;
 
-	frustum.setCamDef(GetPosition(),GetView(),GetUp());
+	Vector p = position - (view*zoom);
+	frustum.setCamDef(p,view,up);
 	
 	static float maxdistance = vars->getFloatValue("camera_maxdistance");
 
@@ -129,14 +132,27 @@ void Camera::RotateView(float x, float y, float z) {
 */
 }
 
+void Camera::MoveRelative(Vector relativeMovement) { // move using relative axises
+	CalculateView();
+
+	position -= side*relativeMovement.x;
+	position += up*relativeMovement.y;
+	position += view*relativeMovement.z;
+}
+
+void Camera::MoveAbsolute(Vector absoluteMovement) { // move using absolute axises
+	position += absoluteMovement;
+}
+
+
 extern Graphics *renderer;
 void Camera::CalculateView() {
 	if (bViewCalculatedThisFrame) return;
 	Vector v;
 
-	v.x = (float)sin(rotation.y*(PI/180));
 	v.y = (float)-sin((rotation.x)*(PI/180));
-	v.z = (float)-cos(rotation.y*(PI/180));
+	v.x = (float)sin(rotation.y*(PI/180)) / abs(v.y);
+	v.z = (float)-cos(rotation.y*(PI/180)) / abs(v.y);
 
 	up = Vector(0,1,0);
 	view	= Normalize(v);	
