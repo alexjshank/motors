@@ -176,16 +176,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			selector->enabled = true;
 			selector->maxSelectionCount = 8;
 			if (input->GetKeyDown(SDLK_LEFT) || input->GetKeyDown('a') || (input->mouseAbsolute.x <= 30)) {
-				camera->MoveRelative(Vector(-moveSpeed,0,0)*timer->frameScalar);
+				camera->MoveRelative(Vector(-moveSpeed*input->mouseAbsolute.z,0,0)*timer->frameScalar);
 			}
 			if (input->GetKeyDown(SDLK_RIGHT) || input->GetKeyDown('d') || (input->mouseAbsolute.x >= 770)) {
-				camera->MoveRelative(Vector(moveSpeed,0,0)*timer->frameScalar);
+				camera->MoveRelative(Vector(moveSpeed*input->mouseAbsolute.z,0,0)*timer->frameScalar);
 			}
 			if (input->GetKeyDown(SDLK_UP) || input->GetKeyDown('w') || (input->mouseAbsolute.y <= 30)) {
-				camera->MoveRelative(Vector(0,0,moveSpeed)*timer->frameScalar);
+				camera->MoveRelative(Vector(0,0,moveSpeed*input->mouseAbsolute.z)*timer->frameScalar);
 			}
 			if (input->GetKeyDown(SDLK_DOWN) || input->GetKeyDown('s') || (input->mouseAbsolute.y >= 570)) {
-				camera->MoveRelative(Vector(0,0,-moveSpeed)*timer->frameScalar);
+				camera->MoveRelative(Vector(0,0,-moveSpeed*input->mouseAbsolute.z)*timer->frameScalar);
 			}
 			if (input->GetKeyReleased(SDLK_F1)) {
 				input->inputContext = EditMode;
@@ -330,14 +330,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 
-		if (input->mouseAbsolute.z < 0) input->mouseAbsolute.z = 0;
-		if (input->mouseAbsolute.z > 19) input->mouseAbsolute.z  = 19;
+		if (input->mouseAbsolute.z < 1) input->mouseAbsolute.z = 1;
+		if (input->mouseAbsolute.z > 20) input->mouseAbsolute.z  = 20;
 
 		Vector cp = camera->GetPosition();
-		cp.y = 20+input->mouseAbsolute.z*4;
-		float ph = terrain->getInterpolatedHeight(cp.x,cp.z)+5;
-		if (ph+2 > cp.y) cp.y = ph+2;
-		camera->SetPosition(cp);
+		camera->SetPosition(Vector(cp.x,15,cp.z));
+		camera->SetZoom(input->mouseAbsolute.z * input->mouseAbsolute.z);
 
 		if (input->GetKeyDown(SDLK_LCTRL) || input->GetKeyDown(SDLK_RCTRL) || input->GetMButtonState(2)) {
 			camera->RotateView(input->mouseMovement.y/2,input->mouseMovement.x/2,0);

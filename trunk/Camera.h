@@ -70,20 +70,14 @@ public:
 
 	// moving stuff:
 
-	void MoveRelative(Vector relativeMovement) { // move using relative axises
-		CalculateView();
-
-		position -= side*relativeMovement.x;
-		position += up*relativeMovement.y;
-		position += view*relativeMovement.z;
-	}
-
-	void MoveAbsolute(Vector absoluteMovement) { // move using absolute axises
-		position += absoluteMovement;
-	}
+	void MoveRelative(Vector relativeMovement);
+	void MoveAbsolute(Vector absoluteMovement);
 
 	void SetPosition(Vector p) { position = p; }
 	Vector GetPosition() { return position; }
+	Vector GetActualPosition() { return position - (view*zoom); }
+
+	void SetZoom(float z) { zoom = z; }
 
 	enum FollowModes { NotFollowing = 0, Seek, HoverAbove };
 
