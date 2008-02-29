@@ -17,6 +17,7 @@ Ship::Ship(void) {
 	tooltip.enabled = true;
 	tooltip.tooltip = "Pirate Ship";
 	waypointHistory[0] = 0;
+
 }
 
 Ship::~Ship(void)
@@ -39,7 +40,12 @@ void Ship::onUnSelected() {
 void Ship::init() {
 	SetModel("data/models/ship.md2","data/models/ship.bmp");
 	runspeed = vars->getFloatValue("ship_topspeed");
-	team=1;
+	team=2;
+}
+
+void Ship::onAttacked() {
+	// kaboom
+	particles->Spawn(100,Vector(1,0.5,0),Vector(0,0,0), position, Vector(0,-1,0),Vector(0,5,0),Vector(5,5,5),50,20);
 }
 
 void Ship::process() {

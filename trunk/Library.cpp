@@ -2,8 +2,10 @@
 #include "md2.h"
 #include <map>
 #include "graphics.h"
+#include "console.h"
 
 extern Graphics *renderer;
+extern Console *console;
 
 Library::Library(void)
 {
@@ -17,6 +19,8 @@ bool Library::Import(const char *filename, int type) {
 	Model_MD2 *model;
 	TextureObject *texture;
 	std::string name = filename;
+
+	console->Printf("Caching resource: %s",filename);
 
 	switch (type) {
 	case 0:	// texture

@@ -1,9 +1,11 @@
 #include ".\graphics.h"
 #include "Variables.h"
 #include "Camera.h"
+#include "console.h"
 
 extern Camera *camera;
 extern gamevars *vars;	
+extern Console *console;
 
 #pragma comment(lib,"sdl.lib")
 #pragma comment(lib,"sdlmain.lib")
@@ -205,7 +207,7 @@ bool Graphics::init() {
 	    return false;
 	}
 
-	SDL_WM_SetCaption("A demo by Alex Shank", NULL );
+	SDL_WM_SetCaption("MOTORS Engine", NULL );
 
 	glClearColor(0.8f,0.8f,0.8f, 1.0f);  
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -239,6 +241,8 @@ bool Graphics::init() {
 
 	skybox = LoadTexture("data/topographical/skybox.bmp");
 
+	console->Printf("Finished renderer initialization");
+
 	return true;
 }
 
@@ -248,6 +252,8 @@ void Graphics::pause() {
 
 bool Graphics::stop() {
 	SDL_Quit();
+	console->Printf("Renderer shutdown complete");
+
 	return true;
 }
 
@@ -263,6 +269,8 @@ void Graphics::run() {
 // this only loads BMPs... should modify this to include jpg/png/tga also... maybe theres a lib that has it already?
 int Graphics::LoadTexture(const char *filename) {
 	GLuint texture;
+	console->Printf("Loading texture resource: %s",filename);
+
 	SDL_Surface* bmpFile = SDL_LoadBMP(filename);
 
 	if (!bmpFile) return -1;

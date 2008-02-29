@@ -34,6 +34,15 @@ void LassoSelector::Select(Entity *e) {
 	e->onSelected();
 }
 
+void LassoSelector::Unselect(Entity *e) {
+	for (int i=0;i < (int)SelectedEntities.size(); i++) {
+		if (SelectedEntities[i] == e) {
+			SelectedEntities[i] = 0;
+			return;
+		}
+	}
+}
+
 void LassoSelector::ClearSelection() {
 	for (int i=0,s=(int)SelectedEntities.size();i<s;i++) {
 		try {

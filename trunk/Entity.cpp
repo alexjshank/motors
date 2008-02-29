@@ -216,6 +216,8 @@ void Entity::ClearTasks() {
 }
 
 void Entity::Remove() {
+	selector->Unselect(this);
+
 	int s = (int)ents->entities.size();
 	if (leaf) leaf->RemoveEntity(this);
 	leaf = 0;
@@ -232,6 +234,17 @@ void Entity::Remove() {
 void Entity::Kill() {
 	alive = false;
 	deathTime = timer->time;
+}
+
+int Entity::Serialize(unsigned char *byteData, int maxSize) {		// returns number of bytes written to byteData
+	char buffer[512];
+
+
+	return 0;
+}
+
+void Entity::Deserialize(const unsigned char *data) {
+
 }
 
 EntityContainer::EntityContainer() {
@@ -280,4 +293,5 @@ void EntityContainer::run() {
 		}
 	}
 }
+
 

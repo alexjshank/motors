@@ -331,7 +331,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 		if (input->mouseAbsolute.z < 1) input->mouseAbsolute.z = 1;
-		if (input->mouseAbsolute.z > 20) input->mouseAbsolute.z  = 20;
+		if (input->mouseAbsolute.z > 13) input->mouseAbsolute.z  = 13;
 
 		Vector cp = camera->GetPosition();
 		camera->SetPosition(Vector(cp.x,15,cp.z));
