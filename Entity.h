@@ -144,6 +144,9 @@ public:
 	virtual void onSelected() { selected = true;}
 	virtual void onUnSelected() { selected = false;}
 
+	virtual int Serialize(unsigned char *byteData, int maxSize);		// returns number of bytes written to byteData
+	virtual void Deserialize(const unsigned char *data);
+
 	virtual void renderToolTip();
 
 	Entity * PathToNearest(unsigned int requiredType, unsigned int requiredFamily, bool requireAlive, unsigned int requiredTeam);
@@ -157,8 +160,8 @@ public:
 	void ClearTasks();
 
 	void Kill();
-	bool alive;
-	float deathTime;
+
+// Variables -
 
 	struct tagtooltip {
 		bool enabled;
@@ -167,27 +170,29 @@ public:
 	} tooltip;
 
 	int id;
-	int team;
-	int health;
-	int maxhealth;
-	int completed;	// 0 -> 100 (%)
-	int damage;		// how much health we take away from an attacked unit
-	Vector size;
-	float scale;	
+	ENT_STATES state;
+	ENT_TYPE type;
+	ENT_FAMILY family;			
+	bool alive;
 	bool selected;
-
-	float lastPathTime;	// to keep units from hammering the path finding algorithms and killing the frame rate
-
+	float scale;
+	Vector size;
 	Node *leaf;	// the leaf we're in
 	std::list<ENT_TASK*> taskQueue;
+
+	int maxhealth;
+	int damage;		// how much health we take away from an attacked unit
+
+	float deathTime;
+	float lastPathTime;	// to keep units from hammering the path finding algorithms and killing the frame rate
+
+	int team;
+	int health;
+	int completed;	// 0 -> 100 (%)
 	
 	Vector position;
 	Vector velocity;
 	Vector rotation;
-	
-	ENT_STATES state;
-	ENT_TYPE type;
-	ENT_FAMILY family;		
 };
 
 class ENT_TASK {
@@ -269,7 +274,7 @@ public:
 	Node *tree;
 };
 
-class EntityContainer : public Task {
+class EntityContainer : public Task { friend class Entity;
 public:
 	EntityContainer();
 

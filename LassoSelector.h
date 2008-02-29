@@ -17,6 +17,7 @@ public:
 	void run();
 
 	void Select(Entity *e);
+	void Unselect(Entity *e);
 	void ClearSelection();
 
 	bool enabled;

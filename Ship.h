@@ -10,6 +10,9 @@ public:
 
 	void onSelected();
 	void onUnSelected();
+
+	void onAttacked();
+
 	void init();
 	void process();
 	void Think();
