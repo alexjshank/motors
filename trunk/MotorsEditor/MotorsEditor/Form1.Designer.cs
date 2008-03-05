@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("World");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("World");
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,6 +40,7 @@
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
@@ -67,18 +69,19 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.HeightmapEditor = new System.Windows.Forms.PictureBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.ChooseColorButton1 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.toolStrip3 = new System.Windows.Forms.ToolStrip();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ConfigGrid = new System.Windows.Forms.DataGridView();
             this.Variable = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.label1 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -95,12 +98,13 @@
             this.tabPage2.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.HeightmapEditor)).BeginInit();
             this.toolStrip1.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ConfigGrid)).BeginInit();
             this.tabControl1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -134,20 +138,20 @@
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.reloadToolStripMenuItem.Text = "Reload";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(136, 22);
             this.saveAsToolStripMenuItem.Text = "Save As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
@@ -185,6 +189,16 @@
             this.splitContainer1.Size = new System.Drawing.Size(882, 664);
             this.splitContainer1.SplitterDistance = 217;
             this.splitContainer1.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(9, 150);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(189, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "To begin, Open a Project above";
             // 
             // groupBox1
             // 
@@ -321,19 +335,19 @@
             this.treeToolStripMenuItem,
             this.rockToolStripMenuItem});
             this.environmentToolStripMenuItem.Name = "environmentToolStripMenuItem";
-            this.environmentToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.environmentToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.environmentToolStripMenuItem.Text = "Environment";
             // 
             // treeToolStripMenuItem
             // 
             this.treeToolStripMenuItem.Name = "treeToolStripMenuItem";
-            this.treeToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.treeToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.treeToolStripMenuItem.Text = "Tree";
             // 
             // rockToolStripMenuItem
             // 
             this.rockToolStripMenuItem.Name = "rockToolStripMenuItem";
-            this.rockToolStripMenuItem.Size = new System.Drawing.Size(97, 22);
+            this.rockToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.rockToolStripMenuItem.Text = "Rock";
             // 
             // buildingsToolStripMenuItem
@@ -343,25 +357,25 @@
             this.millToolStripMenuItem,
             this.barracksToolStripMenuItem});
             this.buildingsToolStripMenuItem.Name = "buildingsToolStripMenuItem";
-            this.buildingsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.buildingsToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.buildingsToolStripMenuItem.Text = "Buildings";
             // 
             // farmToolStripMenuItem
             // 
             this.farmToolStripMenuItem.Name = "farmToolStripMenuItem";
-            this.farmToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.farmToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.farmToolStripMenuItem.Text = "Farm";
             // 
             // millToolStripMenuItem
             // 
             this.millToolStripMenuItem.Name = "millToolStripMenuItem";
-            this.millToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.millToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.millToolStripMenuItem.Text = "Mill";
             // 
             // barracksToolStripMenuItem
             // 
             this.barracksToolStripMenuItem.Name = "barracksToolStripMenuItem";
-            this.barracksToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.barracksToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.barracksToolStripMenuItem.Text = "Barracks";
             // 
             // unitsToolStripMenuItem
@@ -371,31 +385,31 @@
             this.womanToolStripMenuItem,
             this.soldierToolStripMenuItem});
             this.unitsToolStripMenuItem.Name = "unitsToolStripMenuItem";
-            this.unitsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.unitsToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.unitsToolStripMenuItem.Text = "Units";
             // 
             // peasantToolStripMenuItem
             // 
             this.peasantToolStripMenuItem.Name = "peasantToolStripMenuItem";
-            this.peasantToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.peasantToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.peasantToolStripMenuItem.Text = "Peasant";
             // 
             // womanToolStripMenuItem
             // 
             this.womanToolStripMenuItem.Name = "womanToolStripMenuItem";
-            this.womanToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.womanToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.womanToolStripMenuItem.Text = "Woman";
             // 
             // soldierToolStripMenuItem
             // 
             this.soldierToolStripMenuItem.Name = "soldierToolStripMenuItem";
-            this.soldierToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+            this.soldierToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
             this.soldierToolStripMenuItem.Text = "Soldier";
             // 
             // triggerToolStripMenuItem
             // 
             this.triggerToolStripMenuItem.Name = "triggerToolStripMenuItem";
-            this.triggerToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.triggerToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.triggerToolStripMenuItem.Text = "Trigger";
             // 
             // treeView2
@@ -405,10 +419,10 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView2.Location = new System.Drawing.Point(5, 28);
             this.treeView2.Name = "treeView2";
-            treeNode9.Name = "Node0";
-            treeNode9.Text = "World";
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "World";
             this.treeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode9});
+            treeNode1});
             this.treeView2.Size = new System.Drawing.Size(179, 300);
             this.treeView2.TabIndex = 0;
             // 
@@ -466,6 +480,19 @@
             this.tabPage3.Text = "HeightMap";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(160, 6);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(40, 20);
+            this.numericUpDown1.TabIndex = 2;
+            this.numericUpDown1.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
             // HeightmapEditor
             // 
             this.HeightmapEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -477,8 +504,8 @@
             this.HeightmapEditor.Size = new System.Drawing.Size(874, 614);
             this.HeightmapEditor.TabIndex = 1;
             this.HeightmapEditor.TabStop = false;
-            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseMove += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseMove);
+            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseUp);
             // 
             // toolStrip1
@@ -501,15 +528,30 @@
             this.ChooseColorButton1.Text = "Choose Color";
             this.ChooseColorButton1.Click += new System.EventHandler(this.ChooseColorButton1_Click);
             // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(60, 22);
+            this.toolStripLabel1.Text = "Brush Size:";
+            // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.toolStrip3);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(880, 644);
             this.tabPage4.TabIndex = 1;
-            this.tabPage4.Text = "Texture";
+            this.tabPage4.Text = "Preview";
             this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip3
+            // 
+            this.toolStrip3.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip3.Name = "toolStrip3";
+            this.toolStrip3.Size = new System.Drawing.Size(874, 25);
+            this.toolStrip3.TabIndex = 1;
+            this.toolStrip3.Text = "toolStrip3";
             // 
             // tabPage1
             // 
@@ -564,34 +606,10 @@
             this.tabControl1.Size = new System.Drawing.Size(896, 696);
             this.tabControl1.TabIndex = 1;
             // 
-            // label1
+            // timer1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(9, 150);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(189, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "To begin, Open a Project above";
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(160, 6);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(40, 20);
-            this.numericUpDown1.TabIndex = 2;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
-            // 
-            // toolStripLabel1
-            // 
-            this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(60, 22);
-            this.toolStripLabel1.Text = "Brush Size:";
+            this.timer1.Interval = 10;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 
@@ -625,13 +643,15 @@
             this.tabControl2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.HeightmapEditor)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
+            this.tabPage4.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ConfigGrid)).EndInit();
             this.tabControl1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -688,6 +708,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 
