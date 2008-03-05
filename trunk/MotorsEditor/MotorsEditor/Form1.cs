@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.IO;
+using CS
 
 namespace MotorsEditor
 {
@@ -213,6 +213,8 @@ namespace MotorsEditor
             heightmapEditor_MouseDown = true;
             lastX = e.X;
             lastY = e.Y;
+            heightmapEditor_Graph.FillEllipse(heightmapEditor_pen.Brush, new Rectangle(e.X - (int)(heightmapEditor_pen.Width / 2), e.Y - (int)(heightmapEditor_pen.Width / 2), (int)heightmapEditor_pen.Width, (int)heightmapEditor_pen.Width));
+            HeightmapEditor.Refresh();
         }
 
         private void HeightmapEditor_onMouseMove(object sender, MouseEventArgs e)
@@ -221,9 +223,9 @@ namespace MotorsEditor
             {
                 // draw here
 
-
                 heightmapEditor_Graph.DrawLine(heightmapEditor_pen, e.X, e.Y, lastX, lastY);
-                
+                heightmapEditor_Graph.FillEllipse(heightmapEditor_pen.Brush, new Rectangle(e.X - (int)(heightmapEditor_pen.Width / 2), e.Y - (int)(heightmapEditor_pen.Width / 2), (int)heightmapEditor_pen.Width, (int)heightmapEditor_pen.Width));
+
                 lastX = e.X;
                 lastY = e.Y;
 
@@ -249,6 +251,11 @@ namespace MotorsEditor
         private void HeightmapEditor_SelectBrush_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(heightmapEditor_pen.Color, int.Parse(numericUpDown1.Value.ToString()));
         }
 
    
