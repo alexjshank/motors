@@ -7,7 +7,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.IO;
-using System.Threading;
 using CsGL.OpenGL;
 
 namespace MotorsEditor
@@ -37,51 +36,55 @@ namespace MotorsEditor
 
             string currentElement="";
             string value="";
-            XmlTextReader reader = new XmlTextReader("mru.xml");
-            if (reader != null)
+            try
             {
-                try
+                XmlTextReader reader = new XmlTextReader("mru.xml");
+                if (reader != null)
                 {
                     while (reader.Read())
                     {
                         switch (reader.NodeType)
                         {
-                            case XmlNodeType.Element:
-                                currentElement = reader.Name.ToUpper();
-                                value = "";
-                                break;
-                            case XmlNodeType.Text:
-                                switch (currentElement)
-                                {
-                                    case "MRU":
-                                        value += reader.Value;
-                                        break;
-                                    default:
-                                        MessageBox.Show(currentElement);
-                                        break;
-                                }
-                                break;
-                            case XmlNodeType.EndElement:
-                                if (MRUListBox.Items.IndexOf(value) < 0)
-                                {
-                                    MRUListBox.Items.Add(value);
-                                }
-                                break;
+                        case XmlNodeType.Element:
+                            currentElement = reader.Name.ToUpper();
+                            value = "";
+                            break;
+                        case XmlNodeType.Text:
+                            switch (currentElement)
+                            {
+                                case "MRU":
+                                    value += reader.Value;
+                                    break;
+                                default:
+                                    MessageBox.Show(currentElement);
+                                    break;
+                            }
+                            break;
+                        case XmlNodeType.EndElement:
+                            if (MRUListBox.Items.IndexOf(value) < 0)
+                            {
+                                MRUListBox.Items.Add(value);
+                            }
+                            break;
                         }
                     }
                     reader.Close();
                 }
-                catch (FileNotFoundException e)
-                {
-                    // create a new empty one..
-                }
             }
-
+            catch (FileNotFoundException e)
+            {
+                // create a new empty one..
+            }
 
             HeightmapEditor.Image = new Bitmap(512, 512);
             heightmapEditor_Graph = Graphics.FromImage(HeightmapEditor.Image);
             heightmapEditor_pen = new Pen(Color.FromArgb(10, Color.Black), 25);
-            heightmapEditor_Graph.FillRectangle(Brushes.Black, new Rectangle(0, 0, 512, 512));
+            newToolStripButton_Click(this, null);
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         public void WriteMRUFile()
@@ -205,7 +208,12 @@ namespace MotorsEditor
             configFile.Close();
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openToolStripButton1_Click(object sender, EventArgs e)
+        {
+            loadConfigFile();
+        }
+
+        private void saveToolStripButton1_Click(object sender, EventArgs e)
         {
             saveConfigFile(GameDirectory + "/config.cfg");
         }
@@ -251,208 +259,82 @@ namespace MotorsEditor
             heightmapEditor_MouseDown = false;
         }
 
-        private void ChooseColorButton1_Click(object sender, EventArgs e)
-        {
-            ColorDialog colorDialog1 = new ColorDialog();
-            colorDialog1.Color = heightmapEditor_pen.Color;
-            if (colorDialog1.ShowDialog() == DialogResult.OK)
-            {
-                heightmapEditor_pen = new Pen(colorDialog1.Color, heightmapEditor_pen.Width);
-            }
-        }
 
         private void HeightmapEditor_SelectBrush_Click(object sender, EventArgs e)
         {
 
         }
-
+/*
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
             heightmapEditor_pen = new Pen(heightmapEditor_pen.Color, int.Parse(numericUpDown1.Value.ToString()));
         }
+*/
 
-        private void openGLControl1_Click(object sender, EventArgs e)
+
+        private void ChooseBrushButton_Click(object sender, EventArgs e)
         {
+            BrushSelector selector = new BrushSelector();
+            selector.brushColor = heightmapEditor_pen.Color;
+            selector.brushSize = (int)heightmapEditor_pen.Width;
+            selector.ShowDialog();
+            heightmapEditor_pen = new Pen(selector.brushColor, selector.brushSize);
         }
+
+        private void PreviewButton_Click(object sender, EventArgs e)
+        {
+            Bitmap bmp = new Bitmap(HeightmapEditor.Image);
+            view.terrain.FromBitmap(bmp);
+            tabControl2.SelectTab(1);
+        }
+
+        private void waterToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(Color.FromArgb(25,0,0,0), heightmapEditor_pen.Width);
+        }
+
+        private void beachToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(Color.FromArgb(25,30,30,30), heightmapEditor_pen.Width);
+
+        }
+
+        private void ground1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 60, 60, 60), heightmapEditor_pen.Width);
+        }
+
+        private void ground2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 90, 90, 90), heightmapEditor_pen.Width);
+        }
+
+        private void ground3ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 120, 120, 120), heightmapEditor_pen.Width);
+        }
+
+        private void newToolStripButton_Click(object sender, EventArgs e)
+        {
+            heightmapEditor_Graph.FillRectangle(Brushes.Black, new Rectangle(0, 0, 512, 512));
+        }
+
+        private void saveTerrainButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.DefaultExt = ".top";
+            sfd.FileName = "terrain.top";
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+
+            }
+        }
+
+
+
+
 
  
     }
 
-    class Vector
-    {
-        float x, y, z;
-    }
-
-    class OpenGLView : OpenGLControl
-    {
-        Terrain terrain = new Terrain();
-        float angle = 0;
-        // This function overides the glDraw function found in the CsGL namespace
-        // So that you may customise your viewport settings etc...
-        public override void glDraw()
-        {
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-            GL.glLoadIdentity();
-
-            GL.gluLookAt(terrain.MAP_SIZE / 2, 250, -100, terrain.MAP_SIZE / 2, 0, terrain.MAP_SIZE / 2, 0, 1, 0);
-            GL.glScalef(1, 0.25f, 1);
-            terrain.RenderHeightmap();
-        }
-
-        // This function sets up the OpenGL context as normal, but note the GL prefix's!
-        protected override void InitGLContext()
-        {
-            GL.glShadeModel(GL.GL_SMOOTH);
-            GL.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-            GL.glClearDepth(1.0f);
-            GL.glEnable(GL.GL_DEPTH_TEST);
-            GL.glDepthFunc(GL.GL_LEQUAL);
-            GL.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
-
-            terrain.LoadRawFile("c:/height.raw", 512*512);
-        }
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            base.OnSizeChanged(e);
-            Size s = Size;
-            double aspect_ratio = (double)s.Width / (double)s.Height;
-            GL.glMatrixMode(GL.GL_PROJECTION); // Select The Projection Matrix
-            GL.glLoadIdentity(); // Reset The Projection Matrix
-            // Calculate The Aspect Ratio Of The Window
-            GL.gluPerspective(45.0f, aspect_ratio, 0.1f, 1000.0f);
-            GL.glMatrixMode(GL.GL_MODELVIEW); // Select The Modelview Matrix
-            GL.glLoadIdentity();// Reset The Modelview Matrix
-        }
-
-  
-    }
-
-    public class Terrain
-    {
-        public int MAP_SIZE = 512;
-        protected int STEP_SIZE = 2;
-        private float HEIGHT_RATIO = 1.5f;
-        private static bool render = true;
-        private byte[] heightmap;
-        private static float scaleValue = 0.15f;
-
-
-        public int Height(int X, int Y)
-        {
-            int x = X % MAP_SIZE;
-            int y = Y % MAP_SIZE;
-
-            if (heightmap == null)
-            {
-                return 0;
-            }
-            int index = x + (y * MAP_SIZE);
-            if (index > 0 && index < MAP_SIZE * MAP_SIZE)
-                return heightmap[index];
-            else return 0;
-        }
-
-        public void LoadRawFile(string filename, int size)
-        {
-
-            FileStream stream = null;
-            ASCIIEncoding encoding = new ASCIIEncoding();
-            BinaryReader reader = null;
-
-            try
-            {
-                // Open The File
-                stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                reader = new BinaryReader(stream, encoding);
-                MAP_SIZE = (int)Math.Sqrt((double)stream.Length);
-          
-                heightmap = new byte[MAP_SIZE * MAP_SIZE];
-                heightmap = reader.ReadBytes(MAP_SIZE * MAP_SIZE);
-
-            }
-            catch (Exception e)
-            {
-                // Handle Any Exceptions While Loading Terrain Data, Exit App
-                string errorMsg = "An Error Occurred While Loading And Parsing World Data:\n\t" + filename + "\n" + "\n\nStack Trace:\n\t" + e.StackTrace + "\n";
-                MessageBox.Show(errorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                }
-                if (stream != null)
-                {
-                    stream.Close();
-                }
-            }
-        }
-
-        public void RenderHeightmap()
-        {
-            int X, Y;
-            int x, y, z;
-
-            if (heightmap == null)
-            {
-                return;
-            }
-
-            if (render)
-            {
-                GL.glBegin(GL.GL_QUADS);
-            }
-            else
-            {
-                GL.glBegin(GL.GL_LINES);
-            }
-
-            for (X = 0; X < MAP_SIZE; X += STEP_SIZE)
-                for (Y = 0; Y < MAP_SIZE; Y += STEP_SIZE)
-                {
-                    // Get The (X, Y, Z) Value For The Bottom Left Vertex
-                    x = X;
-                    y = Height(X, Y);
-                    z = Y;
-                    SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
-
-                    // Get The (X, Y, Z) Value For The Top Left Vertex
-                    x = X;
-                    y = Height(X, Y + STEP_SIZE);
-                    z = Y + STEP_SIZE;
-                    SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
-
-                    // Get The (X, Y, Z) Value For The Top Right Vertex
-                    x = X + STEP_SIZE;
-                    y = Height(X + STEP_SIZE, Y + STEP_SIZE);
-                    z = Y + STEP_SIZE;
-                    SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
-
-                    // Get The (X, Y, Z) Value For The Bottom Right Vertex
-                    x = X + STEP_SIZE;
-                    y = Height(X + STEP_SIZE, Y);
-                    z = Y;
-                    SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
-                }
-            GL.glEnd();
-            GL.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        }
-
-        private void SetVertexColor(int x, int y)
-        {
-            if (heightmap == null)
-            {
-                return;
-            }
-
-            float fColor = -0.15f + (Height(x, y) / 256.0f);
-
-            GL.glColor3f(0.0f, 0.0f, fColor);
-        }
-    }
 }
