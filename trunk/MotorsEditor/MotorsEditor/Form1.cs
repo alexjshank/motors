@@ -18,6 +18,7 @@ namespace MotorsEditor
         Graphics heightmapEditor_Graph;
         Pen heightmapEditor_pen;
         private OpenGLView view;
+        private BrushSelector selector;
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -32,6 +33,7 @@ namespace MotorsEditor
             tabControl2.TabPages[1].Controls.Add(view);
             view.Dock = DockStyle.Fill;
             timer1.Enabled = true;
+            selector = new BrushSelector();
 
 
             string currentElement="";
@@ -77,9 +79,14 @@ namespace MotorsEditor
             }
 
             HeightmapEditor.Image = new Bitmap(512, 512);
-            heightmapEditor_Graph = Graphics.FromImage(HeightmapEditor.Image);
-            heightmapEditor_pen = new Pen(Color.FromArgb(10, Color.Black), 25);
+            UpdateBrush();
             newToolStripButton_Click(this, null);
+        }
+
+        private void UpdateBrush()
+        {
+            heightmapEditor_Graph = Graphics.FromImage(HeightmapEditor.Image);
+            heightmapEditor_pen = new Pen(selector.brushColor, selector.brushSize);
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -104,11 +111,6 @@ namespace MotorsEditor
             }
             writer.WriteEndElement();
             writer.Close();
-        }
-
-        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-
         }
 
         private void OnClosing(object sender, FormClosingEventArgs e)
@@ -142,6 +144,32 @@ namespace MotorsEditor
         {
             GameDirectory = dir;
             loadConfigFile();
+            DirectoryInfo di = new DirectoryInfo(GameDirectory + "\\data\\Topographical");
+            FileInfo[] rgFiles = di.GetFiles("*.top");
+
+            treeView3.Nodes[0].Nodes.Clear();
+            foreach (FileInfo fi in rgFiles)
+            {
+                treeView3.Nodes[0].Nodes.Add(fi.Name);
+            }
+
+            DirectoryInfo mapDirectory = new DirectoryInfo(GameDirectory + "\\data\\maps");
+            FileInfo[] savFiles = mapDirectory.GetFiles("*.sav");
+
+            foreach (FileInfo savFile in savFiles)
+            {
+                ToolStripMenuItem tsi = new ToolStripMenuItem();
+                tsi.Text = savFile.Name;
+                tsi.Click += new EventHandler(tsi_Click);
+                toolStripDropDownButton3.DropDownItems.Add(tsi);
+            }
+
+
+        }
+
+        void tsi_Click(object sender, EventArgs e)
+        {
+            LoadSaveFile(GameDirectory + "\\data\\maps\\" + ((ToolStripItem)sender).Text.ToString());
         }
 
         void loadConfigFile()
@@ -274,12 +302,10 @@ namespace MotorsEditor
 
         private void ChooseBrushButton_Click(object sender, EventArgs e)
         {
-            BrushSelector selector = new BrushSelector();
-            selector.brushColor = heightmapEditor_pen.Color;
-            selector.brushSize = (int)heightmapEditor_pen.Width;
             selector.ShowDialog();
-            heightmapEditor_pen = new Pen(selector.brushColor, selector.brushSize);
+            UpdateBrush();
         }
+
 
         private void PreviewButton_Click(object sender, EventArgs e)
         {
@@ -295,28 +321,29 @@ namespace MotorsEditor
 
         private void beachToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            heightmapEditor_pen = new Pen(Color.FromArgb(25,30,30,30), heightmapEditor_pen.Width);
+            heightmapEditor_pen = new Pen(Color.FromArgb(25,50,50,50), heightmapEditor_pen.Width);
 
         }
 
         private void ground1ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            heightmapEditor_pen = new Pen(Color.FromArgb(25, 60, 60, 60), heightmapEditor_pen.Width);
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 100, 100, 100), heightmapEditor_pen.Width);
         }
 
         private void ground2ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            heightmapEditor_pen = new Pen(Color.FromArgb(25, 90, 90, 90), heightmapEditor_pen.Width);
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 150, 150, 150), heightmapEditor_pen.Width);
         }
 
         private void ground3ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            heightmapEditor_pen = new Pen(Color.FromArgb(25, 120, 120, 120), heightmapEditor_pen.Width);
+            heightmapEditor_pen = new Pen(Color.FromArgb(25, 200, 200, 200), heightmapEditor_pen.Width);
         }
 
         private void newToolStripButton_Click(object sender, EventArgs e)
         {
             heightmapEditor_Graph.FillRectangle(Brushes.Black, new Rectangle(0, 0, 512, 512));
+            HeightmapEditor.Refresh();
         }
 
         private void saveTerrainButton_Click(object sender, EventArgs e)
@@ -326,15 +353,170 @@ namespace MotorsEditor
             sfd.FileName = "terrain.top";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-
+                saveTerrain(sfd.FileName);
             }
+        }
+
+        private void saveTerrain(string filename)
+        {
+            Bitmap temp = new Bitmap(HeightmapEditor.Image);
+            view.terrain.FromBitmap(temp);
+
+            Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Write); 
+            BinaryWriter writer = new BinaryWriter(stream);
+            writer.Write(view.terrain.GetData());
+            writer.Close();
+        }
+
+        private void loadTerrain(string filename)
+        {
+            view.terrain.LoadRawFile(filename);
+            Bitmap hbmp = new Bitmap(view.terrain.MAP_SIZE,view.terrain.MAP_SIZE);
+            for (int y=0;y<view.terrain.MAP_SIZE;y++) 
+            {
+                for (int x=0;x<view.terrain.MAP_SIZE;x++) 
+                {
+                   int height = view.terrain.Height(x,y);
+                   hbmp.SetPixel(x, y, Color.FromArgb(height, height, height));
+                }
+            }
+            HeightmapEditor.Image = hbmp;
+            HeightmapEditor.Refresh();
+            UpdateBrush();
+        }
+
+        private void openToolStripButton_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                loadTerrain(ofd.FileName);
+            }
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+
+        }
+                
+        public struct MapHeader {
+	        public string magic;	// ASGE07
+	        public short size_x, size_y;
+            public string terrainName;
+	        public int entityCount;
+        };
+        
+        public struct MapEntity {
+	        public int type;	
+	        public float x,y;
+        };
+
+        private void openToolStripButton2_Click(object sender, EventArgs e)
+        {
+        
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                LoadSaveFile(ofd.FileName);
+            }
+        }
+
+        private void LoadSaveFile(string savefile)
+        {
+            MessageBox.Show("Warning: this function doesn't correctly handle little-endianness of memory?");
+
+            FileStream stream = new FileStream(savefile, FileMode.Open, FileAccess.Read, FileShare.Read);
+            BinaryReader reader = new BinaryReader(stream, System.Text.Encoding.UTF8);
+            MapHeader header;
+
+            header.magic = new string(reader.ReadChars(6));
+            header.size_x = reader.ReadInt16();
+            header.size_y = reader.ReadInt16();
+            header.terrainName = new string(reader.ReadChars(32));
+            header.entityCount = reader.ReadInt32();
+
+            for (int i = 0; i < header.entityCount; i++)
+            {
+                MapEntity ent;
+
+                try
+                {
+                    ent.type = reader.ReadInt32();
+                    ent.x = reader.ReadSingle();
+                    ent.y = reader.ReadSingle();
+                }
+                catch (EndOfStreamException eofe)
+                {
+
+                    break;
+                }
+                string typename = "";
+                switch (ent.type)
+                {
+                    case 0:
+                        typename = "tree";
+                        break;
+                    case 1:
+                        typename = "tower";
+                        break;
+                    case 2:
+                        typename = "farm";
+                        break;
+                    case 3:
+                        typename = "peasant";
+                        break;
+                    case 4:
+                        typename = "mill";
+                        break;
+                    case 5:
+                        typename = "sheep";
+                        break;
+                    case 6:
+                        typename = "lamp";
+                        break;
+                    case 8:
+                        typename = "woman";
+                        break;
+                    case 9:
+                        typename = "soldier";
+                        break;
+                    case 10:
+                        typename = "trigger";
+                        break;
+                    case 11:
+                        typename = "dock";
+                        break;
+                    case 12:
+                        typename = "ship";
+                        break;
+                    case 13:
+                        typename = "barracks";
+                        break;
+                    case 14:
+                        typename = "waypoint";
+                        break;
+                    default:
+                        typename = "(unknown:" + ent.type + ")";
+                        break;
+                }
+
+                treeView2.TopNode.Nodes.Add(typename);
+            }
+        }
+
+        private void treeview3_pickHeightmap(object sender, TreeViewEventArgs e)
+        {
+            loadTerrain(GameDirectory + "\\data\\Topographical\\" + treeView3.SelectedNode.Text.ToString());
         }
 
 
 
 
-
- 
     }
 
 }

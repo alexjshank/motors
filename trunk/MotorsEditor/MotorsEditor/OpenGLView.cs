@@ -14,19 +14,33 @@ namespace MotorsEditor
     class OpenGLView : OpenGLControl
     {
         public Terrain terrain = new Terrain();
-        float angle = 0;
-
+        public float angle = 0;
+        bool[] keys = new bool[512];
 
         public override void glDraw()
         {
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
             GL.glLoadIdentity();
 
-            GL.gluLookAt(terrain.MAP_SIZE / 2, 250, -100, terrain.MAP_SIZE / 2, 0, terrain.MAP_SIZE / 2, 0, 1, 0);
-            GL.glScalef(1, 0.5f, 1);
+            GL.gluLookAt(terrain.MAP_SIZE / 2, terrain.MAP_SIZE / 2, -terrain.MAP_SIZE / 2, terrain.MAP_SIZE / 2, 0, terrain.MAP_SIZE / 2, 0, 1, 0);
+            GL.glScalef(1, 0.2f, 1);
 
+            if (keys[(int)Keys.Left]) angle++;
+            if (keys[(int)Keys.Right]) angle--;
   
             terrain.RenderHeightmap();
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+             keys[(int)e.KeyCode] = true;
+           base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            keys[(int)e.KeyCode] = false;
+            base.OnKeyUp(e);
         }
 
         protected override void InitGLContext()
@@ -38,8 +52,7 @@ namespace MotorsEditor
             GL.glDepthFunc(GL.GL_LEQUAL);
             GL.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
-
-            terrain.LoadRawFile("c:/height.raw", 512 * 512);
+          //           terrain.LoadRawFile("c:/height.raw");
         }
 
         protected override void OnSizeChanged(EventArgs e)
@@ -67,6 +80,10 @@ namespace MotorsEditor
         private byte[] heightmap;
         private static float scaleValue = 0.15f;
 
+        public byte[] GetData()
+        {
+            return heightmap;
+        }
 
         public int Height(int X, int Y)
         {
@@ -83,7 +100,7 @@ namespace MotorsEditor
             else return 0;
         }
 
-        public void LoadRawFile(string filename, int size)
+        public void LoadRawFile(string filename)
         {
 
             FileStream stream = null;
@@ -193,9 +210,9 @@ namespace MotorsEditor
                 return;
             }
 
-            float fColor = -0.15f + (Height(x, y) / 256.0f);
+            float fColor = 0.5f + (Height(x, y) / 256.0f);
 
-            GL.glColor3f(0.0f, 0.0f, fColor);
+            GL.glColor3f(fColor, fColor, fColor);
         }
     }
 }
