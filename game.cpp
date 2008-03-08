@@ -142,7 +142,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	waypointEditor->visible = false;
 
     bool camerafollowing = false;
-	input->mouseAbsolute.z = 100;
+	input->mouseAbsolute = Vector(100,100, 100);
+	input->mouseMovement = Vector(0,0,0);
 
 	while (active) {
 		tasks.Run();			

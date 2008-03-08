@@ -21,6 +21,7 @@ Building::Building(void)
 	model = NULL;
 	health = 1000;
 	toolWindow = 0;
+	completed = 0;
 }
 
 Building::~Building(void)
@@ -74,13 +75,17 @@ void Building::process() {
 
 void Building::render() {
 	if (camera->frustum.pointInFrustum(position) && alive) {
-		model->setPosition(position);
-		model->setRotation(rotation);
-		model->setScale(scale);
-		glColor3f(1,1,1);
-		glBindTexture(GL_TEXTURE_2D,texture);
-		model->drawObjectFrame(0,model->kDrawImmediate);
-	
-		renderToolTip();
+		if (this->completed < 100) {
+			DrawCube(position,size);
+		} else {
+			model->setPosition(position);
+			model->setRotation(rotation);
+			model->setScale(scale);
+			glColor3f(1,1,1);
+			glBindTexture(GL_TEXTURE_2D,texture);
+			model->drawObjectFrame(0,model->kDrawImmediate);
+		
+			renderToolTip();
+		}
 	}
 }

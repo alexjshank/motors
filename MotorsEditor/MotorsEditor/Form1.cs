@@ -30,9 +30,10 @@ namespace MotorsEditor
             InitializeComponent();
 
             view = new OpenGLView();
+            
             tabControl2.TabPages[1].Controls.Add(view);
             view.Dock = DockStyle.Fill;
-            timer1.Enabled = true;
+            timer1.Enabled = false;
             selector = new BrushSelector();
 
 
@@ -512,6 +513,11 @@ namespace MotorsEditor
         private void treeview3_pickHeightmap(object sender, TreeViewEventArgs e)
         {
             loadTerrain(GameDirectory + "\\data\\Topographical\\" + treeView3.SelectedNode.Text.ToString());
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
 
