@@ -201,7 +201,7 @@ bool Graphics::init() {
 
 
     /* Verify there is a surface */
-    if (!SDL_SetVideoMode(vars->getIntValue("screen_width"), vars->getIntValue("screen_height"), 16,videoFlags))
+    if (!SDL_SetVideoMode(vars->getIntValue("screen_width"), vars->getIntValue("screen_height"), 16, videoFlags))
 	{
 	    fprintf( stderr,  "Video mode set failed: %s\n", SDL_GetError( ) );
 	    return false;
@@ -216,7 +216,7 @@ bool Graphics::init() {
 
  	glEnable(GL_DEPTH_TEST);                             
 	glDepthFunc(GL_LEQUAL);                              
-	glClearDepth(1400.0f); 
+	glClearDepth(9999.0f); 
    	
 	glEnable(GL_TEXTURE_2D);	
 

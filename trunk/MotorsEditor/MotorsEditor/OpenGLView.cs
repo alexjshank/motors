@@ -8,13 +8,18 @@ using System.Windows.Forms;
 using System.Xml;
 using System.IO;
 using CsGL.OpenGL;
+using System.Threading;
 
 namespace MotorsEditor
 {
     class OpenGLView : OpenGLControl
     {
+        private static Thread thread;
         public Terrain terrain = new Terrain();
         public float angle = 0;
+
+        int lastMouseX = 0;
+        bool mouseDown;
         bool[] keys = new bool[512];
 
         public override void glDraw()
@@ -25,39 +30,54 @@ namespace MotorsEditor
             GL.gluLookAt(terrain.MAP_SIZE / 2, terrain.MAP_SIZE / 2, -terrain.MAP_SIZE / 2, terrain.MAP_SIZE / 2, 0, terrain.MAP_SIZE / 2, 0, 1, 0);
             GL.glScalef(1, 0.2f, 1);
 
-            if (keys[(int)Keys.Left]) angle++;
-            if (keys[(int)Keys.Right]) angle--;
+            GL.glTranslatef(terrain.MAP_SIZE / 2, 0, terrain.MAP_SIZE / 2);
+            GL.glRotatef(angle, 0, 1, 0);
+            GL.glTranslatef(-terrain.MAP_SIZE / 2, 0, -terrain.MAP_SIZE / 2);
   
             terrain.RenderHeightmap();
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-             keys[(int)e.KeyCode] = true;
-           base.OnKeyDown(e);
-        }
 
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            keys[(int)e.KeyCode] = false;
-            base.OnKeyUp(e);
-        }
 
         protected override void InitGLContext()
         {
             GL.glShadeModel(GL.GL_SMOOTH);
-            GL.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+            GL.glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
             GL.glClearDepth(1.0f);
             GL.glEnable(GL.GL_DEPTH_TEST);
             GL.glDepthFunc(GL.GL_LEQUAL);
             GL.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
 
-          //           terrain.LoadRawFile("c:/height.raw");
+            this.MouseDown += new MouseEventHandler(OpenGLView_MouseDown);
+            this.MouseUp += new MouseEventHandler(OpenGLView_MouseUp);
+            this.MouseMove += new MouseEventHandler(OpenGLView_MouseMove);
+        }
+
+        void OpenGLView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown)
+            {
+                angle += (e.X - lastMouseX);
+                lastMouseX = e.X;
+                Refresh();
+            }
+        }
+
+        void OpenGLView_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
+        void OpenGLView_MouseDown(object sender, MouseEventArgs e)
+        {
+            lastMouseX = e.X;
+            mouseDown = true;
         }
 
         protected override void OnSizeChanged(EventArgs e)
         {
             base.OnSizeChanged(e);
+
             Size s = Size;
             double aspect_ratio = (double)s.Width / (double)s.Height;
             GL.glMatrixMode(GL.GL_PROJECTION); 
