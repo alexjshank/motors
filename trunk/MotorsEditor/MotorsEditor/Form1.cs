@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.IO;
 using CsGL.OpenGL;
+using System.Reflection;
 
 namespace MotorsEditor
 {
@@ -427,19 +428,31 @@ namespace MotorsEditor
             }
         }
 
+        public static int LittleEndianBytesToInt(byte [] src)
+        {            
+            int result;
+            if (src.Length != 4) return -666;
+
+            result = ((int)src[3] << 24) +
+                     ((int)src[2] << 16) +
+                     ((int)src[1] << 8) +
+                     ((int)src[0]);
+            return (int)result;
+        }
+
         private void LoadSaveFile(string savefile)
         {
-            MessageBox.Show("Warning: this function doesn't correctly handle little-endianness of memory?");
-
+            treeView2.TopNode.Nodes.Clear();
             FileStream stream = new FileStream(savefile, FileMode.Open, FileAccess.Read, FileShare.Read);
-            BinaryReader reader = new BinaryReader(stream, System.Text.Encoding.UTF8);
+            BinaryReader reader = new BinaryReader(stream);
             MapHeader header;
 
             header.magic = new string(reader.ReadChars(6));
             header.size_x = reader.ReadInt16();
             header.size_y = reader.ReadInt16();
             header.terrainName = new string(reader.ReadChars(32));
-            header.entityCount = reader.ReadInt32();
+            reader.ReadInt16();
+            header.entityCount = LittleEndianBytesToInt(reader.ReadBytes(4));
 
             for (int i = 0; i < header.entityCount; i++)
             {
@@ -447,7 +460,8 @@ namespace MotorsEditor
 
                 try
                 {
-                    ent.type = reader.ReadInt32();
+                    ent.type = LittleEndianBytesToInt(reader.ReadBytes(4));
+
                     ent.x = reader.ReadSingle();
                     ent.y = reader.ReadSingle();
                 }
@@ -507,6 +521,7 @@ namespace MotorsEditor
                 }
 
                 treeView2.TopNode.Nodes.Add(typename);
+                
             }
         }
 
