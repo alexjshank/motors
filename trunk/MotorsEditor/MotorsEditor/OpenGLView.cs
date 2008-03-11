@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -14,7 +15,6 @@ namespace MotorsEditor
 {
     class OpenGLView : OpenGLControl
     {
-        private static Thread thread;
         public Terrain terrain = new Terrain();
         public float angle = 0;
 
@@ -47,6 +47,8 @@ namespace MotorsEditor
             GL.glEnable(GL.GL_DEPTH_TEST);
             GL.glDepthFunc(GL.GL_LEQUAL);
             GL.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+
+            GL.glEnable(GL.GL_TEXTURE_2D);
 
             this.MouseDown += new MouseEventHandler(OpenGLView_MouseDown);
             this.MouseUp += new MouseEventHandler(OpenGLView_MouseUp);
@@ -93,19 +95,24 @@ namespace MotorsEditor
 
     public class Terrain
     {
-        public int MAP_SIZE = 512;
-        protected int STEP_SIZE = 5;
-        private float HEIGHT_RATIO = 1.5f;
+        public int MAP_SIZE = 256;
+        protected int STEP_SIZE = 4;
         private static bool render = true;
         private byte[] heightmap;
-        private static float scaleValue = 0.15f;
+        private static float scaleValue = 1.5f;
+        public uint texture = 0;
 
         public byte[] GetData()
         {
             return heightmap;
         }
 
-        public int Height(int X, int Y)
+        public float Height(int X, int Y)
+        {
+            return ((float)rawHeight(X, Y)) * scaleValue;
+        }
+
+        public int rawHeight(int X, int Y)
         {
             int x = X % MAP_SIZE;
             int y = Y % MAP_SIZE;
@@ -117,7 +124,8 @@ namespace MotorsEditor
             int index = x + (y * MAP_SIZE);
             if (index > 0 && index < MAP_SIZE * MAP_SIZE)
                 return heightmap[index];
-            else return 0;
+            
+            return 0;
         }
 
         public void LoadRawFile(string filename)
@@ -141,7 +149,7 @@ namespace MotorsEditor
             catch (Exception e)
             {
                 // Handle Any Exceptions While Loading Terrain Data, Exit App
-                string errorMsg = "An Error Occurred While Loading And Parsing World Data:\n\t" + filename;
+                string errorMsg = "An Error Occurred While Loading And Parsing World Data:\n\t" + filename + "\n\nException: "+ e.Message;
                 MessageBox.Show(errorMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             finally
@@ -155,6 +163,34 @@ namespace MotorsEditor
                     stream.Close();
                 }
             }
+        }
+
+        public uint LoadTexture(string filename)
+        {
+            uint tex = 0;
+            Bitmap bmp = new Bitmap(filename);
+            if (bmp != null)
+            {
+                tex = LoadTexture(bmp);
+                bmp.Dispose();
+            }
+            return tex;
+        }
+
+
+        public uint LoadTexture(Bitmap bmp)
+        {
+            uint[] texture = new uint[1];
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, PixelFormat.Format24bppRgb);
+            if (bmpData != null)
+            {
+                GL.glGenTextures(1, texture);
+                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+                GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
+                GL.glTexImage2D(GL.GL_TEXTURE_2D, 0, (int)GL.GL_RGB8, bmp.Width, bmp.Height, 0, GL.GL_BGR_EXT, GL.GL_UNSIGNED_BYTE, bmpData.Scan0);
+                bmp.UnlockBits(bmpData);
+            }
+            return texture[0];
         }
 
         public void FromBitmap(Bitmap bmp)
@@ -173,7 +209,8 @@ namespace MotorsEditor
         public void RenderHeightmap()
         {
             int X, Y;
-            int x, y, z;
+            int x, z;
+            float y;
 
             if (heightmap == null)
             {
@@ -196,28 +233,32 @@ namespace MotorsEditor
                     y = Height(X, Y);
                     z = Y;
                     SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
+                    GL.glTexCoord2f(((float)x) / MAP_SIZE, ((float)z) / MAP_SIZE);
+                    GL.glVertex3f((float)x, y, (float)z);
 
                     // Get The (X, Y, Z) Value For The Top Left Vertex
                     x = X;
                     y = Height(X, Y + STEP_SIZE);
                     z = Y + STEP_SIZE;
                     SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
+                    GL.glTexCoord2f(((float)x) / MAP_SIZE, ((float)z) / MAP_SIZE);
+                    GL.glVertex3f((float)x, y, (float)z);
 
                     // Get The (X, Y, Z) Value For The Top Right Vertex
                     x = X + STEP_SIZE;
                     y = Height(X + STEP_SIZE, Y + STEP_SIZE);
                     z = Y + STEP_SIZE;
                     SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
+                    GL.glTexCoord2f(((float)x) / MAP_SIZE, ((float)z) / MAP_SIZE);
+                    GL.glVertex3f((float)x, y, (float)z);
 
                     // Get The (X, Y, Z) Value For The Bottom Right Vertex
                     x = X + STEP_SIZE;
                     y = Height(X + STEP_SIZE, Y);
                     z = Y;
                     SetVertexColor(x, z);
-                    GL.glVertex3i(x, y, z);
+                    GL.glTexCoord2f(((float)x) / MAP_SIZE, ((float)z) / MAP_SIZE);
+                    GL.glVertex3f((float)x, y, (float)z);
                 }
             GL.glEnd();
             GL.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -230,7 +271,7 @@ namespace MotorsEditor
                 return;
             }
 
-            float fColor = 0.5f + (Height(x, y) / 256.0f);
+            float fColor = 0.5f + (rawHeight(x, y) / 256.0f);
 
             GL.glColor3f(fColor, fColor, fColor);
         }
