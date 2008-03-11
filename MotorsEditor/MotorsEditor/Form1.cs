@@ -21,6 +21,7 @@ namespace MotorsEditor
         Pen heightmapEditor_pen;
         private OpenGLView view;
         private BrushSelector selector;
+        private Noise noiseDialog = new Noise();
 
         private Dictionary<string, Image> brushes = new Dictionary<string, Image>();
         private Image currentBrush;
@@ -42,7 +43,7 @@ namespace MotorsEditor
 
             view = new OpenGLView();
             
-            tabControl2.TabPages[1].Controls.Add(view);
+            tabControl2.TabPages[2].Controls.Add(view);
             view.Dock = DockStyle.Fill;
             timer1.Enabled = false;
             selector = new BrushSelector();
@@ -85,7 +86,7 @@ namespace MotorsEditor
                     reader.Close();
                 }
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 // create a new empty one..
             }
@@ -95,6 +96,7 @@ namespace MotorsEditor
             cm.Matrix33 = 0.5f;
             ia.SetColorMatrix(cm);
 
+            noiseDialog.outputBox = HeightmapEditor;
             HeightmapEditor.Image = new Bitmap(512, 512);
             UpdateBrush();
             newToolStripButton_Click(this, null);
@@ -197,7 +199,7 @@ namespace MotorsEditor
             {
                 configFile = new StreamReader(GameDirectory + "/config.cfg");
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 MessageBox.Show("Hmm... couldn't open the config file in that directory... are you sure thats the right directory?");
                 return;
@@ -328,7 +330,7 @@ namespace MotorsEditor
         {
             Bitmap bmp = new Bitmap(HeightmapEditor.Image);
             view.terrain.FromBitmap(bmp);
-            tabControl2.SelectTab(1);
+            tabControl2.SelectTab(2);
         }
 
         private void waterToolStripMenuItem_Click(object sender, EventArgs e)
@@ -393,7 +395,7 @@ namespace MotorsEditor
             {
                 for (int x=0;x<view.terrain.MAP_SIZE;x++) 
                 {
-                   int height = view.terrain.Height(x,y);
+                   int height = view.terrain.rawHeight(x,y);
                    hbmp.SetPixel(x, y, Color.FromArgb(height, height, height));
                 }
             }
@@ -480,9 +482,8 @@ namespace MotorsEditor
                     ent.x = reader.ReadSingle();
                     ent.y = reader.ReadSingle();
                 }
-                catch (EndOfStreamException eofe)
+                catch (EndOfStreamException)
                 {
-
                     break;
                 }
                 string typename = "";
@@ -608,7 +609,35 @@ namespace MotorsEditor
 
         private void terrainTexture_Draw(int x, int y)
         {
-            tTex_graph.DrawImage(currentBrush, new Rectangle(x, y, 25, 25), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
+            if (currentBrush != null)
+            {
+                tTex_graph.DrawImage(currentBrush, new Rectangle(x-12, y-12, 25, 25), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
+            }
+        }
+
+        private void toolStripButton5_Click(object sender, EventArgs e)
+        {
+            if (view.terrain.texture > 0)
+            {
+                uint[] tex = new uint[1];
+                tex[0] = view.terrain.texture;
+                GL.glDeleteTextures(1, tex);
+            }
+            view.terrain.texture = view.terrain.LoadTexture((Bitmap)terrainTexture.Image);
+            tabControl2.SelectTab(2);
+        }
+
+        private void toolStripButton6_Click(object sender, EventArgs e)
+        {
+            if (currentBrush != null)
+            {
+                tTex_graph.DrawImage(currentBrush,new Point(0,0));
+            }
+        }
+
+        private void openNoiseDialogButton_Click(object sender, EventArgs e)
+        {
+            noiseDialog.Show();
         }
 
 

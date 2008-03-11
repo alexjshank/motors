@@ -31,6 +31,7 @@ namespace MotorsEditor
 
         private void UpdatePreviewWindow()
         {
+            graph.Clear(Color.White);
             pen = new Pen(brushColor, brushSize);
             switch (brushType) {
                 case 0:
