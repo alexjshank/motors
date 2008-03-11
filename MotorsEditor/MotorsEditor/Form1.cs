@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -20,6 +21,15 @@ namespace MotorsEditor
         Pen heightmapEditor_pen;
         private OpenGLView view;
         private BrushSelector selector;
+
+        private Dictionary<string, Image> brushes = new Dictionary<string, Image>();
+        private Image currentBrush;
+        private Graphics tTex_graph;
+        private bool tTex_mouseDown = false;
+        private Point tTex_lastMousePos = new Point(0, 0);
+        private ImageAttributes ia = new ImageAttributes();
+        private ColorMatrix cm = new ColorMatrix();
+
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -79,6 +89,11 @@ namespace MotorsEditor
             {
                 // create a new empty one..
             }
+
+            terrainTexture.Image = new Bitmap(1024, 1024, PixelFormat.Format32bppPArgb);
+            tTex_graph = Graphics.FromImage(terrainTexture.Image);
+            cm.Matrix33 = 0.5f;
+            ia.SetColorMatrix(cm);
 
             HeightmapEditor.Image = new Bitmap(512, 512);
             UpdateBrush();
@@ -535,6 +550,66 @@ namespace MotorsEditor
 
         }
 
+        private void addBrushTypeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.OK) 
+            {
+                brushes.Add(ofd.FileName, new Bitmap(ofd.FileName.ToString()));
+                ToolStripMenuItem item = new ToolStripMenuItem();
+                item.Text = ofd.FileName;
+                item.Click += new EventHandler(textureSelectBrush);
+                item.Image = brushes[ofd.FileName];
+                toolStripDropDownButton1.DropDownItems.Add(item);
+                currentBrush = brushes[ofd.FileName];
+            }
+        }
+
+        void textureSelectBrush(object sender, EventArgs e)
+        {
+            currentBrush = brushes[((ToolStripItem)sender).Text];
+        }
+
+
+        private void terrainTexture_MouseDown(object sender, MouseEventArgs e)
+        {
+            tTex_mouseDown = true;
+            terrainTexture_Draw(e.X, e.Y);
+            terrainTexture.Refresh();
+            tTex_lastMousePos = e.Location;
+        }
+
+
+        private void terrainTexture_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (tTex_mouseDown)
+            {
+                int xDelta = (e.X - tTex_lastMousePos.X);
+                int yDelta = (e.Y - tTex_lastMousePos.Y);
+                int drawDistance = (int)Math.Sqrt((xDelta * xDelta) + (yDelta * yDelta));
+                
+                for (int i = 0; i < drawDistance/5; i++)
+                {
+                    float lerp = (float)i / 10;
+                    float x = tTex_lastMousePos.X + xDelta * lerp;
+                    float y = tTex_lastMousePos.Y + yDelta * lerp;
+                    terrainTexture_Draw((int)x, (int)y);
+                }
+                tTex_lastMousePos = e.Location;      
+                terrainTexture.Refresh();
+            }
+
+        }
+
+        private void terrainTexture_MouseUp(object sender, MouseEventArgs e)
+        {
+            tTex_mouseDown = false;
+        }
+
+        private void terrainTexture_Draw(int x, int y)
+        {
+            tTex_graph.DrawImage(currentBrush, new Rectangle(x, y, 25, 25), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
+        }
 
 
 
