@@ -589,9 +589,9 @@ namespace MotorsEditor
                 int yDelta = (e.Y - tTex_lastMousePos.Y);
                 int drawDistance = (int)Math.Sqrt((xDelta * xDelta) + (yDelta * yDelta));
                 
-                for (int i = 0; i < drawDistance/5; i++)
+                for (int i = 0; i < 1+(drawDistance/20); i++)
                 {
-                    float lerp = (float)i / 10;
+                    float lerp = (float)i / (1 + (drawDistance / 20));
                     float x = tTex_lastMousePos.X + xDelta * lerp;
                     float y = tTex_lastMousePos.Y + yDelta * lerp;
                     terrainTexture_Draw((int)x, (int)y);
@@ -609,9 +609,22 @@ namespace MotorsEditor
 
         private void terrainTexture_Draw(int x, int y)
         {
+            int brushSize = 40;
+            int halfBrushSize = 20;
             if (currentBrush != null)
             {
-                tTex_graph.DrawImage(currentBrush, new Rectangle(x-20, y-20, 40, 40), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
+                int i = (x - halfBrushSize) % currentBrush.Width;
+                int u = (y - halfBrushSize) % currentBrush.Height;
+                if (i + brushSize > currentBrush.Width)
+                {
+                    tTex_graph.DrawImage(currentBrush, new Rectangle(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize), i - currentBrush.Width, u, brushSize, brushSize, GraphicsUnit.Pixel, ia);
+                }
+                if (u + brushSize > currentBrush.Height)
+                {
+                    tTex_graph.DrawImage(currentBrush, new Rectangle(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize), i, u - currentBrush.Height, brushSize, brushSize, GraphicsUnit.Pixel, ia);
+                }
+
+                tTex_graph.DrawImage(currentBrush, new Rectangle(x - halfBrushSize, y - halfBrushSize, brushSize, brushSize), i, u, brushSize, brushSize, GraphicsUnit.Pixel, ia);
             }
         }
 
@@ -640,7 +653,67 @@ namespace MotorsEditor
             noiseDialog.Show();
         }
 
+        private void tabControl2_SelectedIndexChanged(object sender, EventArgs e)
+        {
 
+        }
+
+        private void GenerateFromHeightmap_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to generate a texture from the heightmap?\nYou will loose your current texture if you haven't saved.", "Discard Current Texture?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+            {
+                int lastHeight = 0;
+                int heightDelta = 255 / brushes.Count;
+                foreach (Image brush in brushes.Values)
+                {
+                    genBrushFromHeightmap((Bitmap)HeightmapEditor.Image, brush, lastHeight, lastHeight + heightDelta);
+                    lastHeight += heightDelta;
+                }
+            }
+        }
+
+        private void genBrushFromHeightmap(Bitmap source, Image brush, int heightRange_bottom, int heightRange_top)
+        {
+            Graphics graph = Graphics.FromImage(terrainTexture.Image);
+            Pen pen = new Pen(Color.Black, 1);
+            int scaleFactorX = terrainTexture.Image.Width / source.Width;
+            int scaleFactorY = terrainTexture.Image.Height / source.Height;
+            int rc = 0;
+            int srcHeight = 0;
+            int x, y;
+            Rectangle r1 = new Rectangle(), r2 = new Rectangle();
+
+            BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+            int step = 5;
+            unsafe
+            {
+                for (y = 0; y < source.Height; y+=step)
+                {
+                    for (x = 0; x < source.Width; x+=step)
+                    {
+                        int* sourcePixel = (int*)((int*)sourceData.Scan0 + (y * sourceData.Width) + x);
+                        srcHeight = Color.FromArgb(*sourcePixel).R;
+
+                        if (srcHeight <= heightRange_top && srcHeight >= heightRange_bottom)
+                        {
+                            r1.X = (x * scaleFactorX); r1.Y = (y * scaleFactorY);
+                            r1.Width = 1 * scaleFactorX; r1.Height = 1 * scaleFactorY;
+
+                            r2.X = (x * scaleFactorX) % brush.Width; r2.Y = (y * scaleFactorY) % brush.Height;
+                            r2.Width = 1 * scaleFactorX; r2.Height = 1 * scaleFactorY;
+
+                            graph.DrawImage(brush, r1, r2, GraphicsUnit.Pixel);
+                        }
+                    }
+              //**      if (rc++ > 25)
+                    {
+                        terrainTexture.Refresh();
+                        rc = 0;
+                    }
+                }
+            }
+            source.UnlockBits(sourceData);
+        }
 
     }
 

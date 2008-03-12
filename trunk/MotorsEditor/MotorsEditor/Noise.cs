@@ -40,12 +40,30 @@ namespace MotorsEditor
             {
                 for (int x = 0; x < outputBox.Image.Width; x += size)
                 {
-                    int v = r2(seed,x,y);
-                    pen.Color = Color.FromArgb((int)(255 * persistence), v, v, v);
-                    Brush b = new Brush();
-                    pen.PenType = System.Drawing.Drawing2D.PenType.PathGradient;
-                    pen.
-                    graph.DrawRectangle(pen, new Rectangle(x, y, size, size));
+                    if (size > 1)
+                    {
+                        Point[] ptGraph = { new Point(x, y), new Point(x + size, y), new Point(x + size, y + size), new Point(x, y + size) };
+                        System.Drawing.Drawing2D.PathGradientBrush pgb = new System.Drawing.Drawing2D.PathGradientBrush(ptGraph);
+
+                        int v1 = r2(seed, x, y);
+                        int v2 = r2(seed, x + size, y);
+                        int v3 = r2(seed, x + size, y + size);
+                        int v4 = r2(seed, x, y + size);
+                        int v = (v1 + v2 + v3 + v4) / 4;
+                        pgb.CenterColor = Color.FromArgb((int)(255 * persistence), v, v, v);
+                        pgb.SurroundColors = new Color[] {  Color.FromArgb((int)(255 * persistence), v1, v1, v1), 
+                                                            Color.FromArgb((int)(255 * persistence), v2, v2, v2), 
+                                                            Color.FromArgb((int)(255 * persistence), v3, v3, v3), 
+                                                            Color.FromArgb((int)(255 * persistence), v4, v4, v4) };
+
+                        graph.FillRectangle(pgb, new Rectangle(x, y, size, size));
+                    }
+                    else
+                    {
+                        int v = r2(seed, x, y);
+                        pen.Color = Color.FromArgb((int)(255 * persistence), v, v, v);
+                        graph.DrawRectangle(pen, x, y, 1, 1);
+                    }
                 }
             }
         }
@@ -92,18 +110,17 @@ namespace MotorsEditor
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int n = 10;
+            int n = 8;
             Random r = new Random();
 
-
-            GenerateNoise(128, r.Next(1, 999999), 1.0f);
+            GenerateNoise(256, r.Next(1,999999), 1.0f);
+          
             for (int i = 1; i < n; i++)
             {
-                GenerateNoise(128 / i, r.Next(1,999999), 1.0f / (i * 4));
+                GenerateNoise(256 / i, r.Next(1,999999), 0.5f);
             }
 
-//            for (int i=0; i<10;i++) 
-//                Smooth(1);
+            Smooth(1);
   
             outputBox.Refresh();
         }
