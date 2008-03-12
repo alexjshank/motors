@@ -30,11 +30,11 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("World");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Project Maps");
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("World");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Project Maps");
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,6 +89,7 @@
             this.ground2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ground3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.openNoiseDialogButton = new System.Windows.Forms.ToolStripButton();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.treeView3 = new System.Windows.Forms.TreeView();
             this.HeightmapEditor = new System.Windows.Forms.PictureBox();
@@ -98,6 +99,9 @@
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.addBrushTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.terrainTexture = new System.Windows.Forms.PictureBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -116,10 +120,6 @@
             this.ContentPanel = new System.Windows.Forms.ToolStripContentPanel();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton6 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.openNoiseDialogButton = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -180,7 +180,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -378,13 +378,13 @@
             // 
             this.projectSavesToolStripMenuItem.Enabled = false;
             this.projectSavesToolStripMenuItem.Name = "projectSavesToolStripMenuItem";
-            this.projectSavesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.projectSavesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.projectSavesToolStripMenuItem.Text = "Project Saves...";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(160, 6);
             // 
             // openToolStripButton2
             // 
@@ -428,31 +428,31 @@
             // unitsToolStripMenuItem1
             // 
             this.unitsToolStripMenuItem1.Name = "unitsToolStripMenuItem1";
-            this.unitsToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.unitsToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.unitsToolStripMenuItem1.Text = "Units";
             // 
             // buildingsToolStripMenuItem1
             // 
             this.buildingsToolStripMenuItem1.Name = "buildingsToolStripMenuItem1";
-            this.buildingsToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.buildingsToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.buildingsToolStripMenuItem1.Text = "Buildings";
             // 
             // environmentToolStripMenuItem1
             // 
             this.environmentToolStripMenuItem1.Name = "environmentToolStripMenuItem1";
-            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.environmentToolStripMenuItem1.Text = "Environment";
             // 
             // triggerToolStripMenuItem1
             // 
             this.triggerToolStripMenuItem1.Name = "triggerToolStripMenuItem1";
-            this.triggerToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.triggerToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.triggerToolStripMenuItem1.Text = "Trigger";
             // 
             // soundToolStripMenuItem
             // 
             this.soundToolStripMenuItem.Name = "soundToolStripMenuItem";
-            this.soundToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.soundToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.soundToolStripMenuItem.Text = "Sound";
             // 
             // treeView2
@@ -462,10 +462,10 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView2.Location = new System.Drawing.Point(5, 28);
             this.treeView2.Name = "treeView2";
-            treeNode1.Name = "Node0";
-            treeNode1.Text = "World";
+            treeNode9.Name = "Node0";
+            treeNode9.Text = "World";
             this.treeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode9});
             this.treeView2.Size = new System.Drawing.Size(179, 300);
             this.treeView2.TabIndex = 0;
             // 
@@ -674,35 +674,35 @@
             // waterToolStripMenuItem
             // 
             this.waterToolStripMenuItem.Name = "waterToolStripMenuItem";
-            this.waterToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.waterToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.waterToolStripMenuItem.Text = "Water";
             this.waterToolStripMenuItem.Click += new System.EventHandler(this.waterToolStripMenuItem_Click);
             // 
             // beachToolStripMenuItem
             // 
             this.beachToolStripMenuItem.Name = "beachToolStripMenuItem";
-            this.beachToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.beachToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.beachToolStripMenuItem.Text = "Beach";
             this.beachToolStripMenuItem.Click += new System.EventHandler(this.beachToolStripMenuItem_Click);
             // 
             // ground1ToolStripMenuItem
             // 
             this.ground1ToolStripMenuItem.Name = "ground1ToolStripMenuItem";
-            this.ground1ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground1ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground1ToolStripMenuItem.Text = "Ground1";
             this.ground1ToolStripMenuItem.Click += new System.EventHandler(this.ground1ToolStripMenuItem_Click);
             // 
             // ground2ToolStripMenuItem
             // 
             this.ground2ToolStripMenuItem.Name = "ground2ToolStripMenuItem";
-            this.ground2ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground2ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground2ToolStripMenuItem.Text = "Ground2";
             this.ground2ToolStripMenuItem.Click += new System.EventHandler(this.ground2ToolStripMenuItem_Click);
             // 
             // ground3ToolStripMenuItem
             // 
             this.ground3ToolStripMenuItem.Name = "ground3ToolStripMenuItem";
-            this.ground3ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground3ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground3ToolStripMenuItem.Text = "Ground3";
             this.ground3ToolStripMenuItem.Click += new System.EventHandler(this.ground3ToolStripMenuItem_Click);
             // 
@@ -715,6 +715,16 @@
             this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton1.Text = "toolStripButton1";
             this.toolStripButton1.Click += new System.EventHandler(this.ChooseBrushButton_Click);
+            // 
+            // openNoiseDialogButton
+            // 
+            this.openNoiseDialogButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.openNoiseDialogButton.Image = ((System.Drawing.Image)(resources.GetObject("openNoiseDialogButton.Image")));
+            this.openNoiseDialogButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.openNoiseDialogButton.Name = "openNoiseDialogButton";
+            this.openNoiseDialogButton.Size = new System.Drawing.Size(23, 22);
+            this.openNoiseDialogButton.Text = "toolStripButton7";
+            this.openNoiseDialogButton.Click += new System.EventHandler(this.openNoiseDialogButton_Click);
             // 
             // splitContainer4
             // 
@@ -740,10 +750,10 @@
             this.treeView3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView3.Location = new System.Drawing.Point(0, 0);
             this.treeView3.Name = "treeView3";
-            treeNode2.Name = "Node0";
-            treeNode2.Text = "Project Maps";
+            treeNode10.Name = "Node0";
+            treeNode10.Text = "Project Maps";
             this.treeView3.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode10});
             this.treeView3.Size = new System.Drawing.Size(149, 608);
             this.treeView3.TabIndex = 0;
             this.treeView3.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeview3_pickHeightmap);
@@ -759,8 +769,8 @@
             this.HeightmapEditor.Size = new System.Drawing.Size(712, 602);
             this.HeightmapEditor.TabIndex = 1;
             this.HeightmapEditor.TabStop = false;
-            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseMove += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseMove);
+            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseUp);
             // 
             // terrainTexturePage
@@ -804,7 +814,7 @@
             this.toolStripButton5});
             this.toolStrip2.Location = new System.Drawing.Point(0, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(30, 84);
+            this.toolStrip2.Size = new System.Drawing.Size(30, 86);
             this.toolStrip2.TabIndex = 0;
             // 
             // toolStripDropDownButton1
@@ -822,14 +832,39 @@
             // addBrushTypeToolStripMenuItem
             // 
             this.addBrushTypeToolStripMenuItem.Name = "addBrushTypeToolStripMenuItem";
-            this.addBrushTypeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.addBrushTypeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.addBrushTypeToolStripMenuItem.Text = "Add Brush Type";
             this.addBrushTypeToolStripMenuItem.Click += new System.EventHandler(this.addBrushTypeToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
+            // 
+            // toolStripButton6
+            // 
+            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
+            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton6.Name = "toolStripButton6";
+            this.toolStripButton6.Size = new System.Drawing.Size(28, 20);
+            this.toolStripButton6.Text = "toolStripButton6";
+            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(28, 6);
+            // 
+            // toolStripButton5
+            // 
+            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton5.Image = global::MotorsEditor.Properties.Resources.PreviewButton;
+            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton5.Name = "toolStripButton5";
+            this.toolStripButton5.Size = new System.Drawing.Size(28, 20);
+            this.toolStripButton5.Text = "toolStripButton5";
+            this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton5_Click);
             // 
             // terrainTexture
             // 
@@ -841,8 +876,8 @@
             this.terrainTexture.Size = new System.Drawing.Size(842, 644);
             this.terrainTexture.TabIndex = 0;
             this.terrainTexture.TabStop = false;
-            this.terrainTexture.MouseDown += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseDown);
             this.terrainTexture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseMove);
+            this.terrainTexture.MouseDown += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseDown);
             this.terrainTexture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseUp);
             // 
             // tabPage4
@@ -905,36 +940,36 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.ConfigGrid.BackgroundColor = System.Drawing.SystemColors.ActiveBorder;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
             this.ConfigGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ConfigGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Variable,
             this.Value});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ConfigGrid.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ConfigGrid.DefaultCellStyle = dataGridViewCellStyle14;
             this.ConfigGrid.Location = new System.Drawing.Point(0, 31);
             this.ConfigGrid.Name = "ConfigGrid";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
             this.ConfigGrid.Size = new System.Drawing.Size(888, 639);
             this.ConfigGrid.TabIndex = 0;
             // 
@@ -1024,41 +1059,6 @@
             this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton2.Text = "toolStripButton2";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-            // 
-            // toolStripButton5
-            // 
-            this.toolStripButton5.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton5.Image = global::MotorsEditor.Properties.Resources.PreviewButton;
-            this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(28, 20);
-            this.toolStripButton5.Text = "toolStripButton5";
-            this.toolStripButton5.Click += new System.EventHandler(this.toolStripButton5_Click);
-            // 
-            // toolStripButton6
-            // 
-            this.toolStripButton6.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton6.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton6.Image")));
-            this.toolStripButton6.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton6.Name = "toolStripButton6";
-            this.toolStripButton6.Size = new System.Drawing.Size(28, 20);
-            this.toolStripButton6.Text = "toolStripButton6";
-            this.toolStripButton6.Click += new System.EventHandler(this.toolStripButton6_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(28, 6);
-            // 
-            // openNoiseDialogButton
-            // 
-            this.openNoiseDialogButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.openNoiseDialogButton.Image = ((System.Drawing.Image)(resources.GetObject("openNoiseDialogButton.Image")));
-            this.openNoiseDialogButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.openNoiseDialogButton.Name = "openNoiseDialogButton";
-            this.openNoiseDialogButton.Size = new System.Drawing.Size(23, 22);
-            this.openNoiseDialogButton.Text = "toolStripButton7";
-            this.openNoiseDialogButton.Click += new System.EventHandler(this.openNoiseDialogButton_Click);
             // 
             // Form1
             // 
