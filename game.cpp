@@ -64,6 +64,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	srand(timeGetTime());
 	vars = new gamevars;
 	vars->loadCfgFile("config.cfg");
+
+	LoadWorldState(vars->getValue("default_map")->value.c_str());
+
 	
 	timer = new Timer;
 	tasks.AddTask(timer);
@@ -135,8 +138,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	library->Import("data/models/plant2.md2",1);
 	library->Import("data/models/felwoodbush1.md2",1);
-
-	LoadWorldState(vars->getValue("default_map")->value.c_str());
 
 	UIWindow *waypointEditor = (UIWindow*)ui->CreateFromFile("data/ui/waypointeditor.ui");
 	waypointEditor->visible = false;

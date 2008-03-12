@@ -18,8 +18,8 @@ void SaveWorldState(const char *filename) {
 	FILE * fout = fopen(filename,"w");
 
 	strcpy(head.magic,"ASGE07");
-	head.size_x = 512;
-	head.size_y = 512;
+	head.size_x = terrain->width;
+	head.size_y = terrain->height;
 	strcpy(head.terrainName,"PirateIsland");
 	head.entityCount = (int)ents->entities.size();
 	fwrite(&head,sizeof(MapHeader),1,fout);
