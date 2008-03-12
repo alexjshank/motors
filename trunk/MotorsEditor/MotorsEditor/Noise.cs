@@ -26,6 +26,11 @@ namespace MotorsEditor
             return v;
         }
 
+        private int r2(int s, int x, int y)
+        {
+            return rand(s + x + (y * outputBox.Image.Width)) % 255;
+        }
+
         private void GenerateNoise(int size, int seed, float persistence)
         {
             seed *= 98234;
@@ -35,8 +40,11 @@ namespace MotorsEditor
             {
                 for (int x = 0; x < outputBox.Image.Width; x += size)
                 {
-                    int v = rand(seed + x + (y * outputBox.Image.Width)) % 255;
+                    int v = r2(seed,x,y);
                     pen.Color = Color.FromArgb((int)(255 * persistence), v, v, v);
+                    Brush b = new Brush();
+                    pen.PenType = System.Drawing.Drawing2D.PenType.PathGradient;
+                    pen.
                     graph.DrawRectangle(pen, new Rectangle(x, y, size, size));
                 }
             }

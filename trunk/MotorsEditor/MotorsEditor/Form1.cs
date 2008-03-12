@@ -611,7 +611,7 @@ namespace MotorsEditor
         {
             if (currentBrush != null)
             {
-                tTex_graph.DrawImage(currentBrush, new Rectangle(x-12, y-12, 25, 25), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
+                tTex_graph.DrawImage(currentBrush, new Rectangle(x-20, y-20, 40, 40), x % currentBrush.Width, y % currentBrush.Height, 25, 25, GraphicsUnit.Pixel, ia);
             }
         }
 
