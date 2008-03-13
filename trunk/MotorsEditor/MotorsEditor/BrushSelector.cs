@@ -25,8 +25,13 @@ namespace MotorsEditor
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            brushSize = int.Parse(numericUpDown1.Value.ToString());
+            brushSize = int.Parse(brushSizePicker.Value.ToString());
             UpdatePreviewWindow();
+        }
+
+        private void brushColorPicker_ValueChanged(object sender, EventArgs e)
+        {
+            brushColor = Color.FromArgb(255, (int)brushColorPicker.Value, (int)brushColorPicker.Value, (int)brushColorPicker.Value);
         }
 
         private void UpdatePreviewWindow()
@@ -74,14 +79,15 @@ namespace MotorsEditor
 
         private void textBox1_TextChanged_1(object sender, EventArgs e)
         {
-            int color = 0;
-            if (int.TryParse(textBox1.Text.ToString(), out color))
-            {
-                brushColor = Color.FromArgb(color);
-                brushColor = Color.FromArgb(255, brushColor);   // set the alpha to 255
-                textBox1.BackColor = brushColor;
-                UpdatePreviewWindow();
-            }
+            int color = (int)brushColorPicker.Value;
+            brushColor = Color.FromArgb(255,color,color,color);
+            UpdatePreviewWindow();
+        }
+
+        private void BrushSelector_Load(object sender, EventArgs e)
+        {
+            brushColorPicker.Value = brushColor.R;
+            brushSizePicker.Value = brushSize;
         }
 
     }
