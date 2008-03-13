@@ -98,6 +98,8 @@ namespace MotorsEditor
 
             noiseDialog.outputBox = HeightmapEditor;
             HeightmapEditor.Image = new Bitmap(512, 512);
+            selector.brushColor = Color.Black;
+            selector.brushSize = 25;
             UpdateBrush();
             newToolStripButton_Click(this, null);
         }
@@ -105,7 +107,7 @@ namespace MotorsEditor
         private void UpdateBrush()
         {
             heightmapEditor_Graph = Graphics.FromImage(HeightmapEditor.Image);
-            heightmapEditor_pen = new Pen(selector.brushColor, selector.brushSize);
+            heightmapEditor_pen = new Pen(selector.brushColor, selector.brushSize); // hooray for memory leaks
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -140,12 +142,12 @@ namespace MotorsEditor
         private void button1_Click(object sender, EventArgs e)
         {
             LoadGameDir(MRUListBox.Items[MRUListBox.SelectedIndex].ToString());
-            tabControl1.SelectTab(1);
+            MainTabcontrol.SelectTab(1);
         }
         private void MRUListBox_DoubleClick(object sender, EventArgs e)
         {
             LoadGameDir(MRUListBox.Items[MRUListBox.SelectedIndex].ToString());
-            tabControl1.SelectTab(1);
+            MainTabcontrol.SelectTab(1);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -155,7 +157,7 @@ namespace MotorsEditor
             if (fbd.ShowDialog() == DialogResult.OK)
             {
                 LoadGameDir(fbd.SelectedPath);
-                tabControl1.SelectTab(1);
+                MainTabcontrol.SelectTab(1);
             }
         }
 
@@ -321,6 +323,8 @@ namespace MotorsEditor
 
         private void ChooseBrushButton_Click(object sender, EventArgs e)
         {
+            selector.brushColor = heightmapEditor_pen.Color;
+            selector.brushSize = (int)heightmapEditor_pen.Width;
             selector.ShowDialog();
             UpdateBrush();
         }
@@ -613,6 +617,7 @@ namespace MotorsEditor
             int halfBrushSize = 20;
             if (currentBrush != null)
             {
+                tTex_graph.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
                 int i = (x - halfBrushSize) % currentBrush.Width;
                 int u = (y - halfBrushSize) % currentBrush.Height;
                 if (i + brushSize > currentBrush.Width)
@@ -642,9 +647,19 @@ namespace MotorsEditor
 
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
+            if (MessageBox.Show("Are you sure you want to fill the texture with your current brush?\nYou will loose your current texture.") != DialogResult.OK)
+                return;
+
             if (currentBrush != null)
             {
-                tTex_graph.DrawImage(currentBrush,new Point(0,0));
+                for (int y = 0; y < terrainTexture.Height; y += currentBrush.Height)
+                {
+                    for (int x = 0; x < terrainTexture.Width; x += currentBrush.Width)
+                    {
+                        tTex_graph.DrawImage(currentBrush, new Point(x, y));
+                    }
+                }
+                terrainTexture.Refresh();
             }
         }
 
@@ -705,7 +720,7 @@ namespace MotorsEditor
                             graph.DrawImage(brush, r1, r2, GraphicsUnit.Pixel);
                         }
                     }
-              //**      if (rc++ > 25)
+                    if (rc++ > 25)
                     {
                         terrainTexture.Refresh();
                         rc = 0;
@@ -713,6 +728,11 @@ namespace MotorsEditor
                 }
             }
             source.UnlockBits(sourceData);
+        }
+
+        private void splitContainer5_Panel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
 
     }

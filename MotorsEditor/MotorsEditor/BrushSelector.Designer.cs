@@ -30,16 +30,17 @@ namespace MotorsEditor
         {
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.brushSizePicker = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.BrushPreview = new System.Windows.Forms.PictureBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.brushColorPicker = new System.Windows.Forms.NumericUpDown();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizePicker)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.BrushPreview)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushColorPicker)).BeginInit();
             this.SuspendLayout();
             // 
             // comboBox1
@@ -58,9 +59,9 @@ namespace MotorsEditor
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBox1);
+            this.groupBox1.Controls.Add(this.brushColorPicker);
             this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this.numericUpDown1);
+            this.groupBox1.Controls.Add(this.brushSizePicker);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.comboBox1);
@@ -71,35 +72,18 @@ namespace MotorsEditor
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Brush";
             // 
-            // textBox1
+            // brushSizePicker
             // 
-            this.textBox1.Location = new System.Drawing.Point(46, 83);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(69, 20);
-            this.textBox1.TabIndex = 5;
-            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged_1);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 86);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(31, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Color";
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(46, 52);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(69, 20);
-            this.numericUpDown1.TabIndex = 3;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.brushSizePicker.Location = new System.Drawing.Point(46, 52);
+            this.brushSizePicker.Name = "brushSizePicker";
+            this.brushSizePicker.Size = new System.Drawing.Size(69, 20);
+            this.brushSizePicker.TabIndex = 3;
+            this.brushSizePicker.Value = new decimal(new int[] {
             10,
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            this.brushSizePicker.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // label2
             // 
@@ -138,6 +122,28 @@ namespace MotorsEditor
             this.BrushPreview.TabIndex = 4;
             this.BrushPreview.TabStop = false;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(2, 86);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(38, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Height";
+            // 
+            // brushColorPicker
+            // 
+            this.brushColorPicker.Location = new System.Drawing.Point(46, 84);
+            this.brushColorPicker.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.brushColorPicker.Name = "brushColorPicker";
+            this.brushColorPicker.Size = new System.Drawing.Size(69, 20);
+            this.brushColorPicker.TabIndex = 5;
+            this.brushColorPicker.ValueChanged += new System.EventHandler(this.brushColorPicker_ValueChanged);
+            // 
             // BrushSelector
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -148,10 +154,12 @@ namespace MotorsEditor
             this.Controls.Add(this.groupBox1);
             this.Name = "BrushSelector";
             this.Text = "BrushSelector";
+            this.Load += new System.EventHandler(this.BrushSelector_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushSizePicker)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.BrushPreview)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.brushColorPicker)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -161,11 +169,11 @@ namespace MotorsEditor
         private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown brushSizePicker;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.PictureBox BrushPreview;
+        private System.Windows.Forms.NumericUpDown brushColorPicker;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox1;
     }
 }

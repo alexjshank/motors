@@ -11,7 +11,7 @@ namespace MotorsEditor
     public partial class Noise : Form
     {
         public PictureBox outputBox;
-
+        Random r = new Random();
 
         public Noise()
         {
@@ -115,18 +115,23 @@ namespace MotorsEditor
         private void button1_Click(object sender, EventArgs e)
         {
             int n = (int)noiseOctaves.Value;
-            Random r = new Random();
+            
 
-            GenerateNoise(256, r.Next(1,999999), 1.0f);
+            GenerateNoise(256, (int)noiseSeed.Value, 1.0f);
           
             for (int i = 1; i < n; i++)
             {
-                GenerateNoise(256 / i, r.Next(1, 999999), (float)noisePresistence.Value / (i * (float)presistenceReductorDivisor.Value));
+                GenerateNoise(256 / i, (int)noiseSeed.Value, (float)noisePresistence.Value / (i * (float)presistenceReductorDivisor.Value));
             }
 
             Smooth(1);
   
             outputBox.Refresh();
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            noiseSeed.Value = r.Next((int)noiseSeed.Minimum, (int)noiseSeed.Maximum);
         }
 
     }
