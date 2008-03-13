@@ -697,10 +697,10 @@ namespace MotorsEditor
                         if (srcHeight <= heightRange_top && srcHeight >= heightRange_bottom)
                         {
                             r1.X = (x * scaleFactorX); r1.Y = (y * scaleFactorY);
-                            r1.Width = 1 * scaleFactorX; r1.Height = 1 * scaleFactorY;
+                            r1.Width = step * scaleFactorX; r1.Height = step * scaleFactorY;
 
                             r2.X = (x * scaleFactorX) % brush.Width; r2.Y = (y * scaleFactorY) % brush.Height;
-                            r2.Width = 1 * scaleFactorX; r2.Height = 1 * scaleFactorY;
+                            r2.Width = step * scaleFactorX; r2.Height = step * scaleFactorY;
 
                             graph.DrawImage(brush, r1, r2, GraphicsUnit.Pixel);
                         }

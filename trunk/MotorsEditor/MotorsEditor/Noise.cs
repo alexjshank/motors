@@ -36,6 +36,8 @@ namespace MotorsEditor
             seed *= 98234;
             Graphics graph = Graphics.FromImage(outputBox.Image);
             Pen pen = new Pen(Color.Black,size);
+            int p = (int)(255 * persistence);
+
             for (int y = 0; y < outputBox.Image.Height; y += size)
             {
                 for (int x = 0; x < outputBox.Image.Width; x += size)
@@ -50,11 +52,13 @@ namespace MotorsEditor
                         int v3 = r2(seed, x + size, y + size);
                         int v4 = r2(seed, x, y + size);
                         int v = (v1 + v2 + v3 + v4) / 4;
-                        pgb.CenterColor = Color.FromArgb((int)(255 * persistence), v, v, v);
-                        pgb.SurroundColors = new Color[] {  Color.FromArgb((int)(255 * persistence), v1, v1, v1), 
-                                                            Color.FromArgb((int)(255 * persistence), v2, v2, v2), 
-                                                            Color.FromArgb((int)(255 * persistence), v3, v3, v3), 
-                                                            Color.FromArgb((int)(255 * persistence), v4, v4, v4) };
+                        if (v > 255) v = 255;
+
+                        pgb.CenterColor = Color.FromArgb(p, v, v, v);
+                        pgb.SurroundColors = new Color[] {  Color.FromArgb(p, v1, v1, v1), 
+                                                            Color.FromArgb(p, v2, v2, v2), 
+                                                            Color.FromArgb(p, v3, v3, v3), 
+                                                            Color.FromArgb(p, v4, v4, v4) };
 
                         graph.FillRectangle(pgb, new Rectangle(x, y, size, size));
                     }
@@ -110,14 +114,14 @@ namespace MotorsEditor
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int n = 8;
+            int n = (int)noiseOctaves.Value;
             Random r = new Random();
 
             GenerateNoise(256, r.Next(1,999999), 1.0f);
           
             for (int i = 1; i < n; i++)
             {
-                GenerateNoise(256 / i, r.Next(1,999999), 0.5f);
+                GenerateNoise(256 / i, r.Next(1, 999999), (float)noisePresistence.Value / (i * (float)presistenceReductorDivisor.Value));
             }
 
             Smooth(1);
