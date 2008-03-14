@@ -116,7 +116,9 @@ void gamevars::setValue(const char *variable, float value)
 	}
 	else
 	{
-		varvalue->value = value;
+		char buf[50];
+		sprintf(buf,"%f",value);
+		varvalue->value = buf;
 	}
 }
  

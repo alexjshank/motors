@@ -49,20 +49,10 @@ Unit::~Unit(void)
 }
 
 void Unit::Think() { 
-	char buffer[1024];
-	sprintf(buffer,"$curID = %d;",id);
-	console->RunLine(buffer);
-	console->RunLine(script.c_str()); 
+	console->RunLinef("curID = %d",id);
+	console->RunLine(Scripts.onThink.c_str()); 
 }
 
-
-void Unit::SetScript(const char *szScript) {
-	script = szScript;
-}
-
-bool Unit::LoadScript(const char *szFilename) {
-	return console->LoadScript(szFilename);
-}
 
 void Unit::WalkTo(Vector t) {
 	target = t;
@@ -70,31 +60,30 @@ void Unit::WalkTo(Vector t) {
 }
 
 void Unit::process() {
-	// some sanity checks
-	assert (this && terrain);
+//	assert (this && terrain);
 
 	blood.position = position;
 	blood.Run();
 
 	if (alive) {
-		if (position.x < 0 || position.z < 0 || position.x > terrain->width || position.z > terrain->height) {
+		if (terrain && (position.x < 0 || position.z < 0 || position.x > terrain->width || position.z > terrain->height)) {
 			// out of bounds! dirty traitor, trying to run away from the action!
 			Kill();
 			return;
 		}
 
 		if (footprints && (state == WalkToTarget || state == RunToTarget)) {
-			if (timer->time - lastFootprintSpawn > 0.1f) {
+			if (timer->time - lastFootprintSpawn > 0.25f) {
 				if ((++foot)%2 == 1) 
-					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position+Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),15,0);
+					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position+Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),25,0);
 				else
-					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position-Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),15,0);
+					particles->Spawn(1,Vector(0.5f,0.5f,0.5f),Vector(0.5f,0.5f,0.5f),position-Normalize(Vector(sin(atan2f(velocity.x,velocity.z)+45),0,cos(atan2f(velocity.x,velocity.z)+45)))*0.25f,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),25,0);
 				lastFootprintSpawn = timer->time;
 			}
 		}
 
-		// if the terrain we're standing in is marked as unwalkable - ie: we're in an invalid piece of terrain
-		if (terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
+		// if the terrain we're standing in is marked as unwalkable - ie: we're in an invalid piece of terrain (e.g. water, or the ground under a building)
+		if (terrain && terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
  			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,EF_BUILDING,0,0);
 			if (stuckIn && dist2(stuckIn->position,position) < stuckIn->size.len2() + size.len2()) {	// if we're stuck in something
 				position += Normalize(position - stuckIn->position) * timer->frameScalar;
@@ -178,10 +167,6 @@ void Unit::process() {
 			model->setRotation(calibratedModelRotation + Vector(0,0,atan2(velocity.x,velocity.z)/(3.1415f/180)));
 		}
 
-		if (script.length() > 0) {
-			console->RunLine(script.c_str());
-		}
-
 		Think();
 	} else {
 		blood.on = true;
@@ -198,7 +183,6 @@ void Unit::process() {
 				try {				
 					Remove();
 				} catch (...) {
-					// FFFFFuccccccccccckkkkkkkkk... delete failed.... umm do something!!!
 					console->Print("Yar, thar be holes in them thar code!");
 				}
 			}
@@ -208,50 +192,52 @@ void Unit::process() {
 
 void Unit::render() {
 	if (camera->frustum.pointInFrustum(position)) {
-		model->setScale(scale);
-		glBindTexture(GL_TEXTURE_2D,texture);
-		glColor3f(1,1,1);
+		if (model) {
+			model->setScale(scale);
+			glBindTexture(GL_TEXTURE_2D,texture);
+			glColor3f(1,1,1);
 
-		int animationStart = 0;
-		int animationEnd = 0;
+			int animationStart = 0;
+			int animationEnd = 0;
 
-		switch (state) {
-			case WalkToTarget:
-				animationStart = modelAnimations.walkStart;
-				animationEnd = modelAnimations.walkEnd;
-				break;
-			case RunToTarget:
-				animationStart = modelAnimations.runStart;
-				animationEnd = modelAnimations.runEnd;
-				break;
+			switch (state) {
+				case WalkToTarget:
+					animationStart = modelAnimations.walkStart;
+					animationEnd = modelAnimations.walkEnd;
+					break;
+				case RunToTarget:
+					animationStart = modelAnimations.runStart;
+					animationEnd = modelAnimations.runEnd;
+					break;
 
-			case Stopped:
-			default:
-				animationStart = modelAnimations.idleStart;
-				animationEnd = modelAnimations.idleEnd;
-				break;
+				case Stopped:
+				default:
+					animationStart = modelAnimations.idleStart;
+					animationEnd = modelAnimations.idleEnd;
+					break;
+			}
+
+			if (alive) {
+				frame += modelAnimations.fps*timer->frameDifference;
+				if ((frame > animationEnd) || (frame < animationStart)) frame = (float)animationStart;
+				glPushAttrib(GL_ALL_ATTRIB_BITS);
+				glDisable(GL_DEPTH_TEST);
+				glLineWidth(5);
+				glDisable(GL_TEXTURE_2D);
+				glBegin(GL_LINES);
+					glColor3f(1,0,0);
+					glVertex3f(position.x,position.y+size.y,position.z);
+					glVertex3f(position.x,position.y+size.y + 1,position.z);
+				
+					glColor3f(0,1,0);
+					glVertex3f(position.x,position.y+size.y,position.z);
+					glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
+				glEnd();
+				glPopAttrib();
+			}
+
+			model->drawObjectFrame(frame,model->kDrawImmediate);
 		}
-
-		if (alive) {
-			frame += modelAnimations.fps*timer->frameDifference;
-			if ((frame > animationEnd) || (frame < animationStart)) frame = (float)animationStart;
-			glPushAttrib(GL_ALL_ATTRIB_BITS);
-			glDisable(GL_DEPTH_TEST);
-			glLineWidth(5);
-			glDisable(GL_TEXTURE_2D);
-			glBegin(GL_LINES);
-				glColor3f(1,0,0);
-				glVertex3f(position.x,position.y+size.y,position.z);
-				glVertex3f(position.x,position.y+size.y + 1,position.z);
-			
-				glColor3f(0,1,0);
-				glVertex3f(position.x,position.y+size.y,position.z);
-				glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
-			glEnd();
-			glPopAttrib();
-		}
-
-		model->drawObjectFrame(frame,model->kDrawImmediate);
 	}
 
 	renderToolTip();
@@ -295,4 +281,27 @@ void Unit::SetModel(const char *modelname, const char *texturename) {
 	model = new Md2Object;
 	model->setModel((Model_MD2*)library->Export(modelname));
 	texture = renderer->LoadTexture(texturename);
+}
+
+
+
+void Unit::onAttacked(Entity *source) {
+	console->RunLinef("curID = %d",id);
+	console->RunLinef("srcID = %d",source->id);
+	console->RunLine(Scripts.onAttacked.c_str()); 
+}
+
+void Unit::onDeath() {
+	console->RunLinef("curID = %d",id);
+	console->RunLine(Scripts.onKilled.c_str()); 
+}
+
+void Unit::onSelected() {
+	console->RunLinef("curID = %d",id);
+	console->RunLine(Scripts.onSelected.c_str()); 
+}
+
+void Unit::onUnSelected() {
+	console->RunLinef("curID = %d",id);
+	console->RunLine(Scripts.onUnSelected.c_str()); 
 }

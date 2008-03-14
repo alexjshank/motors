@@ -53,7 +53,7 @@ Camera::~Camera(void)
 void Camera::setProjectionMatrix(float zoomFactor, int width, int height) { 
 	glMatrixMode(GL_PROJECTION); 
 	glLoadIdentity(); 
-	gluPerspective (50.0*zoomFactor, (float)width/(float)height, 0.1f,300); 
+	gluPerspective (50.0*zoomFactor, (float)width/(float)height, 0.1f,500); 
 	glMatrixMode(GL_MODELVIEW); 
 	glLoadIdentity();
 }
@@ -62,7 +62,7 @@ void Camera::setProjectionMatrix(float zoomFactor, int width, int height) {
 
 bool Camera::init() {
 	setProjectionMatrix(1.0f,vars->getIntValue("screen_width"),vars->getIntValue("screen_height"));
-	frustum.setCamInternals(65, 1.3f, 0.01f, 200);
+	frustum.setCamInternals(65, 1.3f, 0.01f, 500);
 	return true;
 }
 
@@ -114,15 +114,15 @@ void Camera::LookAt(Vector pos) {
 	view = pos - position;
 	view.normalize();
 
-	rotation.y = 180+(float)-(atan2(view.x,view.z)/(PI/180));
+	idealRotation.y = 180+(float)-(atan2(view.x,view.z)/(PI/180));
 	float xyDelta = (float)sqrt((view.x*view.x)+(view.z*view.z));
 	float v=view.y;
 
-	rotation.x = -asin(v)/(PI/180);
+	idealRotation.x = -asin(v)/(PI/180);
 }
 
 void Camera::RotateView(float x, float y, float z) {
-	rotation += Vector(x,y,z);
+	idealRotation += Vector(x,y,z);
 /*	if (rotation.x < 0) rotation.x = 360;
 	if (rotation.y < 0) rotation.y = 360;
 	if (rotation.z < 0) rotation.z = 360;
@@ -149,6 +149,13 @@ extern Graphics *renderer;
 void Camera::CalculateView() {
 	if (bViewCalculatedThisFrame) return;
 	Vector v;
+
+	Vector dR = (idealRotation - rotation) * 10 * timer->frameScalar;
+	if (dR.len2() > 15*15) {
+		dR.normalize();
+		dR *= 15;
+	}
+	rotation += dR;
 
 	float rx = (rotation.x)*(PI/180);
 	v.y = (float)-sin(rx);

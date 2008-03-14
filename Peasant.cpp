@@ -24,7 +24,7 @@ Peasant::Peasant(void) {
 	size=Vector(1,1,1);
 	runspeed = 3.2f;
 	walkspeed = 2.5f;
-	scale = 0.05f;
+	scale = 0.07f;
 	food = NULL;
 	home = NULL;
 	mill = NULL;
@@ -168,6 +168,7 @@ void Sheep::onAttacked(Entity *source) {
 	state = RunToTarget;
 	target = position + (position - source->position);
 }
+
 
 void Sheep::Think() {
 	scale = 0.02f + ((timer->time - born)/1000);

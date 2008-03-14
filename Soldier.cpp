@@ -16,10 +16,10 @@ Soldier::Soldier(void) {
 	
 	type=E_SOLDIER;
 	family=EF_UNIT;
-	size=Vector(0.5,0.75f,0.5);
+	size=Vector(1,2,1);
 	runspeed = 4.0f;
 	walkspeed = 3.5f;
-	scale = 0.02f;
+	scale = 0.04f;
 
 	calibratedModelPosition.y = 1;
 	calibratedModelRotation.z = -90;

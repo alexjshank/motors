@@ -188,7 +188,7 @@ public:
 
 	int team;
 	int health;
-	int completed;	// 0 -> 100 (%)
+	float completed;	// 0 -> 100 (%)
 	
 	Vector position;
 	Vector velocity;

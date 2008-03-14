@@ -10,12 +10,21 @@
 #include "building.h"
 #include "LassoSelector.h"
 
+
+
 extern gamevars *vars;
 extern Graphics *renderer;
 extern EntityContainer *ents;
 extern Input *input;
 extern Camera *camera;
 extern LassoSelector *selector;
+
+#define PYTHONMODULE(varname) static PyMethodDef varname[] = {
+#define ENDPYTHONMOD {0,0,0,0} };
+#define SCRIPTFUNC(name) static PyObject* name(PyObject *self, PyObject *args)
+#define pydef(a,b)  {a, b, METH_VARARGS, ""},
+
+
 
 Console::Console(void)
 {
@@ -35,7 +44,7 @@ extern Console *console;
 
 
 // gprint('hello world')
-static PyObject * game_print(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_print) {
     const char *value;
 
     if (!PyArg_ParseTuple(args, "s", &value))
@@ -50,7 +59,7 @@ bool PlaceEntity(Entity *ent);
 
 // spawn('peasant')
 extern int currentID;
-static PyObject * game_spawn(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_spawn) {
     char *entityName;
 	int x,y;
 
@@ -62,7 +71,7 @@ static PyObject * game_spawn(PyObject *self, PyObject *args) {
 	if (!ent) return NULL;
 
 	if (ent->family == EF_UNIT) {
-		if (currentID >= 0 && currentID < ents->entities.size()) {
+		if (currentID >= 0 && currentID < (int)ents->entities.size()) {
 			Entity *parent = ents->entities[currentID];
 			if (parent) {
 					ent->position = parent->position - parent->size.flat();
@@ -78,13 +87,13 @@ static PyObject * game_spawn(PyObject *self, PyObject *args) {
 	return NULL;
 }
 
-static PyObject * game_QueueUnitForBuild(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_QueueUnitForBuild) {
     char *entityName;
 
     if (!PyArg_ParseTuple(args, "s", &entityName))
         return NULL;
 
-	if (currentID >= 0 && currentID < ents->entities.size()) {
+	if (currentID >= 0 && currentID < (int)ents->entities.size()) {
 		Entity *parent = ents->entities[currentID];
 		if (parent) {
 			((Building*)parent)->spawnQueue.push(entityName);
@@ -94,7 +103,7 @@ static PyObject * game_QueueUnitForBuild(PyObject *self, PyObject *args) {
 	return NULL;
 }
 
-static PyObject * game_killSelected(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_killSelected) {
 
 	for (int i=0;i<(int)selector->SelectedEntities.size();i++) {
 		Entity *SelectedEntity = selector->SelectedEntities[i];
@@ -126,7 +135,7 @@ static PyObject * game_save(PyObject *self, PyObject *args) {
 }
 
 
-static PyObject * game_script_getposition(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_getposition) {
     DWORD value;
  
     if (!PyArg_ParseTuple(args, "i", &value))
@@ -139,7 +148,7 @@ static PyObject * game_script_getposition(PyObject *self, PyObject *args) {
       return PyComplex_FromDoubles(0,0);
 }
  
-static PyObject * game_script_getstate(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_getstate) {
     DWORD value;
  
     if (!PyArg_ParseTuple(args, "i", &value))
@@ -151,7 +160,7 @@ static PyObject * game_script_getstate(PyObject *self, PyObject *args) {
 	return NULL;
 }
  
-static PyObject * game_script_setstate(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_setstate) {
     DWORD value,state;
  
     if (!PyArg_ParseTuple(args, "ii", &value, &state))
@@ -163,7 +172,7 @@ static PyObject * game_script_setstate(PyObject *self, PyObject *args) {
       return NULL;
 }
  
-static PyObject * game_script_pathto(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_pathto) {
     DWORD value;
       DWORD x,y;
  
@@ -176,7 +185,7 @@ static PyObject * game_script_pathto(PyObject *self, PyObject *args) {
       return NULL;
 }
  
-static PyObject * game_script_pathtoent(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_pathtoent) {
     DWORD value;
       DWORD target;
  
@@ -188,7 +197,7 @@ static PyObject * game_script_pathtoent(PyObject *self, PyObject *args) {
       return NULL;
 }
  
-static PyObject * game_script_getnearestentity(PyObject *self, PyObject *args) {
+SCRIPTFUNC(game_script_getnearestentity) {
     DWORD value;
       DWORD type,family,team;
  
@@ -205,33 +214,34 @@ static PyObject * game_script_getnearestentity(PyObject *self, PyObject *args) {
       }
       return PyInt_FromLong(0);
 }
- 
-static PyMethodDef GameMethods[] = {
-    {"echo",  game_print, METH_VARARGS, "print a string to the console."},
-      {"spawn",   game_spawn, METH_VARARGS, "spawn an entity into the game."},
-      {"save",    game_save, METH_VARARGS,"Save the game"},
- 
-      {"getPosition", game_script_getposition, METH_VARARGS, "returns the position of a unit"},
-      {"setState", game_script_setstate, METH_VARARGS, "set the current state of an entity"},
-      {"getState", game_script_getstate, METH_VARARGS, "get the current state of an entity"},
-     
-      {"getNearestEntity", game_script_getnearestentity, METH_VARARGS, "used to access other entities"},
- 
-      {"PathTo", game_script_pathto, METH_VARARGS,"issues commands to a unit to pathfind a route to a location and then go there"},
-      {"PathToEnt", game_script_pathtoent, METH_VARARGS, "issues commands to a unit to pathfind a route to a location and then go there"},
 
-      {NULL, NULL, 0, NULL}        /* Sentinel */
-};
+PYTHONMODULE(GameMethods)
+    pydef("echo",  game_print)
+    pydef("spawn",   game_spawn)
+    pydef("save",    game_save)
+ 
+    pydef("getPosition", game_script_getposition)
+    pydef("setState", game_script_setstate)
+    pydef("getState", game_script_getstate)
+     
+    pydef("getNearestEntity", game_script_getnearestentity)
+ 
+    pydef("PathTo", game_script_pathto)
+    pydef("PathToEnt", game_script_pathtoent)
+ENDPYTHONMOD
 
  
 
 
 bool Console::init() {
+	history.clear();
+
 	Py_Initialize();
 	Py_InitModule("__main__", GameMethods);
 
 	PyRun_SimpleString("echo ('Embedded Python console initialization complete - Alex shank - 2008 - alexjshank@gmail.com')");
-
+	PyRun_SimpleString("a = 5");
+	PyRun_SimpleString("echo a");
 	return true;
 }
 
@@ -266,6 +276,7 @@ void Console::run() {
 
 		renderer->text.print(0,14,"] %s",currentline.c_str());
 	
+		// this is a pretty shitty interface to the input class... input class should store keypress events in a list for each frame to be retrieved in one call to avoid this loop
 		if (input->GetKeyPressed(SDLK_RETURN)) { 
 			ProcessLine(); 
 		} else {
@@ -297,7 +308,6 @@ void Console::ProcessLine() {
 
 void Console::RunLine(const char *line) {
 
-	printf("%s",line);
 	PyRun_SimpleString(line);
 
 }
@@ -316,7 +326,9 @@ void Console::RunLinef(const char *format, ...) {
 }
 
 void Console::Print(const char *line) {
-	history.push_back(line);
+	std::string pbl(line);
+	history.push_back(pbl);
+	printf("%s\n",line);
 }
 
 void Console::Printf(const char *format, ...) { 
