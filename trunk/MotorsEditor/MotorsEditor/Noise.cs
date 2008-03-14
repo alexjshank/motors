@@ -37,6 +37,7 @@ namespace MotorsEditor
             Graphics graph = Graphics.FromImage(outputBox.Image);
             Pen pen = new Pen(Color.Black,size);
             int p = (int)(255 * persistence);
+            if (p > 255) p = 0;
 
             for (int y = 0; y < outputBox.Image.Height; y += size)
             {
@@ -72,45 +73,6 @@ namespace MotorsEditor
             }
         }
 
-        private void Smooth(int samplesize)
-        {
-            Color c = new Color();
-            System.Drawing.Imaging.BitmapData bmpData = ((Bitmap)outputBox.Image).LockBits(new Rectangle(0, 0, outputBox.Image.Width, outputBox.Image.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-            unsafe
-            {
-                for (int y = samplesize; y < bmpData.Height - samplesize; y++)
-                {
-                    for (int x = samplesize; x < bmpData.Width - samplesize; x++)
-                    {
-                        int sample = 0;
-                        int samplecount = 0;
-                        for (int i = x - samplesize; i < x + samplesize; i++)
-                        {
-                            for (int u = y - samplesize; u < y + samplesize; u++)
-                            {
-                                if (u < 0 || i < 0 || u >= bmpData.Height || i >= bmpData.Width) continue;
-
-                                //unsafe
-                                //{
-                                int* ptr1 = (int*)(((int*)bmpData.Scan0) + (u * bmpData.Width) + i);
-                                c = Color.FromArgb(*ptr1);
-                                //}
-
-                                sample += c.R;
-                                samplecount++;
-                            }
-                        }
-                        int color = sample / samplecount;
-                        //unsafe
-                        //{
-                        int* ptr2 = (int*)(((int*)bmpData.Scan0) + (y * bmpData.Width) + x);
-                        *ptr2 = c.ToArgb();
-                        //}
-                    }
-                }
-            }
-            ((Bitmap)outputBox.Image).UnlockBits(bmpData);
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -123,8 +85,6 @@ namespace MotorsEditor
             {
                 GenerateNoise(256 / i, (int)noiseSeed.Value, (float)noisePresistence.Value / (i * (float)presistenceReductorDivisor.Value));
             }
-
-            Smooth(1);
   
             outputBox.Refresh();
         }
