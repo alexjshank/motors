@@ -88,6 +88,7 @@ private:
 
 	Vector *target;
 	Vector targetPosition;
+	Vector idealRotation;
 	int followmode;	
 	
 	Vector position,  up, view, side;

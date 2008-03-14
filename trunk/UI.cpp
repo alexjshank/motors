@@ -70,7 +70,7 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 		for (int i=0; buffer[i]==' ' || buffer[i]=='\t'; i++);
 		preadpos = &buffer[i];
 		
-		for (i=0;i<strlen(buffer);i++) {
+		for (i=0;i<(int)strlen(buffer);i++) {
 			if (buffer[i] == '#')
 				buffer[i] = 0;
 		}

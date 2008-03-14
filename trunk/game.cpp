@@ -62,12 +62,12 @@ bool PlaceEntity(Entity *ent) {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	srand(timeGetTime());
+	AllocConsole();
+	freopen("CONOUT$", "wb", stdout);
+
 	vars = new gamevars;
 	vars->loadCfgFile("config.cfg");
 
-	LoadWorldState(vars->getValue("default_map")->value.c_str());
-
-	
 	timer = new Timer;
 	tasks.AddTask(timer);
 
@@ -115,6 +115,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	renderer->run();
+	input->mouseAbsolute = Vector(100,100, 100);
+	input->mouseMovement = Vector(0,0,0);
+
 
 	library->Import("data/topographical/PirateIsland.bmp",0);
 	library->Import("data/models/house.BMP",0);
@@ -145,6 +148,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     bool camerafollowing = false;
 	input->mouseAbsolute = Vector(100,100, 100);
 	input->mouseMovement = Vector(0,0,0);
+	timer->frameScalar = 0.0001f;
+	
+
+
+	LoadWorldState(vars->getValue("default_map")->value.c_str());
+
+	Unit *unit = new Unit();
+	unit->classname = "Custom";
+	unit->health = 100;
+	unit->updateInterval = 1;	// update once per second
+	unit->Scripts.onThink = "echo(str(curID))";
+
+	ents->AddEntity((Entity *)unit);
+
 
 	while (active) {
 		tasks.Run();			
@@ -196,8 +213,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			if (entityToPlace) {
 				if (placingEntity) {
+					entityToPlace->completed = 0;
 					entityToPlace->position = selector->gridAlignedLassoPosition;
 				} else if (rotatingEntity) {
+					entityToPlace->completed = 0;
 					entityToPlace->rotation.z += input->mouseMovement.x;
 				}
 			}

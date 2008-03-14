@@ -30,6 +30,8 @@ public:
 private:
 	Md2Object *model;
 	int texture;
+
+	int buildTexture;
 };
 
 #endif

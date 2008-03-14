@@ -12,8 +12,10 @@ Barracks::~Barracks(void)
 }
 
 void Barracks::init() {
+	Building::init();
+
 	size = Vector(3,2,3);
-	scale = 0.1f;
+	scale = 0.2f;
 
 	SetModel("data/models/barracks.md2","data/models/barracks.BMP");
 	toolWindow = (UIWindow *)ui->CreateFromFile("data/UI/barracks.ui");

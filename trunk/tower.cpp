@@ -2,7 +2,7 @@
 
 Tower::Tower(void)
 {
-	scale = 0.07f;
+	scale = 0.14f;
 	size = Vector(5,8,5);
 	type=E_TOWER;
 }
@@ -12,6 +12,8 @@ Tower::~Tower(void)
 }
 
 void Tower::init() {
+	Building::init();
+
 	SetModel("data/models/tower/tower.md2","data/models/tower/tower.bmp");
 	tooltip.enabled = true;
 	tooltip.tooltip = "Tower";

@@ -29,7 +29,7 @@ LassoSelector::~LassoSelector(void)
 }
 
 void LassoSelector::Select(Entity *e) {
-	if (SelectedEntities.size() >= maxSelectionCount || !e->alive) return;
+	if ((int)SelectedEntities.size() >= maxSelectionCount || !e->alive) return;
 	SelectedEntities.push_back(e);
 	e->onSelected();
 }
@@ -83,7 +83,7 @@ void LassoSelector::run() {
 		
 		node = ents->qtree.tree->getLeaf(gridAlignedLassoPosition);
 		closestEntity = node->getClosestEntity(gridAlignedLassoPosition,-1,0,0,0);		
-		if (closestEntity && dist2(gridAlignedLassoPosition,closestEntity->position) < closestEntity->size.len2()) {
+		if (closestEntity && dist2(gridAlignedLassoPosition,closestEntity->position) < closestEntity->size.len2() && closestEntity->family != EF_ENVIRONMENT) {
 			if (!input->GetKeyState(SDLK_RSHIFT) && !input->GetKeyState(SDLK_LSHIFT)) {
 				ClearSelection();
 			}

@@ -20,7 +20,7 @@ LumberMill::LumberMill(void)
 	size = Vector(3,2,3);
 	type=E_LUMBERMILL;
 	family = EF_BUILDING;
-	scale = 0.03f;
+	scale = 0.06f;
 	lumber = 0;
 	food = 0;
 
@@ -33,6 +33,7 @@ LumberMill::~LumberMill(void)
 }
 
 void LumberMill::init() {
+	Building::init();
 	size = Vector(3,2,3);
 
 	SetModel("data/models/mill.md2","data/models/LumberMill.BMP");

@@ -30,6 +30,7 @@ Building::~Building(void)
 
 void Building::init() {
 	toolWindow = 0;
+	buildTexture = renderer->LoadTexture("data/UI/wood.bmp");
 }
 
 extern int currentID;
@@ -66,6 +67,8 @@ void Building::process() {
 	Think();
 	if (health < 0) alive = false;
 
+	if (completed < 100) completed += timer->frameDifference * 10;
+
 	if (spawnQueue.size() > 0 && timer->time - startBuildTime >= 10) { 
 		startBuildTime = timer->time;
 		SpawnEntity(spawnQueue.front().c_str(),spawnPoint);
@@ -76,16 +79,18 @@ void Building::process() {
 void Building::render() {
 	if (camera->frustum.pointInFrustum(position) && alive) {
 		if (this->completed < 100) {
-			DrawCube(position,size);
-		} else {
+			glBindTexture(GL_TEXTURE_2D,buildTexture);
+			DrawCube(position+Vector(0,100-completed,0),Vector(size.x,(size.x+size.z)/2,size.z));
+		}
+
+		if (completed < 5 || completed > 99) {
 			model->setPosition(position);
 			model->setRotation(rotation);
 			model->setScale(scale);
 			glColor3f(1,1,1);
 			glBindTexture(GL_TEXTURE_2D,texture);
 			model->drawObjectFrame(0,model->kDrawImmediate);
-		
-			renderToolTip();
 		}
+		renderToolTip();			
 	}
 }

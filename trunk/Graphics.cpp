@@ -82,7 +82,7 @@ int skybox;
 void DrawSkybox() {
 	glPushMatrix();
 		glLoadIdentity();
-		glTranslatef(0,-0.25f,0);
+		glScalef(10,10,10);
 		glRotatef(camera->GetRotation().x,1,0,0);
 		glRotatef(camera->GetRotation().y,0,1,0);
 		glRotatef(camera->GetRotation().z,0,0,1);
@@ -201,7 +201,7 @@ bool Graphics::init() {
 
 
     /* Verify there is a surface */
-    if (!SDL_SetVideoMode(vars->getIntValue("screen_width"), vars->getIntValue("screen_height"), 16, videoFlags))
+    if (!SDL_SetVideoMode(vars->getIntValue("screen_width"), vars->getIntValue("screen_height"), 24, videoFlags))
 	{
 	    fprintf( stderr,  "Video mode set failed: %s\n", SDL_GetError( ) );
 	    return false;

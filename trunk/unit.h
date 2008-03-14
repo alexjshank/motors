@@ -11,46 +11,49 @@ public:
 
 	virtual void Think(); 
 
-	void SetScript(const char *szScript);
-	bool LoadScript(const char *szFilename);
-
-// entity calls
 	void process();
 	void render();
 	void interact(Entity *source, int type);
 	void WalkTo(Vector t);
 
+	void onAttacked(Entity *source);
+	void onDeath();
+	void onSelected();
+	void onUnSelected();
+
 	void SetModel(const char*model, const char*tex);
-	Md2Object *model;	
-	int texture;
 	struct tmodelAnimations {
 		float fps;
 		int walkStart,walkEnd;
 		int runStart,runEnd;
 		int attackStart,attackEnd;
 		int idleStart,idleEnd;
-
 	} modelAnimations;
 
-	ParticleEmitter blood;
+	string classname;
+	Md2Object *model;	
+	int texture;
 	bool footprints;
-	float lastFootprintSpawn;
-	int foot;
 	bool ground_unit;
-
-	Vector target;
+	float buildtime;
+	float updateInterval;	// how often onThink is called
 	float runspeed;
 	float walkspeed;
 
-	float buildtime;
-
+	int foot;
+	float lastRepositionTime;
+	float lastFootprintSpawn;
 	float frame;
 
-	float lastRepositionTime;
+	Vector target;
 	Vector targetvelocity;
 
 	Vector calibratedModelPosition;	// these are used to correct models that don't follow the standard positioning stuff
 	Vector calibratedModelRotation;
+	
+	ParticleEmitter blood;
 
-	std::string script;
+	struct tScripts {
+		std::string onSpawn, checkBuildRequirements, onStartBuild,onFinishBuild,onThink,onDestroy,onSelected,onUnSelected,onOrderIssued,onCompletedOrder,onEnemyNearby,onAttacked,onKilled;
+	} Scripts;
 };

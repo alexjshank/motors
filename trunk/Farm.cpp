@@ -13,7 +13,7 @@ extern EntityContainer *ents;
 
 Farm::Farm(void)
 {
-	scale = 0.05f;
+	scale = 0.1f;
 	size = Vector(4,2,4);
 	type = E_FARM;
 	spawnRate = 25;
@@ -24,6 +24,8 @@ Farm::~Farm(void)
 }
 
 void Farm::init() {	
+	Building::init();
+
 	family = EF_BUILDING;
 	type = E_FARM;
 

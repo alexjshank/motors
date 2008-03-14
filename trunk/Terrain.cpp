@@ -276,12 +276,13 @@ void Terrain::renderLand(int step, int maxd, int mind) {
 
 
 void Terrain::renderWater() {
+	Vector p = camera->GetPosition();
 	glBegin(GL_QUADS);	
-		glColor4f(0,0,0,1);			
-		glVertex3f(-500,0.25f,	-500);
-		glVertex3f(-500,0.25f,	1000);
-		glVertex3f(500,	0.25f,	1000);
-		glVertex3f(500,	0.25f,	-500);
+		glColor4f(0,0,0,1);	
+		glVertex3f(-500 - p.x,	0.25f,	-500 - p.z);
+		glVertex3f(-500 - p.x,	0.25f,	 500 + p.z);
+		glVertex3f( 500 + p.x,	0.25f,	 500 + p.z);
+		glVertex3f( 500 + p.x,	0.25f,	-500 - p.z);
 	glEnd();
 
 	// draw water surface
@@ -297,9 +298,9 @@ void Terrain::renderWater() {
 		glColor4f(1,1,1,1);
 
 		int tilesize = 50;
-		for (int xi=-500;xi<width*2;xi+=tilesize) {
-			for (int yi=-500;yi<height*2;yi+=tilesize) {
-
+		for (int xi=-500 + (int)p.x;xi<500  + p.x;xi+=tilesize) { 
+			for (int yi=-500 + (int)p.z;yi<500  + p.z;yi+=tilesize) {
+				
 				glTexCoord2f((xi)*0.1f + a,(yi)*0.1f+b);						glVertex3f((float)xi +0,	fAvgWaterHeight,(float)yi+	0);
 				glTexCoord2f((xi)*0.1f + a,(yi+tilesize)*0.1f+b);				glVertex3f((float)xi +0,	fAvgWaterHeight,(float)yi+tilesize);
 				glTexCoord2f((xi + tilesize)*0.1f + a,(yi+tilesize)*0.1f+b);	glVertex3f((float)xi +tilesize,	fAvgWaterHeight,(float)yi+	tilesize);
@@ -331,10 +332,10 @@ void Terrain::renderWater() {
 		glRotatef(atan2f(d.x,d.z)/(3.1415926f/180),0,1,0);
 		glBegin(GL_QUADS);	
 			glColor4f(1.0f,1.0f,1.0f,0.5f+(cos(b)+1)/4);			
-			glTexCoord2f(0,0);			glVertex3f(-tilesize,	fAvgWaterHeight,	0);
-			glTexCoord2f(0,1.0f);		glVertex3f(-tilesize,	fAvgWaterHeight,	(float)tilesize);
-			glTexCoord2f(1.0f,1.0f);	glVertex3f(tilesize,	fAvgWaterHeight,	(float)tilesize);
-			glTexCoord2f(1.0f,0);		glVertex3f(tilesize,	fAvgWaterHeight,	0);
+			glTexCoord2f(0,0);			glVertex3f((float)-tilesize,	fAvgWaterHeight,	0);
+			glTexCoord2f(0,1.0f);		glVertex3f((float)-tilesize,	fAvgWaterHeight,	(float)tilesize);
+			glTexCoord2f(1.0f,1.0f);	glVertex3f((float)tilesize,	fAvgWaterHeight,	(float)tilesize);
+			glTexCoord2f(1.0f,0);		glVertex3f((float)tilesize,	fAvgWaterHeight,	0);
 		glEnd();
 	glPopMatrix();
 	}	
