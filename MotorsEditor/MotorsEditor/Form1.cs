@@ -408,6 +408,36 @@ namespace MotorsEditor
             UpdateBrush();
         }
 
+        private void SmoothTerrainButton_Click(object sender, EventArgs e)
+        {
+            Bitmap source = (Bitmap)HeightmapEditor.Image;
+            BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppPArgb);
+   
+            unsafe
+            {
+                for (int y = 1; y < source.Height-1; y ++)
+                {
+                    for (int x = 1; x < source.Width-1; x ++)
+                    {
+                        int* [] sourcePixel = {(int*)((int*)sourceData.Scan0 + ((y-1) * sourceData.Width) + x),
+                                               (int*)((int*)sourceData.Scan0 + (y * sourceData.Width) + x),
+                                               (int*)((int*)sourceData.Scan0 + ((y+1) * sourceData.Width) + x)};
+
+                        int v = ((Color.FromArgb(*(sourcePixel[0] - 1)).R + Color.FromArgb(*(sourcePixel[0])).R + Color.FromArgb(*(sourcePixel[0] + 1)).R) + 
+                                 (Color.FromArgb(*(sourcePixel[1] - 1)).R + Color.FromArgb(*(sourcePixel[1])).R + Color.FromArgb(*(sourcePixel[1] + 1)).R) + 
+                                 (Color.FromArgb(*(sourcePixel[2] - 1)).R + Color.FromArgb(*(sourcePixel[2])).R + Color.FromArgb(*(sourcePixel[2] + 1)).R)) / 9;
+
+                    //    if (v >= 255) v = 255;
+
+                        *sourcePixel[1] = Color.FromArgb(255,v,v,v).ToArgb();
+                    }
+                }
+            }
+
+            source.UnlockBits(sourceData);
+            HeightmapEditor.Refresh();
+        }
+
         private void openToolStripButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -677,6 +707,12 @@ namespace MotorsEditor
         {
             if (MessageBox.Show("Are you sure you want to generate a texture from the heightmap?\nYou will loose your current texture if you haven't saved.", "Discard Current Texture?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
             {
+                if (brushes.Count < 1)
+                {
+                    MessageBox.Show("You need to add some terrain brushes before i can generate a texture for you.");
+                    return;
+                }
+
                 int lastHeight = 0;
                 int heightDelta = 255 / brushes.Count;
                 foreach (Image brush in brushes.Values)
@@ -690,13 +726,17 @@ namespace MotorsEditor
         private void genBrushFromHeightmap(Bitmap source, Image brush, int heightRange_bottom, int heightRange_top)
         {
             Graphics graph = Graphics.FromImage(terrainTexture.Image);
+            TextureBrush texBrush = new TextureBrush(brush);
+            texBrush.WrapMode = System.Drawing.Drawing2D.WrapMode.Tile;
+         
             Pen pen = new Pen(Color.Black, 1);
             int scaleFactorX = terrainTexture.Image.Width / source.Width;
             int scaleFactorY = terrainTexture.Image.Height / source.Height;
             int rc = 0;
             int srcHeight = 0;
             int x, y;
-            Rectangle r1 = new Rectangle(), r2 = new Rectangle();
+            Rectangle r1 = new Rectangle();
+
 
             BitmapData sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
             int step = 5;
@@ -712,12 +752,9 @@ namespace MotorsEditor
                         if (srcHeight <= heightRange_top && srcHeight >= heightRange_bottom)
                         {
                             r1.X = (x * scaleFactorX); r1.Y = (y * scaleFactorY);
-                            r1.Width = step * scaleFactorX; r1.Height = step * scaleFactorY;
+                            r1.Width = step * scaleFactorX * 2; r1.Height = step * scaleFactorY * 2;
 
-                            r2.X = (x * scaleFactorX) % brush.Width; r2.Y = (y * scaleFactorY) % brush.Height;
-                            r2.Width = step * scaleFactorX; r2.Height = step * scaleFactorY;
-
-                            graph.DrawImage(brush, r1, r2, GraphicsUnit.Pixel);
+                            graph.FillEllipse(texBrush, r1);
                         }
                     }
                     if (rc++ > 25)
@@ -734,6 +771,38 @@ namespace MotorsEditor
         {
 
         }
+
+
+        private void openTerrainTexture_Button_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.OK) 
+            {
+                tTex_graph.Clear(Color.Black);
+                tTex_graph.DrawImage(new Bitmap(ofd.FileName),new Rectangle(0,0,terrainTexture.Image.Width,terrainTexture.Image.Height));
+                terrainTexture.Refresh();
+            }
+        }
+
+        private void newTerrainTexture_Button_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to erase this texture?", "Really erase?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+            {
+                tTex_graph.Clear(Color.Black);
+                terrainTexture.Refresh();
+            }
+        }
+
+        private void saveTerrainTexture_Button_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                terrainTexture.Image.Save(sfd.FileName, ImageFormat.Bmp);
+            }
+        }
+
+
 
     }
 
