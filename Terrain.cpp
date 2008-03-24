@@ -3,7 +3,6 @@
 #include "timer.h"
 #include "camera.h"
 
-extern Camera *camera;
 extern Graphics *renderer;
 
 Terrain::Terrain(void) {
@@ -11,13 +10,33 @@ Terrain::Terrain(void) {
 }
 
 Terrain::~Terrain(void) {
-	if (bHeightData) {
-		delete [] bHeightData;
-	}
 	if (bTerrainContents) {
 		delete [] bTerrainContents;
 	}
 }
+
+
+Terrain::Terrain(const char *heightmap) {
+	LoadHeightMap(heightmap);
+}
+
+Terrain::Terrain(const char *heightmap, int texture) {
+	LoadHeightMap(heightmap);
+	SetTexture(texture,0);
+}
+
+Terrain::Terrain(const char *heightmap, int mainTexture, int detailTexture) {
+	LoadHeightMap(heightmap);
+	SetTexture(mainTexture,detailTexture);
+}
+
+Terrain::Terrain(const char *heightmap, int mainTexture, int detailTexture, Camera *camera) {
+	LoadHeightMap(heightmap);
+	SetTexture(mainTexture,detailTexture);
+	SetCamera(camera);
+}
+
+
 
 bool Terrain::LoadHeightMap(const char * filename) {
 	FILE *fmap = fopen(filename,"rb");
@@ -44,12 +63,8 @@ bool Terrain::LoadHeightMap(const char * filename) {
 		return false;
 	}
 	ZeroMemory(bTerrainContents,size);
-	if (!(bHeightData = new unsigned char[size])) {
-		// error
-		return false;
-	}
 
-	if (!(fSmoothedHeightData = new float[size])) {
+	if (!(fHeightData = new float[size])) {
 		// error
 		return false;
 	}
@@ -80,16 +95,24 @@ bool Terrain::LoadHeightMap(const char * filename) {
 		return false;
 	}
 
-	fread(bHeightData,1,size,fmap);
+	
+	unsigned char *bHeightData = new unsigned char[size];
+	fread(bHeightData,1,size,fmap);										// read in the compressed height data (bytes)
 	fclose(fmap);
+	for (int y=0;y<height;y++) {
+		for (int x=0;x<width;x++) {
+			fHeightData[x+(y*width)] = (float)bHeightData[x+(y*width)] / 16;	// and load it into the float array
+		}
+	}
+	delete [] bHeightData;
 
 	SmootheTerrain();
 	CalculateNormals();
 	CalculateColorData();
-	
-	// dont need compressed terrain data any more
-	delete [] bHeightData;
-	bHeightData = 0;
+
+	SmootheTerrain();
+	SmootheTerrain();
+	SmootheTerrain();	
 
 	waterReflection = renderer->LoadTexture("data/topographical/reflection.bmp");
 
@@ -100,7 +123,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	for (int y=1;y<height-1;y++) {
 		for (int x=1;x<width-1;x++) {
 			if (getHeight(x,y) <= fAvgWaterHeight) {
-				bTerrainContents[(y*height)+x] |= TC_WATER;
+				setContents(x,y, TC_WATER);
 			}
 		}
 	}
@@ -111,15 +134,15 @@ bool Terrain::LoadHeightMap(const char * filename) {
 
 
 void Terrain::SmootheTerrain() {
-	memset(fSmoothedHeightData,0,width*height);
+	float * sourceData = fHeightData;
 
 	for (int y=1;y<height-1;y++) {
 		for (int x=1;x<width-1;x++) {
-			float blocksum = (float)(	(float)bHeightData[((y-1)*height)+(x-1)]	+ (float)bHeightData[((y-1)*height)+x]		+ (float)bHeightData[((y-1)*height)+(x+1)] + 
-										(float)bHeightData[(y*height)+(x-1)]		+ (float)bHeightData[(y*height)+x]			+ (float)bHeightData[(y*height)+(x+1)] + 
-										(float)bHeightData[((y+1)*height)+x-1]		+ (float)bHeightData[((y+1)*height)+x]		+ (float)bHeightData[((y+1)*height)+(x+1)]);
+			float blocksum = (float)(	(float)sourceData[((y-1)*height)+(x-1)]	+ (float)sourceData[((y-1)*height)+x]		+ (float)sourceData[((y-1)*height)+(x+1)] + 
+										(float)sourceData[(y*height)+(x-1)]		+ (float)sourceData[(y*height)+x]			+ (float)sourceData[(y*height)+(x+1)] + 
+										(float)sourceData[((y+1)*height)+x-1]	+ (float)sourceData[((y+1)*height)+x]		+ (float)sourceData[((y+1)*height)+(x+1)]);
 			int pos = (y*height)+x;
-			fSmoothedHeightData[pos] = (blocksum/9) / 16;
+			fHeightData[pos] = (blocksum/9);
 		}
 	}
 }
@@ -168,6 +191,10 @@ void Terrain::CalculateColorData() {
 void Terrain::SetTexture(int mT, int wT) {
 	mainTexture = mT;
 	waterTexture = wT;
+}
+
+void Terrain::SetCamera(Camera *cam) {
+	ourCamera = cam;
 }
 
 void Terrain::CalculateWaveData() {
@@ -222,7 +249,7 @@ void Terrain::renderLand(int step, int maxd, int mind) {
 	float xsize=(float)width;
 	float ysize=(float)height;
 	
-	Vector cp = RayTest(camera->GetPosition(),camera->GetView(),70,4,false);
+	Vector cp = RayTest(ourCamera->GetPosition(),ourCamera->GetView(),70,4,false);
 	int startX=(int)cp.x - maxd,startY=(int)cp.z - maxd,endX=(int)cp.x + maxd,endY=(int)cp.z + maxd;	
 	if (startX < 1) startX = 1;
 	if (startY < 1) startY = 1;
@@ -253,22 +280,22 @@ void Terrain::renderLand(int step, int maxd, int mind) {
 			int index = ((i*height)+j);
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-i_d_xsize,(float)j_d_ysize); 
-			glVertex3f((float)j,	fSmoothedHeightData[index],		(float)i);
+			glVertex3f((float)j,	fHeightData[index],		(float)i);
 
 			index = ((i*height)+(j+step));
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-i_d_xsize,(float)jStepped_d_ysize); 
-			glVertex3f((float)j+step,	fSmoothedHeightData[index],		(float)i);
+			glVertex3f((float)j+step,	fHeightData[index],		(float)i);
 			
 			index = (((i+step)*height)+(j+step));
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-iStepped_d_xsize,(float)jStepped_d_ysize); 
-			glVertex3f((float)j+step,	fSmoothedHeightData[index],		(float)i+step);
+			glVertex3f((float)j+step,	fHeightData[index],		(float)i+step);
 			
 			index = (((i+step)*height)+j);
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-iStepped_d_xsize,(float)j_d_ysize); 
-			glVertex3f((float)j,	fSmoothedHeightData[index],		(float)i+step);
+			glVertex3f((float)j,	fHeightData[index],		(float)i+step);
 		}
 	}
 	glEnd();
@@ -276,7 +303,7 @@ void Terrain::renderLand(int step, int maxd, int mind) {
 
 
 void Terrain::renderWater() {
-	Vector p = camera->GetPosition();
+	Vector p = ourCamera->GetPosition();
 	glBegin(GL_QUADS);	
 		glColor4f(0,0,0,1);	
 		glVertex3f(-500 - p.x,	0.25f,	-500 - p.z);
@@ -347,7 +374,7 @@ void Terrain::renderWater() {
 Vector Terrain::RayTest(Vector start, Vector direction, float length, float step, bool accurate = true) {
 	float progress = 0;
 
-	if (!this || this->fSmoothedHeightData == 0) return start;
+	if (!this || fHeightData == 0) return start;
 
 	direction.normalize();
 	Vector testpoint = start;
@@ -404,7 +431,7 @@ float Terrain::getHeight(int x, int y) {
 	if (x < 0 || x >= width || y < 0 || y >= height) 
 		return 0;
 
-	return fSmoothedHeightData[(y*height)+x];
+	return fHeightData[(y*height)+x];
 }
 
 

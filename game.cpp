@@ -119,7 +119,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	input->mouseMovement = Vector(0,0,0);
 
 
-	library->Import("data/topographical/PirateIsland.bmp",0);
 	library->Import("data/models/house.BMP",0);
 	library->Import("data/models/Sheep.BMP",0);
 	library->Import("data/models/soldier.bmp",0);
@@ -145,7 +144,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UIWindow *waypointEditor = (UIWindow*)ui->CreateFromFile("data/ui/waypointeditor.ui");
 	waypointEditor->visible = false;
 
-    bool camerafollowing = false;
 	input->mouseAbsolute = Vector(100,100, 100);
 	input->mouseMovement = Vector(0,0,0);
 	timer->frameScalar = 0.0001f;
@@ -158,7 +156,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	unit->classname = "Custom";
 	unit->health = 100;
 	unit->updateInterval = 1;	// update once per second
-	unit->Scripts.onThink = "echo(str(curID))";
+//	unit->Scripts.onThink = "echo(str(curID))";
 
 	ents->AddEntity((Entity *)unit);
 

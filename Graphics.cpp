@@ -269,7 +269,8 @@ void Graphics::run() {
 // this only loads BMPs... should modify this to include jpg/png/tga also... maybe theres a lib that has it already?
 int Graphics::LoadTexture(const char *filename) {
 	GLuint texture;
-	console->Printf("Loading texture resource: %s",filename);
+
+	console->Printf("Graphics::LoadTexture(%s);",filename);
 
 	SDL_Surface* bmpFile = SDL_LoadBMP(filename);
 
