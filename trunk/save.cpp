@@ -3,9 +3,13 @@
 #include "Entity.h"
 #include "Terrain.h"
 #include "graphics.h"
+#include "camera.h"
+#include "console.h"
 
 extern Graphics *renderer;
+extern Camera * camera;
 extern Terrain *terrain;
+extern Console *console;
 extern Timer *timer;
 extern EntityContainer *ents;
 using std::string;
@@ -40,11 +44,14 @@ void SaveWorldState(const char *filename) {
 
 void LoadWorldState(const char *filename) {
 	MapHeader head;
+
+	console->Printf("Loading world: %s",filename);
+
 	FILE *fin = fopen(filename,"r");
 	memset(&head,0,sizeof(MapHeader));
 
 	if (!fin) {
-//		console->Printf("load world failed");
+		console->Printf("*** Critical: Error opening world file ***");
 		return;
 	}
 
@@ -55,20 +62,20 @@ void LoadWorldState(const char *filename) {
 		return;
 	}
 
-	terrain = new Terrain;
 	char terrainName[255];
 	sprintf(terrainName,"data/topographical/%s.top",head.terrainName);
-	terrain->LoadHeightMap(terrainName);
-	
+
 	char textureName[255];
 	sprintf(textureName,"data/topographical/%s.bmp",head.terrainName);
-	terrain->SetTexture(renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.bmp"));
+	
+	terrain = new Terrain(terrainName, renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.bmp"), camera);
+	
 	
 	ents->AddEntity((Entity*)terrain);
 	MapEntity e;
 	for (int i=0;i<head.entityCount && !feof(fin);i++) {
 		fread(&e,sizeof(MapEntity),1,fin);	
-//		if (e.type == E_SHEEP || e.type == E_PEASANT || e.type == E_VILLAGEWOMAN || e.type == E_SOLDIER) continue;
+
 		SpawnEntity(e.type,Vector(e.x,0,e.y));
 	}
 

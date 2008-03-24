@@ -1,6 +1,7 @@
 #pragma once
 #include "entity.h"
 #include <assert.h>
+#include "Camera.h"
 
 #define TC_LAND 0			// empty land
 #define TC_UNBUILDABLE 1	
@@ -36,12 +37,19 @@ public:
 	Terrain(void);
 	~Terrain(void);
 
+	Terrain(const char *heightmap);
+	Terrain(const char *heightmap, int texture);
+	Terrain(const char *heightmap, int mainTexture, int detailTexture);
+	Terrain(const char *heightmap, int mainTexture, int detailTexture, Camera *camera);
+
 	bool LoadHeightMap(const char * filename);
 	void SmootheTerrain();
 	void CalculateNormals();
 	void CalculateWaveData();
 	void CalculateColorData();
+
 	void SetTexture(int mT, int wT);
+	void SetCamera(Camera * cam);
 
 	void render();
 	void renderLand(int detail, int maxDistanceFromCamera, int minDistanceFromCamera);
@@ -55,21 +63,20 @@ public:
 	Vector getNormal(int x, int y);
 	float getInterpolatedHeight(float x, float y);
 
-	// A* searching stuff:
-
+// A* searching stuff:
 	float getGscore(Vector start, Vector p, Vector end);
 	void ResetNodes();
 	AS_Node * AStarSearch(Vector start, Vector end);
 	AS_Node *getClosestOpenNode(Vector p);
 	bool CloseNode(AS_Node *openNode);
 
-
+private:
 	AS_Node *endNode, *startNode;
-
 	std::list<AS_Node *> openList;
 	std::list<AS_Node *> closedList;
 	AS_Node *ASnodes;
 
+public:
 	Vector SunDirection;
 	float fAvgWaterHeight;
 
@@ -83,8 +90,9 @@ private:
 	int waterTexture;
 	int waterReflection;
 
+	Camera *ourCamera;
+
 	float scale;
-	unsigned char *bHeightData;
 
 	struct WaveData {
 		Vector waveBreakPosition;
@@ -96,8 +104,8 @@ private:
 	int waveTexture;
 
 	unsigned char *ucColorData[3];	// red green blue
+	float *fHeightData;
 	float *fWaterHeights;
-	float *fSmoothedHeightData;
 	Vector *vNormals;
 	unsigned char *bTerrainContents;
 };
