@@ -10,7 +10,7 @@
 #include "building.h"
 #include "LassoSelector.h"
 
-
+#include <sstream>
 
 extern gamevars *vars;
 extern Graphics *renderer;
@@ -215,14 +215,62 @@ SCRIPTFUNC(game_script_getnearestentity) {
       return PyInt_FromLong(0);
 }
 
+SCRIPTFUNC(game_script_GetRegs) {
+	DWORD value;
+	int ria,rib,ric,rid,rie,rif,rig,rih;
+	float rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh;
+
+    if (!PyArg_ParseTuple(args, "iiiiiiiiiffffffff", &value,  &ria,&rib,&ric,&rid,&rie,&rif,&rig,&rih, &rfa,&rfb,&rfc,&rfd,&rfe,&rff,&rfg,&rfh))
+        return NULL;
+
+    if (value && ents->entities[value] && ents->entities[value]->alive) {
+		if (ents->entities[value]->family == EF_UNIT) {
+			((Unit*)ents->entities[value])->ScriptRegisters.ria = ria;
+			((Unit*)ents->entities[value])->ScriptRegisters.rib = rib;
+			((Unit*)ents->entities[value])->ScriptRegisters.ric = ric;
+			((Unit*)ents->entities[value])->ScriptRegisters.rid = rid;
+			((Unit*)ents->entities[value])->ScriptRegisters.rie = rie;
+			((Unit*)ents->entities[value])->ScriptRegisters.rif = rif;
+			((Unit*)ents->entities[value])->ScriptRegisters.rig = rig;
+			((Unit*)ents->entities[value])->ScriptRegisters.rih = rih;
+			
+			((Unit*)ents->entities[value])->ScriptRegisters.rfa = rfa;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfb = rfb;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfc = rfc;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfd = rfd;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfe = rfe;
+			((Unit*)ents->entities[value])->ScriptRegisters.rff = rff;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfg = rfg;
+			((Unit*)ents->entities[value])->ScriptRegisters.rfh = rfh;
+		}
+    }
+	return NULL;
+}
+ 
+SCRIPTFUNC(game_script_distance) {
+    DWORD value;
+      DWORD target;
+ 
+    if (!PyArg_ParseTuple(args, "ii", &value,&target))        return NULL;
+ 
+      if (value && target && ents->entities[value] && ents->entities[target] && ents->entities[value]->alive && ents->entities[target]->alive) {
+			float d = dist(ents->entities[value]->position,ents->entities[target]->position);
+			return PyFloat_FromDouble((double)d);
+      }
+      return NULL;
+}
 PYTHONMODULE(GameMethods)
     pydef("echo",  game_print)
     pydef("spawn",   game_spawn)
     pydef("save",    game_save)
  
+	pydef("getScriptRegisters", game_script_GetRegs)
+
     pydef("getPosition", game_script_getposition)
     pydef("setState", game_script_setstate)
     pydef("getState", game_script_getstate)
+
+	pydef("distance", game_script_distance)
      
     pydef("getNearestEntity", game_script_getnearestentity)
  
@@ -306,10 +354,15 @@ void Console::ProcessLine() {
 	currentline = "";
 }
 
-void Console::RunLine(const char *line) {
+#define min(x,y) ((x < y)?x:y)
+void Console::RunLine(const char *src) {
 
-	PyRun_SimpleString(line);
+	std::istringstream script(src);
+	std::string line;
 
+	while (getline(script,line)) {
+		PyRun_SimpleString(line.c_str());
+	}
 }
 
 void Console::RunLinef(const char *format, ...) { 

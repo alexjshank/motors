@@ -590,7 +590,14 @@ namespace MotorsEditor
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK) 
             {
-                brushes.Add(ofd.FileName, new Bitmap(ofd.FileName.ToString()));
+                try
+                {
+                    brushes.Add(ofd.FileName, new Bitmap(ofd.FileName.ToString()));
+                }
+                catch (ArgumentException)
+                {
+                    return;
+                }
                 ToolStripMenuItem item = new ToolStripMenuItem();
                 item.Text = ofd.FileName;
                 item.Click += new EventHandler(textureSelectBrush);
@@ -730,8 +737,8 @@ namespace MotorsEditor
             texBrush.WrapMode = System.Drawing.Drawing2D.WrapMode.Tile;
          
             Pen pen = new Pen(Color.Black, 1);
-            int scaleFactorX = terrainTexture.Image.Width / source.Width;
-            int scaleFactorY = terrainTexture.Image.Height / source.Height;
+            float scaleFactorX = ((float)terrainTexture.Image.Width / source.Width);
+            float scaleFactorY = ((float)terrainTexture.Image.Height / source.Height);
             int rc = 0;
             int srcHeight = 0;
             int x, y;
@@ -751,8 +758,8 @@ namespace MotorsEditor
 
                         if (srcHeight <= heightRange_top && srcHeight >= heightRange_bottom)
                         {
-                            r1.X = (x * scaleFactorX); r1.Y = (y * scaleFactorY);
-                            r1.Width = step * scaleFactorX * 2; r1.Height = step * scaleFactorY * 2;
+                            r1.Width = (int)((float)step * scaleFactorX * 2); r1.Height = (int)((float)step * scaleFactorY * 2);
+                            r1.X = (int)(((float)x * scaleFactorX) - (r1.Width / 2)); r1.Y = (int)(((float)y * scaleFactorY) - (r1.Height / 2));
 
                             graph.FillEllipse(texBrush, r1);
                         }

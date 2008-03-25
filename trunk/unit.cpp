@@ -31,11 +31,19 @@ Unit::Unit() {
 	foot = 0;
 	footprints = false;
 
+	size=Vector(1,2,1);
+	runspeed = 2.0f;
+	walkspeed = 1.5f;
+	scale = 0.05f;
+	
+	calibratedModelPosition.y = 1;
+	calibratedModelRotation.z = -90;
+
 	modelAnimations.fps = 15;
-	modelAnimations.runStart = 1;
-	modelAnimations.runEnd = 14;
-	modelAnimations.walkStart = 1;
-	modelAnimations.walkEnd = 14;
+	modelAnimations.walkStart = 40;
+	modelAnimations.walkEnd = 46;
+	modelAnimations.runStart = 40;
+	modelAnimations.runEnd = 46;
 	modelAnimations.idleStart = 13;
 	modelAnimations.idleEnd = 13;
 
@@ -283,25 +291,38 @@ void Unit::SetModel(const char *modelname, const char *texturename) {
 	texture = renderer->LoadTexture(texturename);
 }
 
+void Unit::GetScriptRegisters() {
+	console->RunLine("GetScriptRegisters(curID, ria,rib,ric,rid,rie,rif,rig,rih, rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh)");
+}
 
+void Unit::SetScriptRegisters() {
+	console->RunLinef("curID=%d,ria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
+}
 
 void Unit::onAttacked(Entity *source) {
-	console->RunLinef("curID = %d",id);
+	SetScriptRegisters();
 	console->RunLinef("srcID = %d",source->id);
 	console->RunLine(Scripts.onAttacked.c_str()); 
+	GetScriptRegisters();
 }
 
 void Unit::onDeath() {
+	SetScriptRegisters();
 	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onKilled.c_str()); 
+	GetScriptRegisters();
 }
 
 void Unit::onSelected() {
+	SetScriptRegisters();
 	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onSelected.c_str()); 
+	GetScriptRegisters();
 }
 
 void Unit::onUnSelected() {
+	SetScriptRegisters();
 	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onUnSelected.c_str()); 
+	GetScriptRegisters();
 }

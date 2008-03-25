@@ -2,8 +2,11 @@
 #include "graphics.h"
 #include "timer.h"
 #include "camera.h"
+#include "console.h"
+
 
 extern Graphics *renderer;
+extern Console *console;
 
 Terrain::Terrain(void) {
 	size = Vector(0,0,0);
@@ -101,7 +104,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	fclose(fmap);
 	for (int y=0;y<height;y++) {
 		for (int x=0;x<width;x++) {
-			fHeightData[x+(y*width)] = (float)bHeightData[x+(y*width)] / 16;	// and load it into the float array
+			fHeightData[x+(y*width)] = (float)bHeightData[x+(y*width)] / 4;	// and load it into the float array
 		}
 	}
 	delete [] bHeightData;
@@ -478,6 +481,8 @@ void Terrain::ResetNodes() {
 }
 
 AS_Node * Terrain::AStarSearch(Vector start, Vector end) {
+	try {
+
 	start.y = 0;
 	end.y = 0;
 	int c=0;
@@ -504,6 +509,11 @@ AS_Node * Terrain::AStarSearch(Vector start, Vector end) {
 	
 	// trace back from endNode through parents
 	return endNode;
+
+	} catch(...) {
+		console->Printf("Exception caught in A-Star search code. :(");
+		return 0;
+	}
 }
 
 
