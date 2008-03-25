@@ -52,7 +52,7 @@ SCRIPTFUNC(game_print) {
 
 	console->Print(value);
 
-	return NULL;
+	return Py_None;
 }
 
 bool PlaceEntity(Entity *ent);
@@ -84,7 +84,7 @@ SCRIPTFUNC(game_spawn) {
 	} 
 
 
-	return NULL;
+	return Py_None;
 }
 
 SCRIPTFUNC(game_QueueUnitForBuild) {
@@ -100,7 +100,7 @@ SCRIPTFUNC(game_QueueUnitForBuild) {
 		}
 	}
 	
-	return NULL;
+	return Py_None;
 }
 
 SCRIPTFUNC(game_killSelected) {
@@ -110,7 +110,7 @@ SCRIPTFUNC(game_killSelected) {
 		SelectedEntity->Kill();
 	}
 
-	return NULL;
+	return Py_None;
 }
 
 void SaveWorldState(const char *filename);
@@ -131,7 +131,7 @@ static PyObject * game_save(PyObject *self, PyObject *args) {
 	SaveWorldState(savename.c_str());
 
 	console->Print("Saved.");
-	return NULL;
+	return Py_None;
 }
 
 
@@ -145,7 +145,7 @@ SCRIPTFUNC(game_script_getposition) {
             return PyComplex_FromDoubles(ents->entities[value]->position.x,ents->entities[value]->position.z);
       }
  
-      return PyComplex_FromDoubles(0,0);
+      return NULL;
 }
  
 SCRIPTFUNC(game_script_getstate) {
@@ -157,7 +157,7 @@ SCRIPTFUNC(game_script_getstate) {
     if (value && ents->entities[value] && ents->entities[value]->alive) {
         return PyInt_FromLong(ents->entities[value]->state);
     }
-	return NULL;
+	return Py_None;
 }
  
 SCRIPTFUNC(game_script_setstate) {
@@ -169,7 +169,7 @@ SCRIPTFUNC(game_script_setstate) {
       if (value && ents->entities[value] && ents->entities[value]->alive) {
             ents->entities[value]->state = (ENT_STATES)state;
       }
-      return NULL;
+      return Py_None;
 }
  
 SCRIPTFUNC(game_script_pathto) {
@@ -182,7 +182,7 @@ SCRIPTFUNC(game_script_pathto) {
       if (value && ents->entities[value] && ents->entities[value]->alive) {
             ents->entities[value]->PathTo(Vector((float)x,0,(float)y));
       }
-      return NULL;
+      return Py_None;
 }
  
 SCRIPTFUNC(game_script_pathtoent) {
@@ -194,7 +194,7 @@ SCRIPTFUNC(game_script_pathtoent) {
       if (value && target && ents->entities[value] && ents->entities[target] && ents->entities[value]->alive && ents->entities[target]->alive) {
             ents->entities[value]->PathTo(ents->entities[target]->position);
       }
-      return NULL;
+      return Py_None;
 }
  
 SCRIPTFUNC(game_script_getnearestentity) {
@@ -244,7 +244,7 @@ SCRIPTFUNC(game_script_GetRegs) {
 			((Unit*)ents->entities[value])->ScriptRegisters.rfh = rfh;
 		}
     }
-	return NULL;
+	return Py_None;
 }
  
 SCRIPTFUNC(game_script_distance) {
@@ -259,23 +259,43 @@ SCRIPTFUNC(game_script_distance) {
       }
       return NULL;
 }
+
+SCRIPTFUNC(game_script_gettime) {
+	return PyFloat_FromDouble(timer->time);
+}
+
+SCRIPTFUNC(game_killent) {
+    DWORD value;
+
+	if (!PyArg_ParseTuple(args, "i", &value))        return NULL;
+
+	if (value && ents->entities[value] && ents->entities[value]->alive) {
+		ents->entities[value]->Kill();
+	}
+
+	return Py_None;
+}
+
 PYTHONMODULE(GameMethods)
     pydef("echo",  game_print)
     pydef("spawn",   game_spawn)
+	pydef("killent", game_killent)
     pydef("save",    game_save)
  
-	pydef("getScriptRegisters", game_script_GetRegs)
+	pydef("GetScriptRegisters", game_script_GetRegs)
 
+	pydef("setPosition", game_script_setposition)
     pydef("getPosition", game_script_getposition)
     pydef("setState", game_script_setstate)
     pydef("getState", game_script_getstate)
+	pydef("getTime", game_script_gettime)
 
 	pydef("distance", game_script_distance)
      
     pydef("getNearestEntity", game_script_getnearestentity)
  
-    pydef("PathTo", game_script_pathto)
-    pydef("PathToEnt", game_script_pathtoent)
+    pydef("pathTo", game_script_pathto)
+    pydef("pathToEnt", game_script_pathtoent)
 ENDPYTHONMOD
 
  
@@ -287,9 +307,21 @@ bool Console::init() {
 	Py_Initialize();
 	Py_InitModule("__main__", GameMethods);
 
-	PyRun_SimpleString("echo ('Embedded Python console initialization complete - Alex shank - 2008 - alexjshank@gmail.com')");
-	PyRun_SimpleString("a = 5");
-	PyRun_SimpleString("echo a");
+	PyRun_SimpleString("echo 'Embedded Python console initialization complete'\necho 'Alex shank - 2008 - alexjshank@gmail.com'");
+
+	// redirect python console output through the proper channels
+	char *code =	"class Sout:\n"
+					"    def write(self, s):\n"
+					"        echo(s)\n"			
+					"\n"
+					"import sys\n"
+					"sys.stdout = Sout()\n"
+					"sys.stderr = Sout()\n";
+//					"sys.stdin  = None\n";
+	int r1 = PyRun_SimpleString(code);
+
+	
+
 	return true;
 }
 
@@ -356,12 +388,12 @@ void Console::ProcessLine() {
 
 #define min(x,y) ((x < y)?x:y)
 void Console::RunLine(const char *src) {
+	PyRun_SimpleString(src);
+	PyObject * pyerr = PyErr_Occurred();
 
-	std::istringstream script(src);
-	std::string line;
-
-	while (getline(script,line)) {
-		PyRun_SimpleString(line.c_str());
+	if (pyerr) {
+		printf("Embedded Python Error in script:\n------------------\n%s\n------------------\n\n",src);
+		PyErr_Print();
 	}
 }
 
@@ -397,17 +429,22 @@ void Console::Printf(const char *format, ...) {
 	Print(text);
 }
 
-bool Console::LoadScript(const char *scriptFilename) {
-	char buffer[8192];
+std::string Console::LoadScript(const char *scriptFilename) {
+	char scriptBuffer[100001];
+	std::string script = "";
 	FILE *fin = fopen(scriptFilename,"r");
+
 	if (fin) {
-		while (!feof(fin)) {
-			ZeroMemory(buffer,8192);
-			fgets(buffer,8192,fin);
-			strcat(buffer,"\n");
-			RunLine(buffer);
-		}
-		return true;
+		ZeroMemory(scriptBuffer,100000);
+		fseek(fin,0,SEEK_END);
+		int len = ftell(fin);
+		fseek(fin,0,SEEK_SET);
+
+		fread(scriptBuffer,1,len,fin);
+		scriptBuffer[len-1] = 0;
+		script = scriptBuffer;
+	} else {
+		Printf("Error opening script file '%s'",scriptFilename);
 	}
-	return false;
+	return script;
 }

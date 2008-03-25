@@ -104,6 +104,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	tasks.Init();
 	tasks.Run();	
 
+	
+	console->RunLine("echo('starting main loop')\n");
+
 	int loadingTexture = renderer->LoadTexture("data/loadingTexture.bmp");
 
 	UIWindow loadingScreen;
@@ -134,7 +137,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	library->Import("data/models/peasant.md2",1);
 	library->Import("data/models/villagewoman.md2",1);
 	library->Import("data/models/sheep.md2",1);
-	library->Import("data/models/vulture.md2",1);
+//	library->Import("data/models/vulture.md2",1);
 	library->Import("data/models/soldier.md2",1);
 	library->Import("data/models/ship.md2",1);
 
@@ -154,10 +157,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Unit *unit = new Unit();
 	unit->classname = "Custom";
-	unit->health = 100;
+	unit->tooltip.enabled = true;
+	unit->tooltip.tooltip = "unit1";
+	unit->position = Vector(128,0,128);
+	
 	unit->updateInterval = 1;	// update once per second
-//	unit->Scripts.onThink = "echo(str(curID))";
-
+	unit->Scripts.onThink = console->LoadScript("data/scripts/woman_think.py");
+	
+	unit->SetModel("data/models/soldier.md2","data/models/soldier.bmp");
 	ents->AddEntity((Entity *)unit);
 
 

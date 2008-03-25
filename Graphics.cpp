@@ -270,7 +270,7 @@ void Graphics::run() {
 int Graphics::LoadTexture(const char *filename) {
 	GLuint texture;
 
-	console->Printf("Graphics::LoadTexture(%s);",filename);
+//	console->Printf("Graphics::LoadTexture(%s);",filename);
 
 	SDL_Surface* bmpFile = SDL_LoadBMP(filename);
 

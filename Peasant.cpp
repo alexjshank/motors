@@ -207,6 +207,49 @@ void VillageWoman::init() {
 	SetModel("data/models/villagewoman.md2","data/models/VillagerWoman.BMP");
 	born = timer->time;
 }
+/*
+need:
+getTime()
+UptakeResources
+setPosition?
+addVector(original, xdist, ydist, zdist)
+*/
+
+/*
+# ria = farm
+# rib = food
+# ric = cycleiter
+# rid = lastEatTime
+
+if ria == 0 : 
+	ria = getClosestEntity(curID, 4, 0, curTeam)
+
+if ric == 2 and rib != 0:
+	setPosition(ric,getPosition(curID))
+
+if getState(curID) == 0:
+	if ric == 0:
+		if getTime() - rid > 30:
+			ric = 1
+	if ric == 1:
+		if rib == 0:
+			rib = getNearestEntity(curID, 5, 0, curTeam)
+			if rib != 0:
+				if distance(curID,rib) < 3:
+					kill(rib)
+					ric = 2
+				else:
+					PathToEnt(rib)
+
+	if ric == 2:
+		if ria != 0:
+			if distance(curID,ria) < 5:
+				rid = getTime()
+				UptakeResources(ria, rib)
+				rib = 0
+				ric = 0
+
+*/
 
 void VillageWoman::Think() {
 	if (!farm) {

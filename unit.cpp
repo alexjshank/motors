@@ -48,17 +48,30 @@ Unit::Unit() {
 	modelAnimations.idleEnd = 13;
 
 	buildtime = 10;
+	lastThinkTime = 0;
+
+	ScriptRegisters.ria=0;
+	ScriptRegisters.rib=0;
+	ScriptRegisters.ric=0;
+	ScriptRegisters.rid=0;
+	ScriptRegisters.rie=0;
+	ScriptRegisters.rif=0;
+	ScriptRegisters.rig=0;
+	ScriptRegisters.rih=0;
+	ScriptRegisters.rfa=0;
+	ScriptRegisters.rfb=0;
+	ScriptRegisters.rfc=0;
+	ScriptRegisters.rfd=0;
+	ScriptRegisters.rfe=0;
+	ScriptRegisters.rff=0;
+	ScriptRegisters.rfg=0;
+	ScriptRegisters.rfh=0;
 
 	calibratedModelPosition = calibratedModelRotation = Vector(0,0,0);
 }
 
 Unit::~Unit(void)
 {
-}
-
-void Unit::Think() { 
-	console->RunLinef("curID = %d",id);
-	console->RunLine(Scripts.onThink.c_str()); 
 }
 
 
@@ -175,7 +188,10 @@ void Unit::process() {
 			model->setRotation(calibratedModelRotation + Vector(0,0,atan2(velocity.x,velocity.z)/(3.1415f/180)));
 		}
 
-		Think();
+		if (timer->time - lastThinkTime > updateInterval) {
+			lastThinkTime = timer->time;
+			Think();
+		}
 	} else {
 		blood.on = true;
 		state = Stopped;
@@ -292,11 +308,17 @@ void Unit::SetModel(const char *modelname, const char *texturename) {
 }
 
 void Unit::GetScriptRegisters() {
-	console->RunLine("GetScriptRegisters(curID, ria,rib,ric,rid,rie,rif,rig,rih, rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh)");
+	console->RunLine("GetScriptRegisters(curID, ria,rib,ric,rid,rie,rif,rig,rih, rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh)\n");
 }
 
 void Unit::SetScriptRegisters() {
-	console->RunLinef("curID=%d,ria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
+	console->RunLinef("curID=%d\nria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
+}
+
+void Unit::Think() { 
+	SetScriptRegisters();
+	console->RunLine(Scripts.onThink.c_str()); 
+	GetScriptRegisters();
 }
 
 void Unit::onAttacked(Entity *source) {
@@ -308,21 +330,18 @@ void Unit::onAttacked(Entity *source) {
 
 void Unit::onDeath() {
 	SetScriptRegisters();
-	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onKilled.c_str()); 
 	GetScriptRegisters();
 }
 
 void Unit::onSelected() {
 	SetScriptRegisters();
-	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onSelected.c_str()); 
 	GetScriptRegisters();
 }
 
 void Unit::onUnSelected() {
 	SetScriptRegisters();
-	console->RunLinef("curID = %d",id);
 	console->RunLine(Scripts.onUnSelected.c_str()); 
 	GetScriptRegisters();
 }
