@@ -39,6 +39,7 @@ public:
 	bool ground_unit;
 	float buildtime;
 	float updateInterval;	// how often onThink is called
+	float lastThinkTime;
 	float runspeed;
 	float walkspeed;
 

@@ -52,7 +52,7 @@ void Soldier::init() {
 	runspeed = vars->getFloatValue("soldier_runspeed");
 	walkspeed = vars->getFloatValue("soldier_walkspeed");
 
-	console->LoadScript("data/scripts/soldier.py");
+//	console->LoadScript("data/scripts/soldier.py");
 }
 
 
