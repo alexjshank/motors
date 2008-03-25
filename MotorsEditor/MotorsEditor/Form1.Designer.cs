@@ -30,11 +30,11 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.TreeNode treeNode15 = new System.Windows.Forms.TreeNode("Project Maps");
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.TreeNode treeNode16 = new System.Windows.Forms.TreeNode("World");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Project Maps");
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("World");
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -198,7 +198,7 @@
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -377,7 +377,7 @@
             this.toolStripSeparator});
             this.toolStrip3.Location = new System.Drawing.Point(3, 0);
             this.toolStrip3.Name = "toolStrip3";
-            this.toolStrip3.Size = new System.Drawing.Size(116, 25);
+            this.toolStrip3.Size = new System.Drawing.Size(87, 25);
             this.toolStrip3.TabIndex = 0;
             this.toolStrip3.Visible = false;
             // 
@@ -612,35 +612,35 @@
             // waterToolStripMenuItem
             // 
             this.waterToolStripMenuItem.Name = "waterToolStripMenuItem";
-            this.waterToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.waterToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.waterToolStripMenuItem.Text = "Water";
             this.waterToolStripMenuItem.Click += new System.EventHandler(this.waterToolStripMenuItem_Click);
             // 
             // beachToolStripMenuItem
             // 
             this.beachToolStripMenuItem.Name = "beachToolStripMenuItem";
-            this.beachToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.beachToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.beachToolStripMenuItem.Text = "Beach";
             this.beachToolStripMenuItem.Click += new System.EventHandler(this.beachToolStripMenuItem_Click);
             // 
             // ground1ToolStripMenuItem
             // 
             this.ground1ToolStripMenuItem.Name = "ground1ToolStripMenuItem";
-            this.ground1ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground1ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground1ToolStripMenuItem.Text = "Ground1";
             this.ground1ToolStripMenuItem.Click += new System.EventHandler(this.ground1ToolStripMenuItem_Click);
             // 
             // ground2ToolStripMenuItem
             // 
             this.ground2ToolStripMenuItem.Name = "ground2ToolStripMenuItem";
-            this.ground2ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground2ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground2ToolStripMenuItem.Text = "Ground2";
             this.ground2ToolStripMenuItem.Click += new System.EventHandler(this.ground2ToolStripMenuItem_Click);
             // 
             // ground3ToolStripMenuItem
             // 
             this.ground3ToolStripMenuItem.Name = "ground3ToolStripMenuItem";
-            this.ground3ToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
+            this.ground3ToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.ground3ToolStripMenuItem.Text = "Ground3";
             this.ground3ToolStripMenuItem.Click += new System.EventHandler(this.ground3ToolStripMenuItem_Click);
             // 
@@ -695,10 +695,10 @@
             this.treeView3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView3.Location = new System.Drawing.Point(0, 0);
             this.treeView3.Name = "treeView3";
-            treeNode15.Name = "Node0";
-            treeNode15.Text = "Project Maps";
+            treeNode1.Name = "Node0";
+            treeNode1.Text = "Project Maps";
             this.treeView3.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode15});
+            treeNode1});
             this.treeView3.Size = new System.Drawing.Size(149, 608);
             this.treeView3.TabIndex = 0;
             this.treeView3.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeview3_pickHeightmap);
@@ -714,8 +714,8 @@
             this.HeightmapEditor.Size = new System.Drawing.Size(712, 602);
             this.HeightmapEditor.TabIndex = 1;
             this.HeightmapEditor.TabStop = false;
-            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseMove += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseMove);
+            this.HeightmapEditor.MouseDown += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseDown);
             this.HeightmapEditor.MouseUp += new System.Windows.Forms.MouseEventHandler(this.HeightmapEditor_onMouseUp);
             // 
             // terrainTexturePage
@@ -765,7 +765,7 @@
             this.toolStripSeparator4});
             this.toolStrip2.Location = new System.Drawing.Point(0, 3);
             this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(32, 243);
+            this.toolStrip2.Size = new System.Drawing.Size(32, 245);
             this.toolStrip2.TabIndex = 0;
             // 
             // newTerrainTexture_Button
@@ -828,14 +828,14 @@
             // addBrushTypeToolStripMenuItem
             // 
             this.addBrushTypeToolStripMenuItem.Name = "addBrushTypeToolStripMenuItem";
-            this.addBrushTypeToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.addBrushTypeToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.addBrushTypeToolStripMenuItem.Text = "Add Brush Type";
             this.addBrushTypeToolStripMenuItem.Click += new System.EventHandler(this.addBrushTypeToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(147, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
             // 
             // toolStripButton6
             // 
@@ -877,11 +877,11 @@
             this.terrainTexture.BackColor = System.Drawing.SystemColors.AppWorkspace;
             this.terrainTexture.Location = new System.Drawing.Point(33, 0);
             this.terrainTexture.Name = "terrainTexture";
-            this.terrainTexture.Size = new System.Drawing.Size(2000, 2051);
+            this.terrainTexture.Size = new System.Drawing.Size(1983, 2052);
             this.terrainTexture.TabIndex = 0;
             this.terrainTexture.TabStop = false;
-            this.terrainTexture.MouseDown += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseDown);
             this.terrainTexture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseMove);
+            this.terrainTexture.MouseDown += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseDown);
             this.terrainTexture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.terrainTexture_MouseUp);
             // 
             // tabPage4
@@ -944,36 +944,36 @@
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.ConfigGrid.BackgroundColor = System.Drawing.SystemColors.ActiveBorder;
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle22.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle22;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.ConfigGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ConfigGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Variable,
             this.Value});
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle23.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.ConfigGrid.DefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ConfigGrid.DefaultCellStyle = dataGridViewCellStyle2;
             this.ConfigGrid.Location = new System.Drawing.Point(0, 31);
             this.ConfigGrid.Name = "ConfigGrid";
-            dataGridViewCellStyle24.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle24.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle24.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle24.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle24.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle24.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle24.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.ConfigGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ConfigGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.ConfigGrid.Size = new System.Drawing.Size(888, 639);
             this.ConfigGrid.TabIndex = 0;
             // 
@@ -1053,10 +1053,10 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView2.Location = new System.Drawing.Point(3, 3);
             this.treeView2.Name = "treeView2";
-            treeNode16.Name = "Node0";
-            treeNode16.Text = "World";
+            treeNode2.Name = "Node0";
+            treeNode2.Text = "World";
             this.treeView2.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode16});
+            treeNode2});
             this.treeView2.Size = new System.Drawing.Size(259, 275);
             this.treeView2.TabIndex = 5;
             // 
@@ -1100,13 +1100,13 @@
             // 
             this.projectSavesToolStripMenuItem.Enabled = false;
             this.projectSavesToolStripMenuItem.Name = "projectSavesToolStripMenuItem";
-            this.projectSavesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.projectSavesToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.projectSavesToolStripMenuItem.Text = "Project Saves...";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(160, 6);
             // 
             // openToolStripButton2
             // 
@@ -1149,31 +1149,31 @@
             // unitsToolStripMenuItem1
             // 
             this.unitsToolStripMenuItem1.Name = "unitsToolStripMenuItem1";
-            this.unitsToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.unitsToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.unitsToolStripMenuItem1.Text = "Units";
             // 
             // buildingsToolStripMenuItem1
             // 
             this.buildingsToolStripMenuItem1.Name = "buildingsToolStripMenuItem1";
-            this.buildingsToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.buildingsToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.buildingsToolStripMenuItem1.Text = "Buildings";
             // 
             // environmentToolStripMenuItem1
             // 
             this.environmentToolStripMenuItem1.Name = "environmentToolStripMenuItem1";
-            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.environmentToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.environmentToolStripMenuItem1.Text = "Environment";
             // 
             // triggerToolStripMenuItem1
             // 
             this.triggerToolStripMenuItem1.Name = "triggerToolStripMenuItem1";
-            this.triggerToolStripMenuItem1.Size = new System.Drawing.Size(134, 22);
+            this.triggerToolStripMenuItem1.Size = new System.Drawing.Size(145, 22);
             this.triggerToolStripMenuItem1.Text = "Trigger";
             // 
             // soundToolStripMenuItem
             // 
             this.soundToolStripMenuItem.Name = "soundToolStripMenuItem";
-            this.soundToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            this.soundToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
             this.soundToolStripMenuItem.Text = "Sound";
             // 
             // timer1
