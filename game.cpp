@@ -104,9 +104,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	tasks.Init();
 	tasks.Run();	
 
-	
-	console->RunLine("echo('starting main loop')\n");
-
 	int loadingTexture = renderer->LoadTexture("data/loadingTexture.bmp");
 
 	UIWindow loadingScreen;
@@ -137,7 +134,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	library->Import("data/models/peasant.md2",1);
 	library->Import("data/models/villagewoman.md2",1);
 	library->Import("data/models/sheep.md2",1);
-//	library->Import("data/models/vulture.md2",1);
 	library->Import("data/models/soldier.md2",1);
 	library->Import("data/models/ship.md2",1);
 
@@ -155,31 +151,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	LoadWorldState(vars->getValue("default_map")->value.c_str());
 
-	Unit *unit = new Unit();
-	unit->classname = "Custom";
-	unit->tooltip.enabled = true;
-	unit->tooltip.tooltip = "unit1";
+	Unit *unit = new Unit("woman","soldier.md2","soldier.bmp");
 	unit->position = Vector(128,0,128);
+	unit->team = 1;
 	
-	unit->updateInterval = 1;	// update once per second
-	unit->Scripts.onThink = console->LoadScript("data/scripts/woman_think.py");
-	
-	unit->SetModel("data/models/soldier.md2","data/models/soldier.bmp");
 	ents->AddEntity((Entity *)unit);
 
 
 	while (active) {
 		tasks.Run();			
 		
-		/*
-		int e = glGetError();
-		if (e) {
-			char t[255];
-			sprintf(t,"Rendering error code: %d (0x%x)",e,e);
-			console->Print(t);
-		} 
-		*/
-
 		// TODO: make key binding system to replace hard-coded tests
 			
 		if (console->toggled) {
@@ -199,6 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 			selector->enabled = true;
 			selector->maxSelectionCount = 8;
+
 			if (input->GetKeyDown(SDLK_LEFT) || input->GetKeyDown('a') || (input->mouseAbsolute.x <= 30)) {
 				camera->MoveRelative(Vector(-moveSpeed*input->mouseAbsolute.z,0,0)*timer->frameScalar);
 			}
@@ -214,7 +196,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (input->GetKeyReleased(SDLK_F1)) {
 				input->inputContext = EditMode;
 			}
-
 
 			if (entityToPlace) {
 				if (placingEntity) {

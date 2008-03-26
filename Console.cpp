@@ -291,7 +291,53 @@ SCRIPTFUNC(game_killent) {
 	Py_RETURN_NONE;
 }
 
+SCRIPTFUNC(game_script_use) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "ii", &a, &b))        
+		return NULL;
+
+	if (a && ents->entities[a] && ents->entities[a]->alive) {
+	
+	}
+}
+
+SCRIPTFUNC(game_script_attach) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "ii", &a, &b))        
+		return NULL;
+
+	if ((a && ents->entities[a] && ents->entities[a]->alive) && (b && ents->entities[b] && ents->entities[b]->alive)) {
+		ents->entities[a]->Attach(ents->entities[b]);
+	}
+}
+
+SCRIPTFUNC(game_loadscript) {
+	const char *scriptname;
+
+	if (!PyArg_ParseTuple(args,"s",&scriptname))
+		return NULL;
+
+	console->LoadScript(scriptname);
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_script_getteam) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a] && ents->entities[a]->alive) {
+		return PyInt_FromLong(ents->entities[a]->team);
+	}
+	return NULL;
+}
+
 PYTHONMODULE(GameMethods)
+	pydef("loadscript", game_loadscript)
     pydef("echo",  game_print)
     pydef("spawn",   game_spawn)
 	pydef("killent", game_killent)
@@ -304,6 +350,7 @@ PYTHONMODULE(GameMethods)
     pydef("setState", game_script_setstate)
     pydef("getState", game_script_getstate)
 	pydef("getTime", game_script_gettime)
+	pydef("getTeam", game_script_getteam)
 
 	pydef("distance", game_script_distance)
      
@@ -311,6 +358,8 @@ PYTHONMODULE(GameMethods)
  
     pydef("pathTo", game_script_pathto)
     pydef("pathToEnt", game_script_pathtoent)
+
+	pydef("use", game_script_use)
 ENDPYTHONMOD
 
  
@@ -444,6 +493,19 @@ void Console::Printf(const char *format, ...) {
 	Print(text);
 }
 
+std::string Console::LoadScriptf(const char *format, ...) {
+	char text[1024];
+	va_list args;
+
+	if (!format) return "";
+
+	va_start(args,format);
+		vsprintf(text,format,args);
+	va_end(args);
+
+	return LoadScript(text);
+}
+
 std::string Console::LoadScript(const char *scriptFilename) {
 	char scriptBuffer[100001];
 	std::string script = "";
@@ -461,5 +523,7 @@ std::string Console::LoadScript(const char *scriptFilename) {
 	} else {
 		Printf("Error opening script file '%s'",scriptFilename);
 	}
+
+	RunLine(script.c_str());
 	return script;
 }

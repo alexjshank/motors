@@ -116,10 +116,16 @@ Entity::Entity(void) {
 	tooltip.tooltip = "";
 	tooltip.subtitle = "";
 	lastPathTime = 0;
+	Attached = false;
 }
 
 Entity::~Entity(void)
 {
+}
+
+void Entity::Attach(Entity *attach_to) {
+	Attached = true;
+	AttachedTo = attach_to;
 }
 
 void Entity::process() {
@@ -243,8 +249,8 @@ int Entity::Serialize(unsigned char *byteData, int maxSize) {		// returns number
 	return 0;
 }
 
-void Entity::Deserialize(const unsigned char *data) {
-
+int Entity::Deserialize(const unsigned char *data) {
+	return 0;
 }
 
 EntityContainer::EntityContainer() {
@@ -261,6 +267,7 @@ void EntityContainer::AddEntity(Entity *ent) {
 	if (ent->size.len2() > 0) {
 		qtree.AddEntity(ent);
 	}
+	ent->init();
 }
 
 

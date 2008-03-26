@@ -6,11 +6,17 @@
 class Unit : public Entity
 {
 public:
+	void Construct();
+
 	Unit(void);
 	~Unit(void);
 
+	Unit(const char *classname);
+	Unit(const char *classname, const char *modelname, const char *skinname);
+
 	virtual void Think(); 
 
+	void init();
 	void process();
 	void render();
 	void interact(Entity *source, int type);

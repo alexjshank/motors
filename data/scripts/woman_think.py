@@ -1,41 +1,65 @@
-curTeam = 0
+woman_state = { }
+woman_target = { }
+woman_mill = { }
+woman_time = { }
 
-#echo ('ria: '+str(ria)+', rib: '+str(rib)+', ric: '+str(ric)+', rid: '+str(rid))
+def woman_onInit(curID):
+	woman_state[curID] = 0
+	woman_target[curID] = 0
+	woman_mill[curID] = 0
+	woman_time[curID] = 0
 
-if ria == 0 : 
-	ria = getNearestEntity(curID, 4, 0, curTeam)
+def woman_onThink(curID):
 
-if ric == 2 and rib != 0:
-	setPosition(rib,curID)
+	echo(str(woman_state[curID])
+	echo(str(woman_target[curID])
+	echo(str(woman_mill[curID])
+	echo(str(woman_time[curID])
+
+	curTeam = getTeam(curID)
+	if woman_state[curID] == 0 : 
+		woman_mill[curID] = getNearestEntity(curID, 4, 0, curTeam)
+
+	if woman_state[curID] == 2 and woman_target[curID] != 0:
+		setPosition(woman_target[curID],curID)
+		
+	if getState(curID) == 2:
+		if woman_state[curID] == 0:
+			if getTime() - woman_time[curID] > 10:
+				woman_state[curID] = 1
+				
+		if woman_state[curID] == 1:
+			if woman_target[curID] == 0:
+				woman_target[curID] = getNearestEntity(curID, 5, 0, curTeam)
+				
+			if woman_target[curID] != 0:
+				tempD = distance(curID,woman_target[curID])
+				
+				if tempD < 3:
+					killent(woman_target[curID])
+					woman_state[curID] = 2
+				else:
+					pathToEnt(curID, woman_target[curID])
+
+		if woman_state[curID] == 2:
+			if woman_mill[curID] != 0:
+				if distance(curID,woman_mill[curID]) < 5:
+	#				UptakeResources(woman_mill[curID], woman_target[curID])
+					woman_target[curID] = 0
+					woman_state[curID] = 0
+					woman_time[curID] = getTime()
+					
+				else:
+					pathToEnt(curID,woman_mill[curID])
+ 
+def woman_onAttacked(curID, attackerID):
+	echo("onattacked()")
 	
-if getState(curID) == 2:
-	if ric == 0:
-		if getTime() - rid > 10:
-			ric = 1
-			echo('unit('+str(curID)+') searching for food!')
-	if ric == 1:
-		if rib == 0:
-			rib = getNearestEntity(curID, 5, 0, curTeam)
-			
-		if rib != 0:
-			tempD = distance(curID,rib)
-			echo ('distance to target: '+str(tempD))
-			
-			if tempD < 3:
-				killent(rib)
-				ric = 2
-				echo('unit('+str(curID)+') gathering food')
-			else:
-				pathToEnt(curID, rib)
-				echo('unit('+str(curID)+') walking to food')
-
-	if ric == 2:
-		if ria != 0:
-			if distance(curID,ria) < 5:
-				rid = getTime()
-#				UptakeResources(ria, rib)
-				rib = 0
-				ric = 0
-				echo('unit('+str(curID)+') eating! yummmm')
-			else:
-				pathToEnt(curID,ria)
+def woman_onDeath(curID):
+	echo("death")
+	
+def woman_onSelected(curID):
+	echo("selected")
+	
+def woman_onUnselected(curID):
+	echo("unselected")
