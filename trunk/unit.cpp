@@ -18,7 +18,7 @@ extern Library *library;
 extern Timer *timer;
 extern EntityContainer *ents;
 
-Unit::Unit() {
+void Unit::Construct() {
 	model = NULL;
 	state = Stopped;
 	family = EF_UNIT;
@@ -48,7 +48,8 @@ Unit::Unit() {
 	modelAnimations.idleEnd = 13;
 
 	buildtime = 10;
-	lastThinkTime = 0;
+	lastThinkTime = -100;	// think asap
+	updateInterval = 1;
 
 	ScriptRegisters.ria=0;
 	ScriptRegisters.rib=0;
@@ -70,10 +71,45 @@ Unit::Unit() {
 	calibratedModelPosition = calibratedModelRotation = Vector(0,0,0);
 }
 
+Unit::Unit() {
+	Construct();
+}
+
 Unit::~Unit(void)
 {
 }
 
+
+Unit::Unit(const char *cn) {
+	Construct();
+
+	classname = cn;
+
+	tooltip.enabled = true;
+	tooltip.tooltip = cn;
+
+	console->LoadScriptf("data/scripts/%s.py",cn);
+}
+
+Unit::Unit(const char *cn, const char *strmodelname, const char *texturename)  {
+	Construct();
+	
+	classname = cn;
+
+	tooltip.enabled = true;
+	tooltip.tooltip = cn;
+
+	console->LoadScriptf("data/scripts/%s.py",cn);
+
+	std::string modelname = "data/models/", texture = "data/models/";
+	modelname += strmodelname;
+	texture += texturename;
+	SetModel(modelname.c_str(),texture.c_str());
+}
+
+void Unit::init() {
+	console->RunLinef("%s_onInit(%d)\n",classname.c_str(), id);
+}
 
 void Unit::WalkTo(Vector t) {
 	target = t;
@@ -316,32 +352,37 @@ void Unit::SetScriptRegisters() {
 }
 
 void Unit::Think() { 
-	SetScriptRegisters();
-	console->RunLine(Scripts.onThink.c_str()); 
-	GetScriptRegisters();
+//	SetScriptRegisters();
+//	console->RunLine(Scripts.onThink.c_str()); 
+	console->RunLinef("%s_onThink(%d)\n",classname.c_str(), id);
+//	GetScriptRegisters();
 }
 
 void Unit::onAttacked(Entity *source) {
-	SetScriptRegisters();
-	console->RunLinef("srcID = %d",source->id);
-	console->RunLine(Scripts.onAttacked.c_str()); 
-	GetScriptRegisters();
+//	SetScriptRegisters();
+//	console->RunLinef("srcID = %d",source->id);
+	console->RunLinef("%s_onAttacked(%d,%d)\n",classname.c_str(), id, source->id);
+//	console->RunLine(Scripts.onAttacked.c_str()); 
+//	GetScriptRegisters();
 }
 
 void Unit::onDeath() {
 	SetScriptRegisters();
-	console->RunLine(Scripts.onKilled.c_str()); 
+//	console->RunLine(Scripts.onKilled.c_str()); 
+	console->RunLinef("%s_onDeath(%d)\n",classname.c_str(), id);
 	GetScriptRegisters();
 }
 
 void Unit::onSelected() {
-	SetScriptRegisters();
-	console->RunLine(Scripts.onSelected.c_str()); 
-	GetScriptRegisters();
+//	SetScriptRegisters();
+//	console->RunLine(Scripts.onSelected.c_str()); 
+	console->RunLinef("%s_onSelected(%d)\n",classname.c_str(), id);
+//	GetScriptRegisters();
 }
 
 void Unit::onUnSelected() {
-	SetScriptRegisters();
-	console->RunLine(Scripts.onUnSelected.c_str()); 
-	GetScriptRegisters();
+//	SetScriptRegisters();
+//	console->RunLine(Scripts.onUnSelected.c_str()); 
+	console->RunLinef("%s_onUnselected(%d)\n",classname.c_str(), id);
+//	GetScriptRegisters();
 }

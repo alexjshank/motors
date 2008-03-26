@@ -16,7 +16,9 @@ public:
 
 	void RunLine(const char *line);
 	void RunLinef(const char *format, ...);
+
 	std::string LoadScript(const char *scriptFilename);
+	std::string Console::LoadScriptf(const char *format, ...);
 
 	void ProcessInput(char input);
 	void ProcessLine();

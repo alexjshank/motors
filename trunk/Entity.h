@@ -136,24 +136,28 @@ public:
 	~Entity(void);
 
 	virtual void init() { }
+	virtual void Remove();	
 	virtual void process();
 	virtual void render();
 	virtual void interact(Entity *source, int type);
+
 	virtual void onDeath() {}
 	virtual void onAttacked(Entity *source) {}
 	virtual void onSelected() { selected = true;}
 	virtual void onUnSelected() { selected = false;}
 
 	virtual int Serialize(unsigned char *byteData, int maxSize);		// returns number of bytes written to byteData
-	virtual void Deserialize(const unsigned char *data);
+	virtual int Deserialize(const unsigned char *data);					// returns the number of bytes read
 
 	virtual void renderToolTip();
+
+	void Attach(Entity *attachto);
+	bool Attached;
+	Entity *AttachedTo;
 
 	Entity * PathToNearest(unsigned int requiredType, unsigned int requiredFamily, bool requireAlive, unsigned int requiredTeam);
 	bool PathTo(Entity *target);
 	bool PathTo(Vector p);
-
-	virtual void Remove();	// remove from the game.
 
 	bool QueueTask(ENT_TASK * newTask, bool front = false);
 	ENT_TASK *GetTask();	// gets the next task in the task queue

@@ -71,14 +71,23 @@ void Camera::run() {
 	Vector cameraPush,a;
 	float h;
 
+	float ph = terrain->getInterpolatedHeight(position.x,position.z)+4;
+	position.y += ((ph - position.y) / 10.0f ) * timer->frameScalar;
+	if (position.y < ph) position.y = ph;	
+	
+	Vector p = position - (view*zoom);
+
+	float ph2 = terrain->getInterpolatedHeight(p.x,p.z);
+	p.y += ((ph2 - p.y) / 10.0f ) * timer->frameScalar;
+	if (p.y < ph2) p.y = ph2;
+
 	CalculateView();
 
 	glRotatef(rotation.x,1.0f,0,0);
 	glRotatef(rotation.y,0,1.0f,0);
-	glTranslatef(-position.x+(view.x*zoom), -position.y+(view.y*zoom), -position.z+(view.z*zoom));
+	glTranslatef(-p.x, -p.y, -p.z);
 	bViewCalculatedThisFrame = false;
 
-	Vector p = position - (view*zoom);
 	frustum.setCamDef(p,view,up);
 	
 	static float maxdistance = vars->getFloatValue("camera_maxdistance");
