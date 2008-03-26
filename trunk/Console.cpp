@@ -52,7 +52,7 @@ SCRIPTFUNC(game_print) {
 
 	console->Print(value);
 
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 bool PlaceEntity(Entity *ent);
@@ -84,7 +84,7 @@ SCRIPTFUNC(game_spawn) {
 	} 
 
 
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 SCRIPTFUNC(game_QueueUnitForBuild) {
@@ -100,7 +100,7 @@ SCRIPTFUNC(game_QueueUnitForBuild) {
 		}
 	}
 	
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 SCRIPTFUNC(game_killSelected) {
@@ -110,7 +110,7 @@ SCRIPTFUNC(game_killSelected) {
 		SelectedEntity->Kill();
 	}
 
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 void SaveWorldState(const char *filename);
@@ -131,9 +131,23 @@ static PyObject * game_save(PyObject *self, PyObject *args) {
 	SaveWorldState(savename.c_str());
 
 	console->Print("Saved.");
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
+SCRIPTFUNC(game_script_setposition) {
+    DWORD value;
+	DWORD loc;
+ 
+    if (!PyArg_ParseTuple(args, "ii", &value,&loc))
+        return NULL;
+
+    if (value && ents->entities[value] && loc && ents->entities[loc]) {
+        ents->entities[value]->position = ents->entities[loc]->position;
+		Py_RETURN_NONE;
+    }
+
+	return NULL;
+}
 
 SCRIPTFUNC(game_script_getposition) {
     DWORD value;
@@ -157,7 +171,7 @@ SCRIPTFUNC(game_script_getstate) {
     if (value && ents->entities[value] && ents->entities[value]->alive) {
         return PyInt_FromLong(ents->entities[value]->state);
     }
-	return Py_None;
+	Py_RETURN_NONE;
 }
  
 SCRIPTFUNC(game_script_setstate) {
@@ -169,32 +183,33 @@ SCRIPTFUNC(game_script_setstate) {
       if (value && ents->entities[value] && ents->entities[value]->alive) {
             ents->entities[value]->state = (ENT_STATES)state;
       }
-      return Py_None;
+	Py_RETURN_NONE;
 }
  
 SCRIPTFUNC(game_script_pathto) {
     DWORD value;
-      DWORD x,y;
- 
-    if (!PyArg_ParseTuple(args, "iii", &value,&x,&y))
-        return NULL;
- 
-      if (value && ents->entities[value] && ents->entities[value]->alive) {
-            ents->entities[value]->PathTo(Vector((float)x,0,(float)y));
-      }
-      return Py_None;
+    DWORD x,y;
+
+	if (!PyArg_ParseTuple(args, "iii", &value,&x,&y))
+		return NULL;
+
+    if (value && ents->entities[value] && ents->entities[value]->alive) {
+        ents->entities[value]->PathTo(Vector((float)x,0,(float)y));
+    }
+	Py_RETURN_NONE;
 }
  
 SCRIPTFUNC(game_script_pathtoent) {
-    DWORD value;
-      DWORD target;
- 
-    if (!PyArg_ParseTuple(args, "ii", &value,&target))        return NULL;
- 
-      if (value && target && ents->entities[value] && ents->entities[target] && ents->entities[value]->alive && ents->entities[target]->alive) {
-            ents->entities[value]->PathTo(ents->entities[target]->position);
-      }
-      return Py_None;
+	DWORD value;
+	DWORD target;
+
+	if (!PyArg_ParseTuple(args, "ii", &value,&target))   
+		return NULL;
+
+	if (value && target && ents->entities[value] && ents->entities[target] && ents->entities[value]->alive && ents->entities[target]->alive) {
+		ents->entities[value]->PathTo(ents->entities[target]->position);
+	}
+	Py_RETURN_NONE;
 }
  
 SCRIPTFUNC(game_script_getnearestentity) {
@@ -223,7 +238,7 @@ SCRIPTFUNC(game_script_GetRegs) {
     if (!PyArg_ParseTuple(args, "iiiiiiiiiffffffff", &value,  &ria,&rib,&ric,&rid,&rie,&rif,&rig,&rih, &rfa,&rfb,&rfc,&rfd,&rfe,&rff,&rfg,&rfh))
         return NULL;
 
-    if (value && ents->entities[value] && ents->entities[value]->alive) {
+    if (value && ents->entities[value]) {
 		if (ents->entities[value]->family == EF_UNIT) {
 			((Unit*)ents->entities[value])->ScriptRegisters.ria = ria;
 			((Unit*)ents->entities[value])->ScriptRegisters.rib = rib;
@@ -244,7 +259,7 @@ SCRIPTFUNC(game_script_GetRegs) {
 			((Unit*)ents->entities[value])->ScriptRegisters.rfh = rfh;
 		}
     }
-	return Py_None;
+	Py_RETURN_NONE;
 }
  
 SCRIPTFUNC(game_script_distance) {
@@ -273,7 +288,7 @@ SCRIPTFUNC(game_killent) {
 		ents->entities[value]->Kill();
 	}
 
-	return Py_None;
+	Py_RETURN_NONE;
 }
 
 PYTHONMODULE(GameMethods)

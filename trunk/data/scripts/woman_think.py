@@ -1,16 +1,16 @@
 curTeam = 0
 
-echo ('ria: '+str(ria)+', rib: '+str(rib)+', ric: '+str(ric)+', rid: '+str(rid))
+#echo ('ria: '+str(ria)+', rib: '+str(rib)+', ric: '+str(ric)+', rid: '+str(rid))
 
 if ria == 0 : 
 	ria = getNearestEntity(curID, 4, 0, curTeam)
 
 if ric == 2 and rib != 0:
-	setPosition(ric,getPosition(curID))
+	setPosition(rib,curID)
 	
 if getState(curID) == 2:
 	if ric == 0:
-		if getTime() - rid > 30:
+		if getTime() - rid > 10:
 			ric = 1
 			echo('unit('+str(curID)+') searching for food!')
 	if ric == 1:
@@ -37,4 +37,5 @@ if getState(curID) == 2:
 				rib = 0
 				ric = 0
 				echo('unit('+str(curID)+') eating! yummmm')
-				
+			else:
+				pathToEnt(curID,ria)
