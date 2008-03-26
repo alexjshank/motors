@@ -32,8 +32,8 @@ Unit::Unit() {
 	footprints = false;
 
 	size=Vector(1,2,1);
-	runspeed = 2.0f;
-	walkspeed = 1.5f;
+	runspeed = 10.0f;
+	walkspeed = 8.5f;
 	scale = 0.05f;
 	
 	calibratedModelPosition.y = 1;
@@ -312,7 +312,7 @@ void Unit::GetScriptRegisters() {
 }
 
 void Unit::SetScriptRegisters() {
-	console->RunLinef("curID=%d\nria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
+	console->RunLinef("curID=%d\ncurTeam=%d\nria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, team, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
 }
 
 void Unit::Think() { 
