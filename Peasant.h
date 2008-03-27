@@ -51,10 +51,10 @@ public:
 class VillageWoman : public Unit {
 public:
 	VillageWoman();
-	void init();
-	void Think();
+//	void init();
+//	void Think();
 
-	bool deliveringFood;
+/*	bool deliveringFood;
 
 	enum GatheringSheepCycle {
 		NotInCycle=0,
@@ -69,7 +69,7 @@ public:
 	float lastEatTime;
 	Entity *food;
 	Entity *farm;
-	float born;
+*/	float born;
 };
 
 #endif
