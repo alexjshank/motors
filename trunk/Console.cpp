@@ -330,8 +330,46 @@ SCRIPTFUNC(game_script_getteam) {
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
 
-	if (a && ents->entities[a] && ents->entities[a]->alive) {
+	if (a && ents->entities[a]) {
 		return PyInt_FromLong(ents->entities[a]->team);
+	}
+	return NULL;
+}
+
+
+SCRIPTFUNC(game_script_gethealth) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyInt_FromLong(ents->entities[a]->health);
+	}
+	return NULL;
+}
+
+
+SCRIPTFUNC(game_script_gettype) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyInt_FromLong(ents->entities[a]->type);
+	}
+	return NULL;
+}
+
+SCRIPTFUNC(game_script_getclassname) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a] && ents->entities[a]->family == EF_UNIT) {
+		return PyString_FromString(((Unit*)ents->entities[a])->classname.c_str());
 	}
 	return NULL;
 }
@@ -345,12 +383,16 @@ PYTHONMODULE(GameMethods)
  
 	pydef("GetScriptRegisters", game_script_GetRegs)
 
+	pydef("getClassname", game_script_getclassname)
+
 	pydef("setPosition", game_script_setposition)
     pydef("getPosition", game_script_getposition)
     pydef("setState", game_script_setstate)
     pydef("getState", game_script_getstate)
 	pydef("getTime", game_script_gettime)
 	pydef("getTeam", game_script_getteam)
+	pydef("getHealth", game_script_gethealth)
+	pydef("getType", game_script_gettype)
 
 	pydef("distance", game_script_distance)
      

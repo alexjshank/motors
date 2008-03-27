@@ -197,7 +197,7 @@ void Sheep::Think() {
 	}
 }
 
-VillageWoman::VillageWoman() {
+VillageWoman::VillageWoman() : Unit("woman","villagewoman.md2","VillagerWoman.BMP") {
 	type = E_VILLAGEWOMAN;
 	family=EF_UNIT;
 	size = Vector(1,2,1);
@@ -205,13 +205,13 @@ VillageWoman::VillageWoman() {
 	walkspeed = 2.0f;
 	scale = 0.05f;
 	footprints = true;
-	food=0;
-	farm=0;
-	lastEatTime = -25;
-	cycleiter=0;
+//	food=0;
+//	farm=0;
+//	lastEatTime = -25;
+//	cycleiter=0;
 	team = 1;
 }
-
+/*
 void VillageWoman::init() {
 	SetModel("data/models/villagewoman.md2","data/models/VillagerWoman.BMP");
 	born = timer->time;
@@ -267,3 +267,4 @@ void VillageWoman::Think() {
 		}
 	}		
 }
+*/
