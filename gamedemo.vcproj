@@ -140,9 +140,6 @@
 					RelativePath=".\Soldier.cpp">
 				</File>
 				<File
-					RelativePath=".\unit.cpp">
-				</File>
-				<File
 					RelativePath=".\Waypoint.cpp">
 				</File>
 			</Filter>
@@ -221,6 +218,9 @@
 				</File>
 				<File
 					RelativePath=".\UI.cpp">
+				</File>
+				<File
+					RelativePath=".\unit.cpp">
 				</File>
 				<File
 					RelativePath=".\Variables.cpp">
