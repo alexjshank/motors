@@ -51,23 +51,6 @@ void Unit::Construct() {
 	lastThinkTime = -100;	// think asap
 	updateInterval = 1;
 
-	ScriptRegisters.ria=0;
-	ScriptRegisters.rib=0;
-	ScriptRegisters.ric=0;
-	ScriptRegisters.rid=0;
-	ScriptRegisters.rie=0;
-	ScriptRegisters.rif=0;
-	ScriptRegisters.rig=0;
-	ScriptRegisters.rih=0;
-	ScriptRegisters.rfa=0;
-	ScriptRegisters.rfb=0;
-	ScriptRegisters.rfc=0;
-	ScriptRegisters.rfd=0;
-	ScriptRegisters.rfe=0;
-	ScriptRegisters.rff=0;
-	ScriptRegisters.rfg=0;
-	ScriptRegisters.rfh=0;
-
 	calibratedModelPosition = calibratedModelRotation = Vector(0,0,0);
 }
 
@@ -83,17 +66,17 @@ Unit::~Unit(void)
 Unit::Unit(const char *cn) {
 	Construct();
 
-	classname = cn;
-
-	tooltip.enabled = true;
-	tooltip.tooltip = cn;
-
-	console->LoadScriptf("data/scripts/%s.py",cn);
+	Initialize(cn);
 }
+
 
 Unit::Unit(const char *cn, const char *strmodelname, const char *texturename)  {
 	Construct();
 	
+	Initialize(cn,strmodelname,texturename);
+}
+
+void Unit::Initialize(const char *cn, const char *strmodelname, const char *texturename) {
 	classname = cn;
 
 	tooltip.enabled = true;
@@ -101,11 +84,14 @@ Unit::Unit(const char *cn, const char *strmodelname, const char *texturename)  {
 
 	console->LoadScriptf("data/scripts/%s.py",cn);
 
-	std::string modelname = "data/models/", texture = "data/models/";
-	modelname += strmodelname;
-	texture += texturename;
-	SetModel(modelname.c_str(),texture.c_str());
+	if (texturename && strmodelname) {
+		std::string modelname = "data/models/", texture = "data/models/";
+		modelname += strmodelname;
+		texture += texturename;
+		SetModel(modelname.c_str(),texture.c_str());
+	}
 }
+
 
 void Unit::init() {
 	console->RunLinef("%s_onInit(%d)\n",classname.c_str(), id);
@@ -121,6 +107,10 @@ void Unit::process() {
 
 	blood.position = position;
 	blood.Run();
+
+	if (Attached && AttachedTo) {
+		position = AttachedTo->position;
+	}
 
 	if (alive) {
 		if (terrain && (position.x < 0 || position.z < 0 || position.x > terrain->width || position.z > terrain->height)) {
@@ -343,46 +333,22 @@ void Unit::SetModel(const char *modelname, const char *texturename) {
 	texture = renderer->LoadTexture(texturename);
 }
 
-void Unit::GetScriptRegisters() {
-	console->RunLine("GetScriptRegisters(curID, ria,rib,ric,rid,rie,rif,rig,rih, rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh)\n");
-}
-
-void Unit::SetScriptRegisters() {
-	console->RunLinef("curID=%d\ncurTeam=%d\nria=%d\nrib=%d\nric=%d\nrid=%d\nrie=%d\nrif=%d\nrig=%d\nrih=%d\nrfa=%f\nrfb=%f\nrfc=%f\nrfd=%f\nrfe=%f\nrff=%f\nrfg=%f\nrfh=%f\n",  id, team, ScriptRegisters.ria,ScriptRegisters.rib,ScriptRegisters.ric,ScriptRegisters.rid,ScriptRegisters.rie,ScriptRegisters.rif,ScriptRegisters.rig,ScriptRegisters.rih,ScriptRegisters.rfa,ScriptRegisters.rfb,ScriptRegisters.rfc,ScriptRegisters.rfd,ScriptRegisters.rfe,ScriptRegisters.rff,ScriptRegisters.rfg,ScriptRegisters.rfh);
-}
-
 void Unit::Think() { 
-//	SetScriptRegisters();
-//	console->RunLine(Scripts.onThink.c_str()); 
 	console->RunLinef("%s_onThink(%d)\n",classname.c_str(), id);
-//	GetScriptRegisters();
 }
 
 void Unit::onAttacked(Entity *source) {
-//	SetScriptRegisters();
-//	console->RunLinef("srcID = %d",source->id);
 	console->RunLinef("%s_onAttacked(%d,%d)\n",classname.c_str(), id, source->id);
-//	console->RunLine(Scripts.onAttacked.c_str()); 
-//	GetScriptRegisters();
 }
 
 void Unit::onDeath() {
-	SetScriptRegisters();
-//	console->RunLine(Scripts.onKilled.c_str()); 
 	console->RunLinef("%s_onDeath(%d)\n",classname.c_str(), id);
-	GetScriptRegisters();
 }
 
 void Unit::onSelected() {
-//	SetScriptRegisters();
-//	console->RunLine(Scripts.onSelected.c_str()); 
 	console->RunLinef("%s_onSelected(%d)\n",classname.c_str(), id);
-//	GetScriptRegisters();
 }
 
 void Unit::onUnSelected() {
-//	SetScriptRegisters();
-//	console->RunLine(Scripts.onUnSelected.c_str()); 
 	console->RunLinef("%s_onUnselected(%d)\n",classname.c_str(), id);
-//	GetScriptRegisters();
 }

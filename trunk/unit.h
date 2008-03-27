@@ -7,6 +7,7 @@ class Unit : public Entity
 {
 public:
 	void Construct();
+	void Initialize(const char *classname, const char *modelname = 0, const char *skinname = 0);
 
 	Unit(void);
 	~Unit(void);
@@ -22,8 +23,6 @@ public:
 	void interact(Entity *source, int type);
 	void WalkTo(Vector t);
 
-	void GetScriptRegisters();
-	void SetScriptRegisters();
 	void onAttacked(Entity *source);
 	void onDeath();
 	void onSelected();
@@ -62,11 +61,5 @@ public:
 	
 	ParticleEmitter blood;
 
-	struct tScripts {
-		std::string onSpawn, checkBuildRequirements, onStartBuild,onFinishBuild,onThink,onDestroy,onSelected,onUnSelected,onOrderIssued,onCompletedOrder,onEnemyNearby,onAttacked,onKilled;
-	} Scripts;
-	struct tScriptRegisters {
-		int ria,rib,ric,rid,rie,rif,rig,rih;
-		float rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh;
-	} ScriptRegisters;
+	
 };

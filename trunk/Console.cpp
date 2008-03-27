@@ -61,9 +61,8 @@ bool PlaceEntity(Entity *ent);
 extern int currentID;
 SCRIPTFUNC(game_spawn) {
     char *entityName;
-	int x,y;
 
-    if (!PyArg_ParseTuple(args, "s", &entityName,&x,&y))
+    if (!PyArg_ParseTuple(args, "s", &entityName))
         return NULL;
 
 	Entity *ent = SpawnEntity(entityName, camera->GetPosition().flat() + Vector(0,terrain->getInterpolatedHeight(camera->GetPosition().x,camera->GetPosition().z),0) );
@@ -83,6 +82,55 @@ SCRIPTFUNC(game_spawn) {
 			input->inputContext = NormalInput;
 	} 
 
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_getxpos) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyFloat_FromDouble(ents->entities[a]->position.x);
+	}
+	return NULL;
+}
+SCRIPTFUNC(game_getzpos) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyFloat_FromDouble(ents->entities[a]->position.z);
+	}
+	return NULL;
+}
+SCRIPTFUNC(game_getypos) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyFloat_FromDouble(ents->entities[a]->position.y);
+	}
+	return NULL;
+}
+
+
+SCRIPTFUNC(game_spawnunit) {
+	char *entityName;
+	float x,y;
+
+    if (!PyArg_ParseTuple(args, "sff", &entityName,&x,&y))
+        return NULL;
+
+	Unit *unit = new Unit(entityName);
+	unit->position = Vector(x,0,y);
+	ents->AddEntity(unit);
 
 	Py_RETURN_NONE;
 }
@@ -229,38 +277,6 @@ SCRIPTFUNC(game_script_getnearestentity) {
       }
       return PyInt_FromLong(0);
 }
-
-SCRIPTFUNC(game_script_GetRegs) {
-	DWORD value;
-	int ria,rib,ric,rid,rie,rif,rig,rih;
-	float rfa,rfb,rfc,rfd,rfe,rff,rfg,rfh;
-
-    if (!PyArg_ParseTuple(args, "iiiiiiiiiffffffff", &value,  &ria,&rib,&ric,&rid,&rie,&rif,&rig,&rih, &rfa,&rfb,&rfc,&rfd,&rfe,&rff,&rfg,&rfh))
-        return NULL;
-
-    if (value && ents->entities[value]) {
-		if (ents->entities[value]->family == EF_UNIT) {
-			((Unit*)ents->entities[value])->ScriptRegisters.ria = ria;
-			((Unit*)ents->entities[value])->ScriptRegisters.rib = rib;
-			((Unit*)ents->entities[value])->ScriptRegisters.ric = ric;
-			((Unit*)ents->entities[value])->ScriptRegisters.rid = rid;
-			((Unit*)ents->entities[value])->ScriptRegisters.rie = rie;
-			((Unit*)ents->entities[value])->ScriptRegisters.rif = rif;
-			((Unit*)ents->entities[value])->ScriptRegisters.rig = rig;
-			((Unit*)ents->entities[value])->ScriptRegisters.rih = rih;
-			
-			((Unit*)ents->entities[value])->ScriptRegisters.rfa = rfa;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfb = rfb;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfc = rfc;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfd = rfd;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfe = rfe;
-			((Unit*)ents->entities[value])->ScriptRegisters.rff = rff;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfg = rfg;
-			((Unit*)ents->entities[value])->ScriptRegisters.rfh = rfh;
-		}
-    }
-	Py_RETURN_NONE;
-}
  
 SCRIPTFUNC(game_script_distance) {
     DWORD value;
@@ -374,19 +390,37 @@ SCRIPTFUNC(game_script_getclassname) {
 	return NULL;
 }
 
+
+SCRIPTFUNC(game_script_setmodel) {
+	DWORD id;
+	const char *modelname, *texturename;
+
+	if (!PyArg_ParseTuple(args, "iss", &id, &modelname, &texturename))        
+		return NULL;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		((Unit*)ents->entities[id])->SetModel(modelname, texturename);
+	}
+
+	Py_RETURN_NONE;
+}
+
 PYTHONMODULE(GameMethods)
 	pydef("loadscript", game_loadscript)
     pydef("echo",  game_print)
     pydef("spawn",   game_spawn)
+	pydef("spawnunit", game_spawnunit)
 	pydef("killent", game_killent)
     pydef("save",    game_save)
  
-	pydef("GetScriptRegisters", game_script_GetRegs)
-
 	pydef("getClassname", game_script_getclassname)
 
+	pydef("setModel", game_script_setmodel)
 	pydef("setPosition", game_script_setposition)
     pydef("getPosition", game_script_getposition)
+	pydef("getXpos", game_getxpos)
+	pydef("getYpos", game_getypos)
+	pydef("getZpos", game_getzpos)
     pydef("setState", game_script_setstate)
     pydef("getState", game_script_getstate)
 	pydef("getTime", game_script_gettime)
