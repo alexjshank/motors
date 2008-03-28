@@ -33,7 +33,7 @@ void LumberTree::init() {
 	model = new Md2Object;
 	model->setModel((Model_MD2*)library->Export("data/models/felwoodbush1.md2"));
 	position.y = terrain->getInterpolatedHeight(position.x,position.z);
-	texture = renderer->LoadTexture("data/models/FelwoodNatural.BMP");
+	texture = renderer->LoadTexture("data/models/FelwoodNatural.JPG");
 	birthtime = timer->time;
 	
 	if (birthtime < 10) birthtime -= 60;

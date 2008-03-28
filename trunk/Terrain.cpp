@@ -42,6 +42,8 @@ Terrain::Terrain(const char *heightmap, int mainTexture, int detailTexture, Came
 
 
 bool Terrain::LoadHeightMap(const char * filename) {
+	console->Printf("Loading terrain file '%s'",filename);
+
 	FILE *fmap = fopen(filename,"rb");
 
 	fAvgWaterHeight = 4;
@@ -49,6 +51,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 
 	if (!fmap) {
 		// errrror
+		console->Printf("Error opening terrain file '%s'",filename);
 		return false;
 	}
 
@@ -63,16 +66,19 @@ bool Terrain::LoadHeightMap(const char * filename) {
 
 	if (!(bTerrainContents = new unsigned char[size])) {
 		// error
+		console->Printf("Error allocating bterraincontents memory [%d]", size);
 		return false;
 	}
 	ZeroMemory(bTerrainContents,size);
 
 	if (!(fHeightData = new float[size])) {
 		// error
+		console->Printf("Error allocating fheightdata memory [%d]", size);
 		return false;
 	}
 
 	if (!(fWaterHeights = new float[size])) {
+		console->Printf("Error allocating fwaterheights memory [%d]", size);
 		return false;
 	}
 	for (int i=0;i<size;i++) { fWaterHeights[i] = fAvgWaterHeight; }
@@ -80,21 +86,25 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	if (!(ucColorData[0] = new unsigned char[size]) || 
 		!(ucColorData[1] = new unsigned char[size]) || 
 		!(ucColorData[2] = new unsigned char[size])) {
+		console->Printf("Error allocated uccolordata memory [%d]", size);
 		return false;
 	}
 
 	if (!(vNormals = new Vector[size])) {
 		// error
+		console->Printf("Error allocated vnormals memory [%d]", size);
 		return false;
 	}
 
 	if (!(ASnodes = new AS_Node[size])) {
 		// error
+		console->Printf("Error allocated asnodes memory [%d]", size);
 		return false;
 	}
 	
 	if (feof(fmap)) {
 		// error - no terrain data
+		console->Printf("Error no terrain data");
 		return false;
 	}
 
@@ -117,7 +127,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	SmootheTerrain();
 	SmootheTerrain();	
 
-	waterReflection = renderer->LoadTexture("data/topographical/reflection.bmp");
+	waterReflection = renderer->LoadTexture("data/topographical/reflection.JPG");
 
 	// set up the terrain contents (this should probably be its own file, but for now we're just generating it and checking for water
 
@@ -132,6 +142,9 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	}
 
 	CalculateWaveData();
+
+	
+	console->Printf("Finished loading terrain");
 	return true;
 }
 
@@ -201,7 +214,7 @@ void Terrain::SetCamera(Camera *cam) {
 }
 
 void Terrain::CalculateWaveData() {
-	waveTexture = renderer->LoadTexture("data\\topographical\\wave.bmp");
+	waveTexture = renderer->LoadTexture("data\\topographical\\wave.JPG");
 	int tilesize = 3;
 	for (int xi=0;xi<width;xi+=tilesize) {
 		for (int yi=0;yi<height;yi+=tilesize) {

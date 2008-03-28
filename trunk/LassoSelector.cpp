@@ -63,7 +63,7 @@ bool LassoSelector::init() {
 	selectTime=0;
 	selectFadeTime=1.0f;
 	
-	texSelectedEntity = renderer->LoadTexture("data/selectedEntity.bmp");
+	texSelectedEntity = renderer->LoadTexture("data/selectedEntity.JPG");
 
 	return true;
 }

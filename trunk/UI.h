@@ -107,7 +107,7 @@ public:
 	// textures:
 	int windowbg;
 	int buttonbg;
-	int farmbutton;
+
 	UIObject *desktop;
 };
 

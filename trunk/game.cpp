@@ -104,7 +104,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	tasks.Init();
 	tasks.Run();	
 
-	int loadingTexture = renderer->LoadTexture("data/loadingTexture.bmp");
+	int loadingTexture = renderer->LoadTexture("data/loadingTexture.JPG");
 
 	UIWindow loadingScreen;
 	glPushMatrix();
@@ -119,10 +119,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	input->mouseMovement = Vector(0,0,0);
 
 
-	library->Import("data/models/house.BMP",0);
-	library->Import("data/models/Sheep.BMP",0);
-	library->Import("data/models/soldier.bmp",0);
-	library->Import("data/models/barracks.bmp",0);
+	library->Import("data/models/house.JPG",0);
+	library->Import("data/models/Sheep.JPG",0);
+	library->Import("data/models/soldier.JPG",0);
+	library->Import("data/models/barracks.JPGF",0);
 
 	library->Import("data/models/farm.md2",1);
 	library->Import("data/models/tower/tower.md2",1);
@@ -150,12 +150,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	LoadWorldState(vars->getValue("default_map")->value.c_str());
-
-	Unit *unit = new Unit("woman","soldier.md2","soldier.bmp");
-	unit->position = Vector(128,0,128);
-	unit->team = 1;
-	
-	ents->AddEntity((Entity *)unit);
 
 
 	while (active) {

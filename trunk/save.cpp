@@ -24,10 +24,10 @@ void SaveWorldState(const char *filename) {
 	strcpy(head.magic,"ASGE07");
 	head.size_x = terrain->width;
 	head.size_y = terrain->height;
-	strcpy(head.terrainName,"PirateIsland");
+	strcpy(head.terrainName,terrain->terrainName.c_str());
 	head.entityCount = (int)ents->entities.size();
-	fwrite(&head,sizeof(MapHeader),1,fout);
 
+	fwrite(&head,sizeof(MapHeader),1,fout);
 
 	for (int i=0;i<head.entityCount;i++) {
 		if (ents->entities[i] && ents->entities[i]->alive && ents->entities[i]->type != E_SHEEP) {
@@ -59,6 +59,7 @@ void LoadWorldState(const char *filename) {
 
 	if (strcmp(head.magic,"ASGE07")!=0) {
 		// error
+		console->Printf("world magic number incorrect!");
 		return;
 	}
 
@@ -66,9 +67,9 @@ void LoadWorldState(const char *filename) {
 	sprintf(terrainName,"data/topographical/%s.top",head.terrainName);
 
 	char textureName[255];
-	sprintf(textureName,"data/topographical/%s.bmp",head.terrainName);
+	sprintf(textureName,"data/topographical/%s.JPG",head.terrainName);
 	
-	terrain = new Terrain(terrainName, renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.bmp"), camera);
+	terrain = new Terrain(terrainName, renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.JPG"), camera);
 	
 	
 	ents->AddEntity((Entity*)terrain);

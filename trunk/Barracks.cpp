@@ -17,7 +17,7 @@ void Barracks::init() {
 	size = Vector(3,2,3);
 	scale = 0.2f;
 
-	SetModel("data/models/barracks.md2","data/models/barracks.BMP");
+	SetModel("data/models/barracks.md2","data/models/barracks.JPG");
 	toolWindow = (UIWindow *)ui->CreateFromFile("data/UI/barracks.ui");
 
 	tooltip.enabled = true;

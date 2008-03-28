@@ -68,7 +68,7 @@ bool ParticleManager::init() {
 	glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, spriteMaxSize );
 	glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
 
-	particleTexture = renderer->LoadTexture("data/models/particle.bmp");
+	particleTexture = renderer->LoadTexture("data/models/particle.JPG");
 
 	return true;
 }

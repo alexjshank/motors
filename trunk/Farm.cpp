@@ -29,7 +29,7 @@ void Farm::init() {
 	family = EF_BUILDING;
 	type = E_FARM;
 
-	SetModel("data/models/farm.md2","data/models/house.BMP");
+	SetModel("data/models/farm.md2","data/models/house.JPG");
 	spawnPoint = position + Vector(1,0,1);
 	lastSpawnTime = 0;
 

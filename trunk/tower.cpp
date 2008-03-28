@@ -14,7 +14,7 @@ Tower::~Tower(void)
 void Tower::init() {
 	Building::init();
 
-	SetModel("data/models/tower/tower.md2","data/models/tower/tower.bmp");
+	SetModel("data/models/tower/tower.md2","data/models/tower/tower.JPG");
 	tooltip.enabled = true;
 	tooltip.tooltip = "Tower";
 	toolWindow = 0;

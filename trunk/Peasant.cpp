@@ -169,7 +169,7 @@ Sheep::Sheep() {
 }
 
 void Sheep::init() {
-	SetModel("data/models/sheep.md2","data/models/Sheep.BMP");
+	SetModel("data/models/sheep.md2","data/models/Sheep.JPG");
 	born = timer->time;
 }
 

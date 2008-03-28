@@ -2,6 +2,7 @@
 #include "Variables.h"
 #include "Camera.h"
 #include "console.h"
+#include "SDL_image.h"
 
 extern Camera *camera;
 extern gamevars *vars;	
@@ -9,6 +10,7 @@ extern Console *console;
 
 #pragma comment(lib,"sdl.lib")
 #pragma comment(lib,"sdlmain.lib")
+#pragma comment(lib,"sdl_image.lib")
 #pragma comment(lib,"opengl32.lib")
 
 PFNGLMULTITEXCOORD2FARBPROC	glMultiTexCoord2fARB	= NULL;
@@ -239,7 +241,7 @@ bool Graphics::init() {
 
 	text.init();
 
-	skybox = LoadTexture("data/topographical/skybox.bmp");
+	skybox = LoadTexture("data/topographical/skybox.JPG");
 
 	console->Printf("Finished renderer initialization");
 
@@ -266,16 +268,17 @@ void Graphics::run() {
 //	glScalef(0.001f,0.001f,0.001f);
 }
 
-// this only loads BMPs... should modify this to include jpg/png/tga also... maybe theres a lib that has it already?
+
 int Graphics::LoadTexture(const char *filename) {
 	GLuint texture;
 
-//	console->Printf("Graphics::LoadTexture(%s);",filename);
+	SDL_Surface* imageFile = IMG_Load(filename);
 
-	SDL_Surface* bmpFile = SDL_LoadBMP(filename);
+	if (!imageFile) {
+		console->Printf("IMG_Load(%s) failed. reason: %s", filename,IMG_GetError());	
+		return -1;
+	}
 
-	if (!bmpFile) return -1;
- 
 	glPixelStorei(GL_UNPACK_ALIGNMENT,4);
  	glGenTextures(1,&texture);
 	glBindTexture(GL_TEXTURE_2D,texture);
@@ -283,8 +286,9 @@ int Graphics::LoadTexture(const char *filename) {
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
  		
-	gluBuild2DMipmaps(GL_TEXTURE_2D,3,bmpFile->w, bmpFile->h,GL_BGR_EXT, GL_UNSIGNED_BYTE,bmpFile->pixels);
+	gluBuild2DMipmaps(GL_TEXTURE_2D,3,imageFile->w, imageFile->h, GL_RGB, GL_UNSIGNED_BYTE,imageFile->pixels);
  
-	SDL_FreeSurface(bmpFile);
+	SDL_FreeSurface(imageFile);
+
 	return (int)texture;
 }
