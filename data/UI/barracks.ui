@@ -1,2 +1,2 @@
 window	Barracks	25	25	200	200	 
-	button	soldier_button	130	40	50	50	spawn('soldier')
+	button	soldier_button	130	40	50	50	spawnunit('soldier',getXpos(curID)+2, getZpos(curID)+2)
