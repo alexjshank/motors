@@ -21,7 +21,7 @@ void Vehicle::init() {
 	model = new Md2Object;
 	model->setModel((Model_MD2*)library->Export("data/models/tower/tower.md2"));
 	position.y = terrain->getInterpolatedHeight(position.x,position.z);
-	texture = renderer->LoadTexture("data/models/tower/tower.bmp");
+	texture = renderer->LoadTexture("data/models/tower/tower.JPG");
 }
 
 

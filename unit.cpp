@@ -116,6 +116,7 @@ void Unit::process() {
 		if (terrain && (position.x < 0 || position.z < 0 || position.x > terrain->width || position.z > terrain->height)) {
 			// out of bounds! dirty traitor, trying to run away from the action!
 			Kill();
+			Remove();
 			return;
 		}
 
@@ -185,16 +186,6 @@ void Unit::process() {
 			position += (velocity + adjust) * timer->frameScalar;
 			break;
 
-		case FlankTargetLeft:
-			velocity = (Vector(0,1,0) ^ Normalize(target - p)) * runspeed;
-			position += velocity * timer->frameScalar;
-			break;
-
-		case FlankTargetRight:
-			velocity = (Vector(0,1,0) ^ Normalize(target - p)) * -runspeed;
-			position += velocity * timer->frameScalar;
-			break;
-
 		case Stopped:
 			nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
 			if (nearest && dist2(position,nearest->position) <= size.len2()) {
@@ -218,23 +209,18 @@ void Unit::process() {
 			lastThinkTime = timer->time;
 			Think();
 		}
-	} else {
+	} else {	// dead
 		blood.on = true;
 		state = Stopped;
-		if (timer->time - deathTime > 60)
-			model->setPosition(position+Vector(0,-1*(timer->time - deathTime),0));		
-		else
-			model->setPosition(position);		
+
+		model->setPosition(position+Vector(0,-0.01f * (timer->time - deathTime),0));		
 		model->setRotation(Vector(90,0,atan2(velocity.x,velocity.z)/(3.1415f/180)));
-		if (timer->time - deathTime > 60)
-		{
-			position.y -= 0.01f;	
-			if (timer->time - deathTime > 120) {
-				try {				
-					Remove();
-				} catch (...) {
-					console->Print("Yar, thar be holes in them thar code!");
-				}
+
+		if (timer->time - deathTime > 60) {
+			try {				
+				Remove();
+			} catch (...) {
+				console->Print("Yar, thar be holes in them thar code!");
 			}
 		}
 	}

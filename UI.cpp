@@ -21,9 +21,9 @@ UI::~UI(void)
 }
 
 bool UI::init() {
-	windowbg = renderer->LoadTexture("data/UI/wood.bmp");
-	buttonbg = renderer->LoadTexture("data/UI/button_bg.bmp");
-	farmbutton = renderer->LoadTexture("data/UI/farm.bmp");
+	windowbg = renderer->LoadTexture("data/UI/wood.JPG");
+	buttonbg = renderer->LoadTexture("data/UI/button_bg.JPG");
+
 	desktop = new UIObject;
 	
 	return true;
@@ -331,7 +331,7 @@ void UIText::render() {
 bool UIButton::loadButtonTextures(const char *filelocation) { // "data/UI/button" -> button_01.bmp, button_02.bmp, button_03.bmp
 	char buf[100];
 	for (int i=0;i<3;i++) {
-		sprintf(buf,"data/UI/%s%d.bmp",filelocation,i);
+		sprintf(buf,"data/UI/%s%d.JPG",filelocation,i);
 		texture[i] = renderer->LoadTexture(buf);
 	}
 

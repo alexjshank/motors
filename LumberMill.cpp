@@ -36,7 +36,7 @@ void LumberMill::init() {
 	Building::init();
 	size = Vector(3,2,3);
 
-	SetModel("data/models/mill.md2","data/models/LumberMill.BMP");
+	SetModel("data/models/mill.md2","data/models/LumberMill.JPG");
 	toolWindow = (UIWindow *)ui->CreateFromFile("data/UI/buildmenu.ui");
 }
 

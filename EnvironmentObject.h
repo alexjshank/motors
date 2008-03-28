@@ -31,7 +31,7 @@ public:
 	}
 
 	void init() {
-		SetModel("data/models/lightpost.md2","data/models/VillageStuff.bmp");
+		SetModel("data/models/lightpost.JPG","data/models/VillageStuff.JPG");
 		position = Vector(position.x,terrain->getInterpolatedHeight(position.x,position.z),position.z);
 	}
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	void init() {
-		SetModel("data/models/dock.md2","data/models/wood.bmp");
+		SetModel("data/models/dock.md2","data/models/wood.JPG");
 		position = Vector(position.x,terrain->getInterpolatedHeight(position.x,position.z),position.z);
 	}
 

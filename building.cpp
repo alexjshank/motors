@@ -30,7 +30,7 @@ Building::~Building(void)
 
 void Building::init() {
 	toolWindow = 0;
-	buildTexture = renderer->LoadTexture("data/UI/wood.bmp");
+	buildTexture = renderer->LoadTexture("data/UI/wood.JPG");
 }
 
 extern int currentID;
