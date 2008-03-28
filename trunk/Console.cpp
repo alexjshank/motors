@@ -405,15 +405,35 @@ SCRIPTFUNC(game_script_setmodel) {
 	Py_RETURN_NONE;
 }
 
+SCRIPTFUNC(game_script_setThinkInterval) {
+	DWORD id;
+	float interval;
+
+	if (!PyArg_ParseTuple(args,"if", &id, &interval)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		((Unit*)ents->entities[id])->updateInterval = interval;
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_script_random) {
+	return PyFloat_FromDouble((float)(rand()%100)/100);
+}
+
 PYTHONMODULE(GameMethods)
 	pydef("loadscript", game_loadscript)
     pydef("echo",  game_print)
-    pydef("spawn",   game_spawn)
+	pydef("random", game_script_random)
+	pydef("spawn",   game_spawn)
 	pydef("spawnunit", game_spawnunit)
 	pydef("killent", game_killent)
     pydef("save",    game_save)
  
 	pydef("getClassname", game_script_getclassname)
+
+	pydef("setUpdateInterval", game_script_setThinkInterval)
 
 	pydef("setModel", game_script_setmodel)
 	pydef("setPosition", game_script_setposition)

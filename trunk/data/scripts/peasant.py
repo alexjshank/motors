@@ -1,7 +1,10 @@
-woman_state = { }
-woman_target = { }
-woman_mill = { }
-woman_time = { }
+try : 
+	woman_state
+except NameError :
+	woman_state = { }
+	woman_target = { }
+	woman_mill = { }
+	woman_time = { }
 
 def woman_onInit(curID):
 	woman_state[curID] = 0
@@ -9,12 +12,9 @@ def woman_onInit(curID):
 	woman_mill[curID] = 0
 	woman_time[curID] = 0
 
-def woman_onThink(curID):
+	setModel(curID,"data/models/villagewoman.md2","data/models/VillagerWoman.BMP")
 
-	echo(str(woman_state[curID])
-	echo(str(woman_target[curID])
-	echo(str(woman_mill[curID])
-	echo(str(woman_time[curID])
+def woman_onThink(curID):
 
 	curTeam = getTeam(curID)
 	if woman_state[curID] == 0 : 
