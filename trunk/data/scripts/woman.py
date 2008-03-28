@@ -12,7 +12,7 @@ def woman_onInit(curID):
 	woman_mill[curID] = 0
 	woman_time[curID] = 0
 
-	setModel(curID,"data/models/villagewoman.md2","data/models/VillagerWoman.BMP")
+	setModel(curID,"data/models/villagewoman.md2","data/models/VillagerWoman.JPG")
 
 def woman_onThink(curID):
 
