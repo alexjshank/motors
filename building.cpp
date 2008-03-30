@@ -1,4 +1,4 @@
-#include ".\farm.h"
+#include ".\building.h"
 #include "library.h"
 #include "terrain.h"
 #include "graphics.h"
@@ -71,7 +71,7 @@ void Building::process() {
 
 	if (spawnQueue.size() > 0 && timer->time - startBuildTime >= 10) { 
 		startBuildTime = timer->time;
-		SpawnEntity(spawnQueue.front().c_str(),spawnPoint);
+//		SpawnEntity(spawnQueue.front().c_str(),spawnPoint);
 		spawnQueue.pop();
 	}
 }

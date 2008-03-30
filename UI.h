@@ -39,6 +39,7 @@ public:
 	float height;
 	std::list<UIObject*> children;
 	UIObject *parent;
+	int ownerID;
 };
 
 #define UI_Z_COORD -2.1

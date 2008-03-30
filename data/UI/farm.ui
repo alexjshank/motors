@@ -1,3 +1,1 @@
 window	Personel	25	25	200	200	 
-	button	peasant_button	10	40	50	50	spawnunit('peasant',getXpos(curID)+2,getZpos(curID)+2)
-	button	woman_button	70	40	50	50	spawnunit('woman',getXpos(curID)+2,getZpos(curID)+2)

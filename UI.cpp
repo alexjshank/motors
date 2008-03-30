@@ -238,6 +238,9 @@ void UIObject::render() {
 	for (std::list<UIObject*>::iterator iter=children.begin(); iter!=children.end(); iter++) {
 		if ((*iter)->visible) {
 			(*iter)->render();
+		} else {
+			(*iter)->mouseOver = false;
+			(*iter)->mouseDown = false;
 		}
 	}
 }
@@ -292,7 +295,10 @@ void UIWindow::render() {
 				(*iter)->mouseDown = false;
 			}
 			(*iter)->render();
-		}	
+		} else {
+			(*iter)->mouseOver = false;
+			(*iter)->mouseDown = false;
+		}
 	}
 }
 
@@ -354,6 +360,7 @@ void UIButton::render() {
 void UIButton::onMouseUp(float x, float y) {
 	mouseDown = false;
 	if (enabled) {
+		console->RunLinef("curID = %d\n",parent->ownerID);
 		console->RunLine(releasedCommand.c_str());
 		OnButtonPressed();
 	}
@@ -363,6 +370,7 @@ void UIButton::onMouseDown(float x, float y) {
 	if (!visible) return;
 	if (enabled) {
 		mouseDown = true;
+		console->RunLinef("curID = %d\n",parent->ownerID);
 		console->RunLine(pressedCommand.c_str());
 	}
 }

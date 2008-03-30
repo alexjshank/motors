@@ -20,6 +20,7 @@ extern EntityContainer *ents;
 
 void Unit::Construct() {
 	model = NULL;
+	menu = 0;
 	state = Stopped;
 	family = EF_UNIT;
 	alive = true;
@@ -134,7 +135,7 @@ void Unit::process() {
 		if (terrain && terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
  			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,EF_BUILDING,0,0);
 			if (stuckIn && dist2(stuckIn->position,position) < stuckIn->size.len2() + size.len2()) {	// if we're stuck in something
-				position += Normalize(position - stuckIn->position) * timer->frameScalar;
+				position += Normalize(position - stuckIn->position) * walkspeed * timer->frameScalar;
 			}
 		}
 
@@ -190,7 +191,7 @@ void Unit::process() {
 			nearest = ents->qtree.tree->getClosestEntity(position,-1,EF_UNIT,true,team);
 			if (nearest && dist2(position,nearest->position) <= size.len2()) {
 				if (nearest->position == position) position += Vector(0.01f,0,0);			
-				position -= Normalize(nearest->position - position) * timer->frameScalar;
+				position -= Normalize(nearest->position - position) * walkspeed * timer->frameScalar;
 			}
 			break;
 		} 

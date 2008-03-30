@@ -38,8 +38,8 @@ extern const char *entNames[E_NUMENTS];
 
 class Entity;
 
-Entity *SpawnEntity(ENT_TYPE type, Vector p);
-Entity *SpawnEntity(const char *entityType, Vector p);
+//Entity *SpawnEntity(ENT_TYPE type, Vector p);
+//Entity *SpawnEntity(const char *entityType, Vector p);
 
 
 enum EI_TYPES {
@@ -248,6 +248,7 @@ public:
 	
 	Vector getPosition() { return position; }
 	float getSize() { return size; }
+	Node *getParent() { return parent; }
 
 private:
 	int level;

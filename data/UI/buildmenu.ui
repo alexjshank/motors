@@ -1,5 +1,0 @@
-window	BuildMenu	25	25	200	200	 
-	button	farm_button	10	40	50	50	spawn('farm')
-	button	mill_button	70	40	50	50	spawn('mill')
-	button	tower_button	130	40	50	50	spawn('tower')
-	button	tower_button	10	70	50	50	spawn('barracks')

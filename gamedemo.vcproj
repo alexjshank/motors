@@ -121,24 +121,9 @@
 			<File
 				RelativePath=".\save.cpp">
 			</File>
-			<File
-				RelativePath=".\Storm.cpp">
-			</File>
-			<File
-				RelativePath=".\Vehicle.cpp">
-			</File>
 			<Filter
 				Name="Units"
 				Filter="">
-				<File
-					RelativePath=".\Peasant.cpp">
-				</File>
-				<File
-					RelativePath=".\Ship.cpp">
-				</File>
-				<File
-					RelativePath=".\Soldier.cpp">
-				</File>
 				<File
 					RelativePath=".\Waypoint.cpp">
 				</File>
@@ -147,28 +132,10 @@
 				Name="Building"
 				Filter="">
 				<File
-					RelativePath=".\Barracks.cpp">
-				</File>
-				<File
 					RelativePath=".\building.cpp">
 				</File>
 				<File
-					RelativePath=".\Crops.cpp">
-				</File>
-				<File
 					RelativePath=".\EnvironmentObject.cpp">
-				</File>
-				<File
-					RelativePath=".\Farm.cpp">
-				</File>
-				<File
-					RelativePath=".\LumberMill.cpp">
-				</File>
-				<File
-					RelativePath=".\LumberTree.cpp">
-				</File>
-				<File
-					RelativePath=".\tower.cpp">
 				</File>
 			</Filter>
 			<Filter
@@ -238,9 +205,6 @@
 				RelativePath=".\Anorms.h">
 			</File>
 			<File
-				RelativePath=".\Barracks.h">
-			</File>
-			<File
 				RelativePath=".\building.h">
 			</File>
 			<File
@@ -250,9 +214,6 @@
 				RelativePath=".\Console.h">
 			</File>
 			<File
-				RelativePath=".\Crops.h">
-			</File>
-			<File
 				RelativePath=".\Entity.h">
 			</File>
 			<File
@@ -260,9 +221,6 @@
 			</File>
 			<File
 				RelativePath=".\EnvironmentObject.h">
-			</File>
-			<File
-				RelativePath=".\Farm.h">
 			</File>
 			<File
 				RelativePath=".\Graphics.h">
@@ -277,19 +235,10 @@
 				RelativePath=".\Library.h">
 			</File>
 			<File
-				RelativePath=".\LumberMill.h">
-			</File>
-			<File
-				RelativePath=".\LumberTree.h">
-			</File>
-			<File
 				RelativePath=".\md2.h">
 			</File>
 			<File
 				RelativePath=".\ParticleManager.h">
-			</File>
-			<File
-				RelativePath=".\Peasant.h">
 			</File>
 			<File
 				RelativePath=".\Printer.h">
@@ -304,15 +253,6 @@
 				RelativePath=".\save.h">
 			</File>
 			<File
-				RelativePath=".\Ship.h">
-			</File>
-			<File
-				RelativePath=".\Soldier.h">
-			</File>
-			<File
-				RelativePath=".\Storm.h">
-			</File>
-			<File
 				RelativePath=".\Task.h">
 			</File>
 			<File
@@ -320,9 +260,6 @@
 			</File>
 			<File
 				RelativePath=".\Timer.h">
-			</File>
-			<File
-				RelativePath=".\tower.h">
 			</File>
 			<File
 				RelativePath=".\Trigger.h">
@@ -338,9 +275,6 @@
 			</File>
 			<File
 				RelativePath=".\Vector.h">
-			</File>
-			<File
-				RelativePath=".\Vehicle.h">
 			</File>
 			<File
 				RelativePath=".\Waypoint.h">

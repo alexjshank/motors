@@ -8,7 +8,7 @@ Input::Input(void)
 	ZeroMemory((void *)&keystate,sizeof(keystate));
 	ZeroMemory((void *)&laststate,sizeof(laststate));
 	mouseMovement = Vector(0,0,0);
-	mouseAbsolute = Vector(0,0,0);
+	mouseAbsolute = Vector(0,10,0);
 	mousePosition = Vector(0,0,0);
 	inputContext = 0;
 }
@@ -47,7 +47,7 @@ void Input::run() {
 			mouseMovement.x = event.motion.xrel;
 			mouseMovement.y = event.motion.yrel;
 			mouseAbsolute.x = event.motion.x;
-			mouseAbsolute.y = event.motion.y;
+			mouseAbsolute.y = event.motion.y + 20;
 			mousePosition += mouseMovement;
 
 			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
