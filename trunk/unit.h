@@ -2,6 +2,7 @@
 #include "entity.h"
 #include "md2.h"
 #include "particlemanager.h"
+#include "ui.h"
 
 class Unit : public Entity
 {
@@ -61,5 +62,5 @@ public:
 	
 	ParticleEmitter blood;
 
-	
+	UIWindow *menu;	
 };

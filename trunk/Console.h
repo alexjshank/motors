@@ -31,6 +31,7 @@ public:
 	bool toggled;
 	std::string currentline;
 	std::vector<std::string> history;
+	FILE *fout;
 };
 
 #endif

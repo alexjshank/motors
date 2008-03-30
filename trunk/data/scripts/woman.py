@@ -13,6 +13,7 @@ def woman_onInit(curID):
 	woman_time[curID] = 0
 
 	setModel(curID,"data/models/villagewoman.md2","data/models/VillagerWoman.JPG")
+	setSpeed(curID,3,1)
 
 def woman_onThink(curID):
 

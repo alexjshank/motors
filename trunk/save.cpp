@@ -30,7 +30,7 @@ void SaveWorldState(const char *filename) {
 	fwrite(&head,sizeof(MapHeader),1,fout);
 
 	for (int i=0;i<head.entityCount;i++) {
-		if (ents->entities[i] && ents->entities[i]->alive && ents->entities[i]->type != E_SHEEP) {
+		if (ents->entities[i] && ents->entities[i]->alive) {
 			ent.type = (ENT_TYPE)ents->entities[i]->type;
 			ent.x = ents->entities[i]->position.x;
 			ent.y = ents->entities[i]->position.z;
@@ -57,19 +57,17 @@ void LoadWorldState(const char *filename) {
 
 	fread(&head,sizeof(MapHeader),1,fin);
 
-	if (strcmp(head.magic,"ASGE07")!=0) {
+	if (strncmp(head.magic,"ASGE07",6)!=0) {
 		// error
 		console->Printf("world magic number incorrect!");
 		return;
 	}
 
-	char terrainName[255];
-	sprintf(terrainName,"data/topographical/%s.top",head.terrainName);
 
 	char textureName[255];
 	sprintf(textureName,"data/topographical/%s.JPG",head.terrainName);
 	
-	terrain = new Terrain(terrainName, renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.JPG"), camera);
+	terrain = new Terrain(head.terrainName, renderer->LoadTexture(textureName),renderer->LoadTexture("data/models/water_surface.JPG"), camera);
 	
 	
 	ents->AddEntity((Entity*)terrain);
@@ -77,7 +75,7 @@ void LoadWorldState(const char *filename) {
 	for (int i=0;i<head.entityCount && !feof(fin);i++) {
 		fread(&e,sizeof(MapEntity),1,fin);	
 
-		SpawnEntity(e.type,Vector(e.x,0,e.y));
+//		SpawnEntity(e.type,Vector(e.x,0,e.y));
 	}
 
 	fclose(fin);

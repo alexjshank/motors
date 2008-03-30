@@ -2,7 +2,6 @@
 #include "entity.h"
 #include "graphics.h"
 #include "console.h"
-#include "lumbertree.h"	
 
 extern Console *console;
 #define DEBUG
@@ -79,18 +78,7 @@ bool Node::AddEntity(Entity *ent) {
 
 bool Node::RemoveEntity(Entity *ent) {
 	if (ent == 0) return false;
-#ifdef __DEBUG__
-	std::string st = "Node::RemoveEntity: ent(";
-	st += ent->position.x; 
-	st += ",";
-	st += ent->position.y; 
-	st += ",";
-	st += ent->position.z; 
-	st += "- type ";
-	st += ent->type; 
-	st += ")";
-	console->Print(st.c_str());
-#endif	
+	console->Printf("Node::RemoveEntity: ent(%f,%f,%f, [type:] %d)",ent->position.x,ent->position.y, ent->position.z, ent->type);
 	contents.remove(ent);
 	return true;
 }
@@ -127,7 +115,6 @@ Entity *Node::getClosestEntity(Vector pos, int type, int family, bool alive, int
 		for (std::list<Entity *>::iterator iter=contents.begin();iter!=contents.end();iter++) {
 			Entity *ent = *iter;
 			if ((type != -1 && ent->type != type) || 
-				(ent->type == E_TREE && ((LumberTree*)ent)->HarvestedBy != 0) ||
 				(family != 0 && ent->family != family) || 
 				(alive && !ent->alive) || 
 				(team != 0 && ent->team != team) ||

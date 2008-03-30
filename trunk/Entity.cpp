@@ -3,19 +3,12 @@
 #include "Quadtree.h"
 #include "Timer.h"
 #include "graphics.h"
-#include "peasant.h"
-#include "tower.h"
-#include "lumbertree.h"
-#include "farm.h"
 #include ".\entity.h"
+
 #include "terrain.h"
-#include "lumbermill.h"
 #include "EnvironmentObject.h"
-#include "soldier.h"
-#include "barracks.h"
-#include "trigger.h"
-#include "ship.h"
 #include "lassoselector.h"
+#include "trigger.h"
 #include "waypoint.h"
 //#include "storm.h"
 
@@ -24,56 +17,6 @@ extern LassoSelector *selector;
 extern EntityContainer *ents;
 extern Timer *timer; 
 extern Terrain *terrain;
-
-const char *entNames[E_NUMENTS] = {
-	"tree",
-	"tower",
-	"farm",
-	"peasant",
-	"mill",
-	"sheep",
-	"lamp",
-	"removed1",
-	"woman",
-	"soldier",
-	"trigger",
-	"dock",
-	"ship",
-	"barracks",
-	"waypoint"
-};
-
-
-#define mcSpawnEntity(etype, vtype, vname) case etype: { vtype *vname = new vtype; if (vname) { vname->team = 1; vname->position = p; vname->init(); ents->AddEntity(vname); return vname; } }
-
-Entity *SpawnEntity(ENT_TYPE type, Vector p) {
-	switch(type) {
-		mcSpawnEntity(E_FARM,Farm,farm)
-		mcSpawnEntity(E_TOWER,Tower,tower)
-		mcSpawnEntity(E_LUMBERMILL,LumberMill,lm)
-		mcSpawnEntity(E_PEASANT,Peasant,peasant)
-		mcSpawnEntity(E_VILLAGEWOMAN,VillageWoman,woman)
-		mcSpawnEntity(E_TREE,LumberTree,lt)
-		mcSpawnEntity(E_SHEEP,Sheep,sheep)
-		mcSpawnEntity(E_LAMPPOST,LampPost,lp)
-		mcSpawnEntity(E_SOLDIER,Soldier,soldier)
-		mcSpawnEntity(E_TRIGGER,Trigger,trigger)
-		mcSpawnEntity(E_DOCK,Dock,dock);
-		mcSpawnEntity(E_SHIP,Ship,ship);
-		mcSpawnEntity(E_BARRACKS,Barracks,barracks);
-		mcSpawnEntity(E_WAYPOINT,Waypoint,waypoint);
-	}
-	return 0;
-}
-
-Entity *SpawnEntity(const char *entityType, Vector p) {
-	for (int i=0;i<E_NUMENTS;i++) {
-		if (strcmp(entityType,entNames[i])==0) {
-			return SpawnEntity((ENT_TYPE)i,p);
-		}
-	}
-	return 0;
-}
 
 
 ENT_TASK *ENT_TASK::CreateFollow(Entity *entityToFollow) {
@@ -245,6 +188,12 @@ void Entity::Kill() {
 int Entity::Serialize(unsigned char *byteData, int maxSize) {		// returns number of bytes written to byteData
 	char buffer[512];
 
+	struct flattened {
+		float x,y;
+	} flat;
+
+	flat.x = this->position.x;
+	flat.y = this->position.z;
 
 	return 0;
 }
@@ -281,7 +230,7 @@ void EntityContainer::run() {
 			if (e->leaf) {
 				size=e->leaf->getSize();
 				a = (float)(e->leaf->getPosition() - e->position).len();
-				if (a > size) {
+				if (a > size && e->leaf->getParent()) {
 					// and we're out of range of that leaf,
 					e->leaf->RemoveEntity(e);
 					qtree.AddEntity(e);

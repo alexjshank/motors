@@ -44,7 +44,9 @@ Terrain::Terrain(const char *heightmap, int mainTexture, int detailTexture, Came
 bool Terrain::LoadHeightMap(const char * filename) {
 	console->Printf("Loading terrain file '%s'",filename);
 
-	FILE *fmap = fopen(filename,"rb");
+	std::string fullpath = "data/topographical/"; fullpath += filename; fullpath += ".top";
+
+	FILE *fmap = fopen(fullpath.c_str(),"rb");
 
 	fAvgWaterHeight = 4;
 	SunDirection = Vector(0.65f,0.35f,0);
@@ -477,7 +479,7 @@ float Terrain::getGscore(Vector start, Vector p, Vector end) {
 	if (getContents((int)p.x,(int)p.z) != 0) {
 		return 1000;
 	}
-	return (float)((p-end).len2()+(p-start).len2());
+	return (float)((p-end).len()+(p-start).len());
 }
 
 void Terrain::ResetNodes() {
@@ -486,7 +488,7 @@ void Terrain::ResetNodes() {
 			ASnodes[(y*width)+x].G = -1;
 			ASnodes[(y*width)+x].parent = NULL;
 			ASnodes[(y*width)+x].position = Vector((float)x,0,(float)y);
-			ASnodes[(y*width)+x].H = 1;
+			ASnodes[(y*width)+x].H = 1 + getNormal(x,y).Dot(Vector(0,1,0));
 		}
 	}
 	openList.clear();
@@ -577,9 +579,9 @@ bool Terrain::CloseNode(AS_Node *openNode) {
 			AS_Node *sp = &ASnodes[((unsigned int)p.z * width)+(unsigned int)p.x];
 			if (sp && sp->parent == NULL) {
 				sp->parent=openNode;
-				sp->position = p;
+		//		sp->position = p;
 				sp->G = getGscore(startNode->position,sp->position,endNode->position);
-				sp->H = 1.0f;//+getNormal((int)p.x,(int)p.z).Dot(Vector(0,1,0));	// larger slopes are harder to traverse...
+		//		sp->H = 1.0f + getNormal((int)p.x,(int)p.z).Dot(Vector(0,1,0));	// larger slopes are harder to traverse...
 				openList.push_back(sp);
 			}
 		}

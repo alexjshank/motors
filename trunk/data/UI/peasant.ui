@@ -1,0 +1,5 @@
+window	BuildMenu	25	25	200	200	 
+	button	farm_button	10	40	50	50	placeent(spawnunit('farm',getXpos(curID),getZpos(curID)))
+	button	mill_button	70	40	50	50	placeent(spawnunit('mill',getXpos(curID),getZpos(curID)))
+	button	tower_button	130	40	50	50	placeent(spawnunit('tower',getXpos(curID),getZpos(curID)))
+	button	tower_button	10	100	50	50	placeent(spawnunit('barracks',getXpos(curID),getZpos(curID)))

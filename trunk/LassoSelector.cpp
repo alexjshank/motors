@@ -75,10 +75,15 @@ void LassoSelector::run() {
 	Node *node;
 	Entity *closestEntity;
 
-	LassoPosition = terrain->RayTest(camera->GetActualPosition(),input->mouseVector,300,4,true);
+	LassoPosition = terrain->RayTest(camera->GetActualPosition(),input->mouseVector,1000,1,true);
 	gridAlignedLassoPosition = Vector(floor(LassoPosition.x),terrain->getHeight((int)LassoPosition.x,(int)LassoPosition.z),floor(LassoPosition.z));
 
-
+/*	glBegin(GL_LINES);
+	glColor3f(0,1,0);
+	glVertex3f(LassoPosition.x,LassoPosition.y, LassoPosition.z);
+	glVertex3f(LassoPosition.x,LassoPosition.y+100, LassoPosition.z);
+	glEnd();
+*/
 	if (input->GetMButtonPushed(1)) {							// initial push
 		
 		node = ents->qtree.tree->getLeaf(gridAlignedLassoPosition);
@@ -273,13 +278,18 @@ void LassoSelector::run() {
 			glDisable(GL_DEPTH_TEST);
 			glBindTexture(GL_TEXTURE_2D,texSelectedEntity);
 			glColor3f(1,1,1);
-			for (int i=0,s=(int)SelectedEntities.size();i<s;i++) {
-				if (!SelectedEntities[i]) continue;
-				if (!SelectedEntities[i]->alive) {
-					SelectedEntities[i] = 0;
+			try {
+				for (int i=0,s=(int)SelectedEntities.size();i<s;i++) {
+					if (!SelectedEntities[i]) continue;
+					if (!SelectedEntities[i]->alive) {
+						SelectedEntities[i] = 0;
+					}
+					DrawQuad(SelectedEntities[i]->position,SelectedEntities[i]->size.flat());	
 				}
-				DrawQuad(SelectedEntities[i]->position,SelectedEntities[i]->size.flat());	
+			} catch(...) {
+				SelectedEntities.clear();
 			}
+
 		glPopAttrib();
 	}		
 }

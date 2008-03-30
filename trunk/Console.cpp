@@ -7,8 +7,8 @@
 #include "unit.h"
 #include "Camera.h"
 #include "variables.h"
-#include "building.h"
 #include "LassoSelector.h"
+#include "ui.h"
 
 #include <sstream>
 
@@ -18,6 +18,7 @@ extern EntityContainer *ents;
 extern Input *input;
 extern Camera *camera;
 extern LassoSelector *selector;
+extern UI *ui;
 
 #define PYTHONMODULE(varname) static PyMethodDef varname[] = {
 #define ENDPYTHONMOD {0,0,0,0} };
@@ -30,6 +31,7 @@ Console::Console(void)
 {
 	enabled = true;
 	toggled = false;
+	fout = 0;
 }
 
 Console::~Console(void)
@@ -37,13 +39,9 @@ Console::~Console(void)
 	Py_Finalize();
 }
 
-
-
 extern Console *console;
 
 
-
-// gprint('hello world')
 SCRIPTFUNC(game_print) {
     const char *value;
 
@@ -56,35 +54,6 @@ SCRIPTFUNC(game_print) {
 }
 
 bool PlaceEntity(Entity *ent);
-
-// spawn('peasant')
-extern int currentID;
-SCRIPTFUNC(game_spawn) {
-    char *entityName;
-
-    if (!PyArg_ParseTuple(args, "s", &entityName))
-        return NULL;
-
-	Entity *ent = SpawnEntity(entityName, camera->GetPosition().flat() + Vector(0,terrain->getInterpolatedHeight(camera->GetPosition().x,camera->GetPosition().z),0) );
-	
-	if (!ent) return NULL;
-
-	if (ent->family == EF_UNIT) {
-		if (currentID >= 0 && currentID < (int)ents->entities.size()) {
-			Entity *parent = ents->entities[currentID];
-			if (parent) {
-					ent->position = parent->position - parent->size.flat();
-			}
-		}
-	} else {
-		PlaceEntity(ent);
-		if (input->inputContext != EditMode)
-			input->inputContext = NormalInput;
-	} 
-
-
-	Py_RETURN_NONE;
-}
 
 SCRIPTFUNC(game_getxpos) {
 	DWORD a,b;
@@ -120,6 +89,18 @@ SCRIPTFUNC(game_getypos) {
 	return NULL;
 }
 
+SCRIPTFUNC(game_placeent) {
+	DWORD id;
+
+    if (!PyArg_ParseTuple(args, "i", &id))
+        return NULL;
+
+	if (id >= 0 && ents->entities[id]) {
+		PlaceEntity(ents->entities[id]);
+	}
+
+	Py_RETURN_NONE;
+}
 
 SCRIPTFUNC(game_spawnunit) {
 	char *entityName;
@@ -132,23 +113,7 @@ SCRIPTFUNC(game_spawnunit) {
 	unit->position = Vector(x,0,y);
 	ents->AddEntity(unit);
 
-	Py_RETURN_NONE;
-}
-
-SCRIPTFUNC(game_QueueUnitForBuild) {
-    char *entityName;
-
-    if (!PyArg_ParseTuple(args, "s", &entityName))
-        return NULL;
-
-	if (currentID >= 0 && currentID < (int)ents->entities.size()) {
-		Entity *parent = ents->entities[currentID];
-		if (parent) {
-			((Building*)parent)->spawnQueue.push(entityName);
-		}
-	}
-	
-	Py_RETURN_NONE;
+	return PyInt_FromLong(unit->id);
 }
 
 SCRIPTFUNC(game_killSelected) {
@@ -316,6 +281,8 @@ SCRIPTFUNC(game_script_use) {
 	if (a && ents->entities[a] && ents->entities[a]->alive) {
 	
 	}
+
+	Py_RETURN_NONE;
 }
 
 SCRIPTFUNC(game_script_attach) {
@@ -327,6 +294,8 @@ SCRIPTFUNC(game_script_attach) {
 	if ((a && ents->entities[a] && ents->entities[a]->alive) && (b && ents->entities[b] && ents->entities[b]->alive)) {
 		ents->entities[a]->Attach(ents->entities[b]);
 	}
+
+	Py_RETURN_NONE;
 }
 
 SCRIPTFUNC(game_loadscript) {
@@ -418,6 +387,64 @@ SCRIPTFUNC(game_script_setThinkInterval) {
 	Py_RETURN_NONE;
 }
 
+SCRIPTFUNC(game_script_setspeed) {
+	DWORD id;
+	float walkspeed, runspeed;
+
+	if (!PyArg_ParseTuple(args,"iff", &id, &walkspeed, &runspeed)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		((Unit*)ents->entities[id])->walkspeed = walkspeed;
+		((Unit*)ents->entities[id])->runspeed = runspeed;
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_loadmenu) {
+	DWORD id;
+	const char *menuname;
+
+	if (!PyArg_ParseTuple(args,"is", &id, &menuname)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		((Unit*)ents->entities[id])->menu = (UIWindow *)ui->CreateFromFile(menuname);
+		if (((Unit*)ents->entities[id])->menu)
+			((Unit*)ents->entities[id])->menu->ownerID = id;
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_showmenu) {
+	DWORD id;
+
+	if (!PyArg_ParseTuple(args,"i", &id)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		if (((Unit*)ents->entities[id])->menu) {
+			((Unit*)ents->entities[id])->menu->visible = true;
+			((Unit*)ents->entities[id])->menu->closeButton.pressed = false;
+		}
+	}
+
+	Py_RETURN_NONE;
+}
+
+
+SCRIPTFUNC(game_hidemenu) {
+	DWORD id;
+
+	if (!PyArg_ParseTuple(args,"i", &id)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		((Unit*)ents->entities[id])->menu->visible = false;
+	}
+
+	Py_RETURN_NONE;
+}
+
+
 SCRIPTFUNC(game_script_random) {
 	return PyFloat_FromDouble((float)(rand()%100)/100);
 }
@@ -426,15 +453,20 @@ PYTHONMODULE(GameMethods)
 	pydef("loadscript", game_loadscript)
     pydef("echo",  game_print)
 	pydef("random", game_script_random)
-	pydef("spawn",   game_spawn)
 	pydef("spawnunit", game_spawnunit)
+	pydef("placeent", game_placeent)
 	pydef("killent", game_killent)
     pydef("save",    game_save)
+
+	pydef("loadMenu", game_loadmenu)
+	pydef("showMenu", game_showmenu)
+	pydef("hideMenu", game_hidemenu)
  
 	pydef("getClassname", game_script_getclassname)
 
 	pydef("setUpdateInterval", game_script_setThinkInterval)
 
+	pydef("setSpeed", game_script_setspeed)
 	pydef("setModel", game_script_setmodel)
 	pydef("setPosition", game_script_setposition)
     pydef("getPosition", game_script_getposition)
@@ -480,7 +512,7 @@ bool Console::init() {
 //					"sys.stdin  = None\n";
 	int r1 = PyRun_SimpleString(code);
 
-	
+	fout = fopen("console.log","w");
 
 	return true;
 }
@@ -574,6 +606,11 @@ void Console::Print(const char *line) {
 	std::string pbl(line);
 	history.push_back(pbl);
 	printf("%s\n",line);
+	
+	if (fout) {
+		fprintf(fout,"%s\n",line);
+		fflush(fout);
+	}
 }
 
 void Console::Printf(const char *format, ...) { 
