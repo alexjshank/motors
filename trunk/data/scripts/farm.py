@@ -7,13 +7,14 @@ except NameError:
 def farm_onInit(curID):
 	loadMenu(curID,'data/ui/farm.ui')
 	setModel(curID,"data/models/farm.md2","data/models/house.JPG")
-	farm_lastSpawnTime[curID] = getTime()
+	farm_lastSpawnTime[curID] = getTime() - 20
 	setSpeed(curID, 0, 0)
 	
 def farm_onThink(curID):
-	if getTime() - farm_lastSpawnTime[curID] > 20:
-		spawnunit('sheep',getXpos(curID)+2, getZpos(curID)+2)
-		farm_lastSpawnTime[curID] = getTime()
+	if getCompleted(curID) == 100:
+		if getTime() - farm_lastSpawnTime[curID] > 20:
+			setCompleted(spawnunit('sheep',getXpos(curID)+2, getZpos(curID)+2),100)
+			farm_lastSpawnTime[curID] = getTime()
 	
 def farm_onAttacked(curID, attackerID):
 

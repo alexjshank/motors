@@ -18,6 +18,11 @@ extern EntityContainer *ents;
 extern Timer *timer; 
 extern Terrain *terrain;
 
+ENT_TASK *ENT_TASK::CreateScriptedTask(std::string action) {
+	scriptedAction = action;
+	type = SCRIPTEDACTION;
+	return this;
+}
 
 ENT_TASK *ENT_TASK::CreateFollow(Entity *entityToFollow) {
 	target = entityToFollow;

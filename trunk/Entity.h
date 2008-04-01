@@ -203,12 +203,14 @@ class ENT_TASK {
 public:
 	enum TASKTYPES {
 		MOVE = 0,
+		SCRIPTEDACTION,
 		FOLLOW,
 		ATTACK,
 		BUILD,
 		REPAIR
 	};
 
+	ENT_TASK *CreateScriptedTask(std::string action);
 	ENT_TASK *CreateFollow(Entity *entityToFollow);
 	ENT_TASK *CreateMove(Vector moveto);
 	ENT_TASK *CreateAttack(Entity *t);
@@ -221,7 +223,7 @@ public:
 	Vector position;	// used in move task
 	Entity *target;		// used in follow, attack, build, repair
 	int modifier;		// attack type?
-
+	std::string scriptedAction;
 
 };
 

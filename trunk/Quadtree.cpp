@@ -78,7 +78,7 @@ bool Node::AddEntity(Entity *ent) {
 
 bool Node::RemoveEntity(Entity *ent) {
 	if (ent == 0) return false;
-	console->Printf("Node::RemoveEntity: ent(%f,%f,%f, [type:] %d)",ent->position.x,ent->position.y, ent->position.z, ent->type);
+//	console->Printf("Node::RemoveEntity: ent(%f,%f,%f, [type:] %d)",ent->position.x,ent->position.y, ent->position.z, ent->type);
 	contents.remove(ent);
 	return true;
 }

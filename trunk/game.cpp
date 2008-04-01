@@ -16,12 +16,6 @@
 #include <mmsystem.h>
 #pragma comment(lib,"winmm.lib")
 
-#include "peasant.h"
-#include "farm.h"
-#include "tower.h"
-#include "lumbermill.h"
-#include "lumbertree.h"
-#include "soldier.h"
 #include "rigidbody.h"
 
 bool active = true;
@@ -46,11 +40,13 @@ int currentID = 0;
 bool placingEntity = false;
 bool rotatingEntity = false;
 Entity *entityToPlace=NULL;
+std::string placeScript = "";
 float beginPlacingTime = 0;
 
-bool PlaceEntity(Entity *ent) { 
+bool PlaceEntity(Entity *ent, const char *script = 0) { 
 	if (!ent) return false;
 
+	if (script) placeScript = script;
 	entityToPlace = ent;
 	placingEntity = true;
 	beginPlacingTime = timer->time;
@@ -62,8 +58,9 @@ bool PlaceEntity(Entity *ent) {
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	srand(timeGetTime());
-	AllocConsole();
-	freopen("CONOUT$", "wb", stdout);
+
+//	AllocConsole();
+//	freopen("CONOUT$", "wb", stdout);
 
 	vars = new gamevars;
 	vars->loadCfgFile("config.cfg");
@@ -104,7 +101,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	tasks.Init();
 	tasks.Run();	
 
-	int loadingTexture = renderer->LoadTexture("data/loadingTexture.bmp");
+	int loadingTexture = renderer->LoadTexture("data/loadingTexture.JPG");
 
 	UIWindow loadingScreen;
 	glPushMatrix();
@@ -125,7 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	library->Import("data/models/barracks.bmp",0);
 
 	library->Import("data/models/farm.md2",1);
-	library->Import("data/models/tower/tower.md2",1);
+	library->Import("data/models/tower.md2",1);
 	library->Import("data/models/mill.md2",1);
 	library->Import("data/models/dock.md2",1);
 	library->Import("data/models/lightpost.md2",1);
@@ -141,30 +138,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	library->Import("data/models/plant2.md2",1);
 	library->Import("data/models/felwoodbush1.md2",1);
 
-	UIWindow *waypointEditor = (UIWindow*)ui->CreateFromFile("data/ui/waypointeditor.ui");
-	waypointEditor->visible = false;
+//	UIWindow *waypointEditor = (UIWindow*)ui->CreateFromFile("data/ui/waypointeditor.ui");
+//	waypointEditor->visible = false;
 
 	input->mouseAbsolute = Vector(100,100, 100);
 	input->mouseMovement = Vector(0,0,0);
 	timer->frameScalar = 0.0001f;
 	
-
-
 	LoadWorldState(vars->getValue("default_map")->value.c_str());
 
-	Unit *unit = new Unit();
-	unit->classname = "Custom";
-	unit->tooltip.enabled = true;
-	unit->tooltip.tooltip = "Dynamic Agent";
-	unit->health = 100;
-	unit->updateInterval = 1;	// update once per second
-	unit->Scripts.onThink = "";
-	unit->position = Vector(128,0,128);
-	unit->size = Vector(1,1,1);
-	unit->SetModel("data/models/soldier.md2","data/models/soldier.bmp");
-
-	ents->AddEntity((Entity *)unit);
-
+	console->RunLine("setCompleted(spawnunit('farm',120,120),100)\n");
 
 	while (active) {
 		tasks.Run();			
@@ -229,9 +212,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 						placingEntity = false;
 						rotatingEntity = true;
 						beginPlacingTime = timer->time;
-					} else if (rotatingEntity) {
+				//	} else if (rotatingEntity) {
 						rotatingEntity = false;
 						entityToPlace = 0;
+						console->RunLine(placeScript.c_str());
 					}
 				}
 			}
@@ -261,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		case EditMode:
 			camera->StopFollowing();
-			waypointEditor->visible = true;
+		//	waypointEditor->visible = true;
 			selector->enabled = true;
 			selector->maxSelectionCount = 1;
 
@@ -281,7 +265,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 			if (input->GetKeyReleased(SDLK_F1)) {
 				input->inputContext = NormalInput;
-				waypointEditor->visible = false;
+			//	waypointEditor->visible = false;
 			}
 
 
@@ -310,7 +294,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				// right-click:
 				if (selector->SelectedEntities.size() > 0) {
 					Entity *SelectedEntity = selector->SelectedEntities[0];
-					PlaceEntity(SelectedEntity);
+					PlaceEntity(SelectedEntity,"");
 				}
 			}
 			break;

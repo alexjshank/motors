@@ -33,9 +33,9 @@ def sheep_onUnselected(curID):
 	hideMenu(curID)
 	
 def sheep_onSelectedPeasant(curID):
-	spawnunit('peasant',getXpos(curID)+1, getZpos(curID))
+	setCompleted(spawnunit('peasant',getXpos(curID)+1, getZpos(curID)),100)
 	killent(curID)
 	
 def sheep_onSelectedWoman(curID):
-	spawnunit('woman',getXpos(curID)+1, getZpos(curID))
+	setCompleted(spawnunit('woman',getXpos(curID)+1, getZpos(curID)),100)
 	killent(curID)

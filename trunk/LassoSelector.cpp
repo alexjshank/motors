@@ -76,6 +76,10 @@ void LassoSelector::run() {
 	Entity *closestEntity;
 
 	LassoPosition = terrain->RayTest(camera->GetActualPosition(),input->mouseVector,1000,1,true);
+	if (LassoPosition.x <= 0) LassoPosition.x = 1;
+	if (LassoPosition.x >= terrain->width) LassoPosition.x = terrain->width - 1;
+	if (LassoPosition.z <= 0) LassoPosition.z = 1;
+	if (LassoPosition.z >= terrain->height) LassoPosition.z = terrain->height - 1;
 	gridAlignedLassoPosition = Vector(floor(LassoPosition.x),terrain->getHeight((int)LassoPosition.x,(int)LassoPosition.z),floor(LassoPosition.z));
 
 /*	glBegin(GL_LINES);
