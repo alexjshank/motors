@@ -31,6 +31,7 @@ void Unit::Construct() {
 	blood.on = false;
 	foot = 0;
 	footprints = false;
+	completed = 0;
 
 	size=Vector(1,2,1);
 	runspeed = 10.0f;
@@ -134,7 +135,7 @@ void Unit::process() {
 		// if the terrain we're standing in is marked as unwalkable - ie: we're in an invalid piece of terrain (e.g. water, or the ground under a building)
 		if (terrain && terrain->getContents((int)position.x,(int)position.z) & ((ground_unit)?TC_UNWALKABLE:0)) {
  			Entity *stuckIn = ents->qtree.tree->getClosestEntity(position,-1,EF_BUILDING,0,0);
-			if (stuckIn && dist2(stuckIn->position,position) < stuckIn->size.len2() + size.len2()) {	// if we're stuck in something
+			if (stuckIn && dist2(stuckIn->position,position) < (stuckIn->size.len2() + size.len2())/2) {	// if we're stuck in something
 				position += Normalize(position - stuckIn->position) * walkspeed * timer->frameScalar;
 			}
 		}
@@ -150,6 +151,10 @@ void Unit::process() {
 				switch (newTask->type) {
 				case ENT_TASK::MOVE:
 					WalkTo(newTask->position);
+					break;
+				case ENT_TASK::SCRIPTEDACTION:
+					console->RunLinef("curID = %d\n%s\n",id,newTask->
+						scriptedAction.c_str());
 					break;
 				}
 			}
@@ -203,7 +208,8 @@ void Unit::process() {
 
 		if (model) {
 			model->setPosition(calibratedModelPosition + position);		
-			model->setRotation(calibratedModelRotation + Vector(0,0,atan2(velocity.x,velocity.z)/(3.1415f/180)));
+			if (velocity.len2() > 0.5f)
+				model->setRotation(calibratedModelRotation + Vector(0,0,atan2(velocity.x,velocity.z)/(3.1415f/180)));
 		}
 
 		if (timer->time - lastThinkTime > updateInterval) {
@@ -230,50 +236,61 @@ void Unit::process() {
 void Unit::render() {
 	if (camera->frustum.pointInFrustum(position)) {
 		if (model) {
-			model->setScale(scale);
-			glBindTexture(GL_TEXTURE_2D,texture);
-			glColor3f(1,1,1);
-
-			int animationStart = 0;
-			int animationEnd = 0;
-
-			switch (state) {
-				case WalkToTarget:
-					animationStart = modelAnimations.walkStart;
-					animationEnd = modelAnimations.walkEnd;
-					break;
-				case RunToTarget:
-					animationStart = modelAnimations.runStart;
-					animationEnd = modelAnimations.runEnd;
-					break;
-
-				case Stopped:
-				default:
-					animationStart = modelAnimations.idleStart;
-					animationEnd = modelAnimations.idleEnd;
-					break;
+			if (this->completed < 100) {
+//				glBindTexture(GL_TEXTURE_2D,buildTexture);
+				DrawCube(position+Vector(0,100-completed,0),Vector(size.x,(size.x+size.z)/2,size.z));
 			}
 
-			if (alive) {
-				frame += modelAnimations.fps*timer->frameDifference;
-				if ((frame > animationEnd) || (frame < animationStart)) frame = (float)animationStart;
-				glPushAttrib(GL_ALL_ATTRIB_BITS);
-				glDisable(GL_DEPTH_TEST);
-				glLineWidth(5);
-				glDisable(GL_TEXTURE_2D);
-				glBegin(GL_LINES);
-					glColor3f(1,0,0);
-					glVertex3f(position.x,position.y+size.y,position.z);
-					glVertex3f(position.x,position.y+size.y + 1,position.z);
-				
-					glColor3f(0,1,0);
-					glVertex3f(position.x,position.y+size.y,position.z);
-					glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
-				glEnd();
-				glPopAttrib();
-			}
+			if (completed < 1 || completed > 99) {
+				model->setScale(scale);
+				glBindTexture(GL_TEXTURE_2D,texture);
+				glColor3f(1,1,1);
 
-			model->drawObjectFrame(frame,model->kDrawImmediate);
+				int animationStart = 0;
+				int animationEnd = 0;
+
+				switch (state) {
+					case WalkToTarget:
+						animationStart = modelAnimations.walkStart;
+						animationEnd = modelAnimations.walkEnd;
+						break;
+					case RunToTarget:
+						animationStart = modelAnimations.runStart;
+						animationEnd = modelAnimations.runEnd;
+						break;
+
+					case Stopped:
+					default:
+						animationStart = modelAnimations.idleStart;
+						animationEnd = modelAnimations.idleEnd;
+						break;
+				}
+
+				if (alive) {
+					frame += modelAnimations.fps*timer->frameDifference;
+					if ((frame > animationEnd) || (frame < animationStart)) frame = (float)animationStart;
+					glPushAttrib(GL_ALL_ATTRIB_BITS);
+					glDisable(GL_DEPTH_TEST);
+					glLineWidth(5);
+					glDisable(GL_TEXTURE_2D);
+					glBegin(GL_LINES);
+						glColor3f(1,0,0);
+						glVertex3f(position.x,position.y+size.y,position.z);
+						glVertex3f(position.x,position.y+size.y + 1,position.z);
+					
+						glColor3f(0,1,0);
+						glVertex3f(position.x,position.y+size.y,position.z);
+						glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
+					glEnd();
+					glPopAttrib();
+				}
+				if (completed < 100) {
+					glColor4f(1,1,1,0.4f);
+					glEnable(GL_BLEND);
+				}
+				model->drawObjectFrame(frame,model->kDrawImmediate);
+				glDisable(GL_BLEND);
+			}
 		}
 	}
 

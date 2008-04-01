@@ -53,7 +53,6 @@ SCRIPTFUNC(game_print) {
 	Py_RETURN_NONE;
 }
 
-bool PlaceEntity(Entity *ent);
 
 SCRIPTFUNC(game_getxpos) {
 	DWORD a,b;
@@ -89,14 +88,17 @@ SCRIPTFUNC(game_getypos) {
 	return NULL;
 }
 
+bool PlaceEntity(Entity *ent, const char *script);
+
 SCRIPTFUNC(game_placeent) {
 	DWORD id;
+	const char *placescript;
 
-    if (!PyArg_ParseTuple(args, "i", &id))
+    if (!PyArg_ParseTuple(args, "is", &id, &placescript))
         return NULL;
 
 	if (id >= 0 && ents->entities[id]) {
-		PlaceEntity(ents->entities[id]);
+		PlaceEntity(ents->entities[id],placescript);
 	}
 
 	Py_RETURN_NONE;
@@ -109,11 +111,30 @@ SCRIPTFUNC(game_spawnunit) {
     if (!PyArg_ParseTuple(args, "sff", &entityName,&x,&y))
         return NULL;
 
-	Unit *unit = new Unit(entityName);
-	unit->position = Vector(x,0,y);
-	ents->AddEntity(unit);
+	try {
+		Unit *unit = new Unit(entityName);
+		unit->position = Vector(x,0,y);
+		ents->AddEntity(unit);
+		return PyInt_FromLong(unit->id);
+	} catch (...) {
+		console->Printf("super bad error creating new unit(%s)",entityName);
+		return 0;
+	}
+}
 
-	return PyInt_FromLong(unit->id);
+SCRIPTFUNC(game_queuescriptedtask) {
+	int i;
+	char *script;
+
+    if (!PyArg_ParseTuple(args, "is", &i, &script))
+        return NULL;
+
+	if (i && ents->entities[i] && ents->entities[i]->family == EF_UNIT) {
+		ENT_TASK task;
+		ents->entities[i]->QueueTask(task.CreateScriptedTask(script),false);
+	}
+
+	Py_RETURN_NONE;
 }
 
 SCRIPTFUNC(game_killSelected) {
@@ -335,6 +356,32 @@ SCRIPTFUNC(game_script_gethealth) {
 }
 
 
+SCRIPTFUNC(game_script_getcompleted) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "i", &a))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		return PyInt_FromLong(ents->entities[a]->completed);
+	}
+	return NULL;
+}
+
+SCRIPTFUNC(game_script_setcompleted) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "ii", &a, &b))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		ents->entities[a]->completed = b;
+	}
+
+	Py_RETURN_NONE;
+}
+
+
 SCRIPTFUNC(game_script_gettype) {
 	DWORD a,b;
 
@@ -396,6 +443,19 @@ SCRIPTFUNC(game_script_setspeed) {
 	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
 		((Unit*)ents->entities[id])->walkspeed = walkspeed;
 		((Unit*)ents->entities[id])->runspeed = runspeed;
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_setsubtitle) {
+	DWORD id;
+	const char *subtitle;
+
+	if (!PyArg_ParseTuple(args,"is", &id, &subtitle)) return 0;
+
+	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
+		ents->entities[id]->tooltip.subtitle = subtitle; 
 	}
 
 	Py_RETURN_NONE;
@@ -466,6 +526,8 @@ PYTHONMODULE(GameMethods)
 
 	pydef("setUpdateInterval", game_script_setThinkInterval)
 
+	pydef("setSubtitle", game_setsubtitle)
+	pydef("queueScriptedTask", game_queuescriptedtask)
 	pydef("setSpeed", game_script_setspeed)
 	pydef("setModel", game_script_setmodel)
 	pydef("setPosition", game_script_setposition)
@@ -478,6 +540,8 @@ PYTHONMODULE(GameMethods)
 	pydef("getTime", game_script_gettime)
 	pydef("getTeam", game_script_getteam)
 	pydef("getHealth", game_script_gethealth)
+	pydef("getCompleted", game_script_getcompleted)
+	pydef("setCompleted", game_script_setcompleted)
 	pydef("getType", game_script_gettype)
 
 	pydef("distance", game_script_distance)
