@@ -144,6 +144,8 @@ bool gamevars::loadCfgFile(const char *filename)
 	char *buffer = new char[size];
 	buffer[fread((void *)buffer,1,size,fin)] = 0;
  
+	fclose(fin);
+
 	return processCfgScript(buffer);
 }
  

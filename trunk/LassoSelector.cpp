@@ -18,6 +18,9 @@ extern Input *input;
 extern Console *console;
 bool spirograph = false;
 
+#define MAX(x,y) ((x>y)?x:y)
+#define MIN(x,y) ((x<y)?x:y)
+
 LassoSelector::LassoSelector(void)
 {
 	enabled = true;
@@ -61,7 +64,7 @@ bool LassoSelector::init() {
 
 	selectionBroke=false;
 	selectTime=0;
-	selectFadeTime=1.0f;
+	selectFadeTime=0.5f;
 	
 	texSelectedEntity = renderer->LoadTexture("data/selectedEntity.JPG");
 
@@ -77,9 +80,9 @@ void LassoSelector::run() {
 
 	LassoPosition = terrain->RayTest(camera->GetActualPosition(),input->mouseVector,1000,1,true);
 	if (LassoPosition.x <= 0) LassoPosition.x = 1;
-	if (LassoPosition.x >= terrain->width) LassoPosition.x = terrain->width - 1;
+	if (LassoPosition.x >= terrain->width) LassoPosition.x = (float)terrain->width - 1;
 	if (LassoPosition.z <= 0) LassoPosition.z = 1;
-	if (LassoPosition.z >= terrain->height) LassoPosition.z = terrain->height - 1;
+	if (LassoPosition.z >= terrain->height) LassoPosition.z = (float)terrain->height - 1;
 	gridAlignedLassoPosition = Vector(floor(LassoPosition.x),terrain->getHeight((int)LassoPosition.x,(int)LassoPosition.z),floor(LassoPosition.z));
 
 /*	glBegin(GL_LINES);
@@ -143,22 +146,42 @@ void LassoSelector::run() {
 			} else if (selectionPoints.size() > 2) {	// released this frame
 				if (!selectionBroke) {
 					// finish up the selection.
-					Vector spP = selectionPoints[selectionPoints.size()-1].v;
-					Vector v = spP - selectionPoints[selectionPoints.size()-2].v;
+
+					
 					float mld = vars->getFloatValue("selection_maxlinkdist");
 					int countAdded = 0;
-					while (dist2(spP,selectionPoints[0].v) > mld && countAdded++ < 30) {
-						if (spirograph) {
+						
+					if (spirograph) {
+						Vector spP = selectionPoints[selectionPoints.size()-1].v;
+						Vector v = spP - selectionPoints[selectionPoints.size()-2].v;
+						while (dist2(spP,selectionPoints[0].v) > mld && countAdded++ < 30) {
 							v += (Normalize(selectionPoints[0].v - spP)) / 8;
-						} else {
-							v = (Normalize(selectionPoints[0].v - spP)) * mld;
-	//						v /= 1.25f;
+							
+							spP += v;
+							selectionPoint nsp;
+							nsp.v = spP;
+							nsp.a = true;
+							selectionPoints.push_back(nsp);
+						} 
+					} else {
+							
+						Vector p1 = selectionPoints[selectionPoints.size()-1].v;
+						Vector p2 = selectionPoints[0].v;
+						float coveringDistance = (float)(p1 - p2).len();
+						Vector v1 = Normalize(p1 - selectionPoints[selectionPoints.size()-2].v) * coveringDistance;
+						Vector v2 = Normalize(p2 - selectionPoints[1].v) * coveringDistance;
+
+						for (int i=0; i<20; i++) {
+							float interp = (float)i/20.0f;
+
+							Vector p = ((p1 + (v1 * interp)) * (1-interp)) +
+									   ((p2 + (v2 * (1-interp))) * interp);
+
+							selectionPoint nsp;
+							nsp.v = p;
+							nsp.a = true;
+							selectionPoints.push_back(nsp);
 						}
-						spP += v;
-						selectionPoint nsp;
-						nsp.v = spP;
-						nsp.a = true;
-						selectionPoints.push_back(nsp);
 					}
 				}
 			} else {
@@ -179,7 +202,8 @@ void LassoSelector::run() {
 
 		if (selectionCount > 5) {
 			selectionCenter /= (float)selectionCount;
-			for (int firstValid = 0; firstValid<(int)selectionPoints.size()-1; firstValid++) {
+			int firstValid;
+			for (firstValid = 0; firstValid<(int)selectionPoints.size()-1; firstValid++) {
 				if (selectionPoints[firstValid].a)
 					break;				
 			}
@@ -187,7 +211,8 @@ void LassoSelector::run() {
 				int last_sp=firstValid;
 				for (int i=1;i<(int)selectionPoints.size()-1;i++) {
 					if (selectionPoints[i].a) {	
-						for (int next_sp = i+1; i<(int)selectionPoints.size()-1; i++) {
+						int next_sp=0;
+						for (next_sp = i+1; i<(int)selectionPoints.size()-1; i++) {
 							if (selectionPoints[i].a)
 								break;
 						}
@@ -228,7 +253,7 @@ void LassoSelector::run() {
 						}
 					}
 					if (dist2(selectionPoints[closestBoundingPoint].v,selectionCenter) > dist2(ents->entities[i]->position, selectionCenter)) {
-						if (ents->entities[i]->family == EF_UNIT && ents->entities[i]->team == 1) {
+						if (ents->entities[i]->family == EF_UNIT){// && ents->entities[i]->team == 1) {
 							Select(ents->entities[i]);
 						}
 					}
@@ -250,7 +275,7 @@ void LassoSelector::run() {
 			glEnable(GL_LINE_STIPPLE);
 			int firstValid = -1;
 
-			glColor4f(0,1,0,1);
+			glColor4f(0,1,0,1-((timer->time - selectTime)/selectFadeTime));
 			Vector a = selectionPoints[0].v;
 			Vector selectionCenter = a;
 			int selectionCount = 0;
@@ -260,7 +285,9 @@ void LassoSelector::run() {
 						a = selectionPoints[i].v;
 						selectionCenter += a;
 						selectionCount++;
-						if (spirograph) glColor3f(sinf((float)i),cosf((float)i),tanf((float)i));
+						if (spirograph) {
+							glColor4f(sinf((float)i),cosf((float)i),tanf((float)i),1-((timer->time - selectTime)/selectFadeTime));
+						}
 						glVertex3f(a.x,a.y+0.5f,a.z);
 						if (firstValid == -1) firstValid = i;
 					}
@@ -284,11 +311,12 @@ void LassoSelector::run() {
 			glColor3f(1,1,1);
 			try {
 				for (int i=0,s=(int)SelectedEntities.size();i<s;i++) {
-					if (!SelectedEntities[i]) continue;
+					if (SelectedEntities[i] == NULL) continue;
 					if (!SelectedEntities[i]->alive) {
 						SelectedEntities[i] = 0;
+					} else {
+						DrawQuad(SelectedEntities[i]->position,SelectedEntities[i]->size.flat());	
 					}
-					DrawQuad(SelectedEntities[i]->position,SelectedEntities[i]->size.flat());	
 				}
 			} catch(...) {
 				SelectedEntities.clear();

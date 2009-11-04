@@ -55,7 +55,7 @@ SCRIPTFUNC(game_print) {
 
 
 SCRIPTFUNC(game_getxpos) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -66,7 +66,7 @@ SCRIPTFUNC(game_getxpos) {
 	return NULL;
 }
 SCRIPTFUNC(game_getzpos) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -77,7 +77,7 @@ SCRIPTFUNC(game_getzpos) {
 	return NULL;
 }
 SCRIPTFUNC(game_getypos) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -245,6 +245,51 @@ SCRIPTFUNC(game_script_pathtoent) {
 	}
 	Py_RETURN_NONE;
 }
+
+SCRIPTFUNC(game_setDamage) {
+	DWORD value;
+	DWORD source;
+
+	if (!PyArg_ParseTuple(args, "ii", &source, &value))   
+		return NULL;
+
+	if (source && ents->entities[source]) {
+		ents->entities[source]->damage = value;
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_attack) {
+	DWORD target;
+	DWORD source;
+
+	if (!PyArg_ParseTuple(args, "ii", &source, &target))   
+		return NULL;
+
+	if (target && ents->entities[target] && ents->entities[source] && ents->entities[target]->alive && ents->entities[source]->alive) {
+		ents->entities[target]->interact(ents->entities[source], EI_ATTACK);
+	}
+
+	Py_RETURN_NONE;
+}
+
+
+SCRIPTFUNC(game_initEntity) {
+	DWORD id;
+	DWORD type;
+	DWORD family;
+
+	if (!PyArg_ParseTuple(args, "iii", &id, &type, &family))   
+		return NULL;
+
+	if (id && ents->entities[id]) {
+		ents->entities[id]->type = (ENT_TYPE)type;
+		ents->entities[id]->family = (ENT_FAMILY)family;
+	}
+
+	Py_RETURN_NONE;
+}
  
 SCRIPTFUNC(game_script_getnearestentity) {
     DWORD value;
@@ -268,12 +313,15 @@ SCRIPTFUNC(game_script_distance) {
     DWORD value;
       DWORD target;
  
-    if (!PyArg_ParseTuple(args, "ii", &value,&target))        return NULL;
+    if (!PyArg_ParseTuple(args, "ii", &value,&target))
+		return NULL;
  
-      if (value && target && ents->entities[value] && ents->entities[target] && ents->entities[value]->alive && ents->entities[target]->alive) {
+      if (value && target && ents->entities[value] && ents->entities[target]) {
 			float d = dist(ents->entities[value]->position,ents->entities[target]->position);
 			return PyFloat_FromDouble((double)d);
-      }
+	  } else {
+		  return PyFloat_FromDouble(255);
+	  }
       return NULL;
 }
 
@@ -288,6 +336,18 @@ SCRIPTFUNC(game_killent) {
 
 	if (value && ents->entities[value] && ents->entities[value]->alive) {
 		ents->entities[value]->Kill();
+	}
+
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_stop) {
+    DWORD value;
+
+	if (!PyArg_ParseTuple(args, "i", &value))        return NULL;
+
+	if (value && ents->entities[value] && ents->entities[value]->alive) {
+		ents->entities[value]->ClearTasks();
 	}
 
 	Py_RETURN_NONE;
@@ -331,7 +391,7 @@ SCRIPTFUNC(game_loadscript) {
 }
 
 SCRIPTFUNC(game_script_getteam) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -343,8 +403,35 @@ SCRIPTFUNC(game_script_getteam) {
 }
 
 
-SCRIPTFUNC(game_script_gethealth) {
+SCRIPTFUNC(game_script_setteam) {
 	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "ii", &a, &b))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		ents->entities[a]->team = b;
+	}
+	Py_RETURN_NONE;
+}
+
+SCRIPTFUNC(game_script_sethealth) {
+	DWORD a,b;
+
+	if (!PyArg_ParseTuple(args, "ii", &a, &b))        
+		return NULL;
+
+	if (a && ents->entities[a]) {
+		ents->entities[a]->health = b;
+		if (ents->entities[a]->maxhealth < (int)b)
+			ents->entities[a]->maxhealth = b;
+	}
+	Py_RETURN_NONE;
+}
+
+
+SCRIPTFUNC(game_script_gethealth) {
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -357,13 +444,13 @@ SCRIPTFUNC(game_script_gethealth) {
 
 
 SCRIPTFUNC(game_script_getcompleted) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
 
 	if (a && ents->entities[a]) {
-		return PyInt_FromLong(ents->entities[a]->completed);
+		return PyInt_FromLong((long)ents->entities[a]->completed);
 	}
 	return NULL;
 }
@@ -375,7 +462,7 @@ SCRIPTFUNC(game_script_setcompleted) {
 		return NULL;
 
 	if (a && ents->entities[a]) {
-		ents->entities[a]->completed = b;
+		ents->entities[a]->completed = (float)b;
 	}
 
 	Py_RETURN_NONE;
@@ -383,7 +470,7 @@ SCRIPTFUNC(game_script_setcompleted) {
 
 
 SCRIPTFUNC(game_script_gettype) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -395,7 +482,7 @@ SCRIPTFUNC(game_script_gettype) {
 }
 
 SCRIPTFUNC(game_script_getclassname) {
-	DWORD a,b;
+	DWORD a;
 
 	if (!PyArg_ParseTuple(args, "i", &a))        
 		return NULL;
@@ -498,7 +585,9 @@ SCRIPTFUNC(game_hidemenu) {
 	if (!PyArg_ParseTuple(args,"i", &id)) return 0;
 
 	if (id && ents->entities[id] && ents->entities[id]->family == EF_UNIT) {
-		((Unit*)ents->entities[id])->menu->visible = false;
+		if (((Unit*)ents->entities[id])->menu) {
+			((Unit*)ents->entities[id])->menu->visible = false;
+		}
 	}
 
 	Py_RETURN_NONE;
@@ -526,9 +615,11 @@ PYTHONMODULE(GameMethods)
 
 	pydef("setUpdateInterval", game_script_setThinkInterval)
 
+	pydef("initEntity", game_initEntity)
 	pydef("setSubtitle", game_setsubtitle)
 	pydef("queueScriptedTask", game_queuescriptedtask)
 	pydef("setSpeed", game_script_setspeed)
+	pydef("setDamage", game_setDamage)
 	pydef("setModel", game_script_setmodel)
 	pydef("setPosition", game_script_setposition)
     pydef("getPosition", game_script_getposition)
@@ -539,6 +630,8 @@ PYTHONMODULE(GameMethods)
     pydef("getState", game_script_getstate)
 	pydef("getTime", game_script_gettime)
 	pydef("getTeam", game_script_getteam)
+	pydef("setTeam", game_script_setteam)
+	pydef("setHealth", game_script_sethealth)
 	pydef("getHealth", game_script_gethealth)
 	pydef("getCompleted", game_script_getcompleted)
 	pydef("setCompleted", game_script_setcompleted)
@@ -551,6 +644,8 @@ PYTHONMODULE(GameMethods)
     pydef("pathTo", game_script_pathto)
     pydef("pathToEnt", game_script_pathtoent)
 
+	pydef("attack", game_attack)
+	pydef("stop", game_stop)
 	pydef("use", game_script_use)
 ENDPYTHONMOD
 
@@ -704,23 +799,39 @@ std::string Console::LoadScriptf(const char *format, ...) {
 }
 
 std::string Console::LoadScript(const char *scriptFilename) {
-	char scriptBuffer[100001];
-	std::string script = "";
-	FILE *fin = fopen(scriptFilename,"r");
+	char *scriptBuffer=0;
+	std::string script;
 
+	FILE *fin = fopen(scriptFilename,"r");
 	if (fin) {
-		ZeroMemory(scriptBuffer,100000);
+
 		fseek(fin,0,SEEK_END);
 		int len = ftell(fin);
-		fseek(fin,0,SEEK_SET);
+			Printf("reading script file '%s' (%.2fKb)\n",scriptFilename,len/1024.0f);
+		
+		scriptBuffer = new char[len+1];
+		memset(scriptBuffer,0,len+1);
+		if (scriptBuffer) {
 
-		fread(scriptBuffer,1,len,fin);
-		scriptBuffer[len-1] = 0;
-		script = scriptBuffer;
+			fseek(fin,0,SEEK_SET);
+			fread(scriptBuffer,1,len,fin);
+
+			scriptBuffer[len-1] = 0;
+			script = scriptBuffer;
+
+			
+			RunLine(scriptBuffer);
+			script = scriptBuffer;
+
+			delete [] scriptBuffer;
+
+		} else {
+			Printf("Error allocating memory to read script file '%s' (%.2fKb)",scriptFilename,len/1024.0f);
+		}
+		fclose(fin);
 	} else {
 		Printf("Error opening script file '%s'",scriptFilename);
 	}
 
-	RunLine(script.c_str());
 	return script;
 }

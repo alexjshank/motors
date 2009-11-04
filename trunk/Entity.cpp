@@ -58,7 +58,8 @@ ENT_TASK *ENT_TASK::CreateBuild(Entity *t) {
 Entity::Entity(void) {
 	size = Vector(0,0,0);
 	leaf = NULL;
-	health = 100;
+	health = 0;
+	maxhealth = 0;
 	completed = 0;
 	tooltip.enabled = false;
 	tooltip.tooltip = "";
@@ -85,7 +86,7 @@ void Entity::render() {
 }
 
 void Entity::renderToolTip() {
-	if (tooltip.enabled && dist2(position,selector->LassoPosition) < 10*10) {
+	if (tooltip.enabled && dist2(position,selector->LassoPosition) < 4) {
 		renderer->text.printpositional(position + Vector(0,size.y+1,0),"%s %s",tooltip.tooltip.c_str(), tooltip.subtitle.c_str());
 	}
 }
@@ -191,8 +192,6 @@ void Entity::Kill() {
 }
 
 int Entity::Serialize(unsigned char *byteData, int maxSize) {		// returns number of bytes written to byteData
-	char buffer[512];
-
 	struct flattened {
 		float x,y;
 	} flat;

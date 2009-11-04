@@ -5,10 +5,13 @@ except NameError:
 	farm_lastSpawnTime = { }
 	
 def farm_onInit(curID):
+
 	loadMenu(curID,'data/ui/farm.ui')
 	setModel(curID,"data/models/farm.md2","data/models/house.JPG")
 	farm_lastSpawnTime[curID] = getTime() - 20
 	setSpeed(curID, 0, 0)
+	setHealth(curID, 500)
+	initEntity(curID, 2, 2)
 	
 def farm_onThink(curID):
 	if getCompleted(curID) == 100:

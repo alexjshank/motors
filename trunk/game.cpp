@@ -147,10 +147,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	LoadWorldState(vars->getValue("default_map")->value.c_str());
 
-	console->RunLine("setCompleted(spawnunit('farm',120,120),100)\n");
+	int ninjaTimeout = (timeGetTime()/1000) + 30;
+
+	int maxCameraZoom = vars->getIntValue("camera_maxdistance");
 
 	while (active) {
-		tasks.Run();			
+		tasks.Run();	
+
+		if ((timeGetTime()/1000) > (DWORD)ninjaTimeout) {
+			ninjaTimeout = (timeGetTime()/1000) + 60;
+			
+			for (int i=0; i<10; i++) {
+				console->RunLinef("setCompleted(spawnunit('ninja',60,60+%d),100)\n",i*3);
+			}
+		}
 		
 		/*
 		int e = glGetError();
@@ -176,10 +186,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		switch (input->inputContext) {
 		case NormalInput: {
-			camera->StopFollowing();
+
+		/*	if (selector->SelectedEntities.size() > 0) {
+				Entity *SelectedEntity = selector->SelectedEntities[0];
+				if (SelectedEntity && SelectedEntity->family == EF_UNIT) {
+					camera->Follow(SelectedEntity,Camera::ThirdPerson);
+				} else {
+					camera->StopFollowing();
+				}
+			} else {
+		*/		camera->StopFollowing();
+		//	}
 
 			selector->enabled = true;
 			selector->maxSelectionCount = 8;
+/*
 			if (input->GetKeyDown(SDLK_LEFT) || input->GetKeyDown('a') || (input->mouseAbsolute.x <= 30)) {
 				camera->MoveRelative(Vector(-moveSpeed*input->mouseAbsolute.z,0,0)*timer->frameScalar);
 			}
@@ -192,6 +213,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			if (input->GetKeyDown(SDLK_DOWN) || input->GetKeyDown('s') || (input->mouseAbsolute.y >= 570)) {
 				camera->MoveRelative(Vector(0,0,-moveSpeed*input->mouseAbsolute.z)*timer->frameScalar);
 			}
+*/
+			if (input->GetKeyDown(SDLK_LEFT) || input->GetKeyDown('a') || (input->mouseAbsolute.x <= 30)) {
+				camera->MoveRelative(Vector(-moveSpeed,0,0)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_RIGHT) || input->GetKeyDown('d') || (input->mouseAbsolute.x >= 770)) {
+				camera->MoveRelative(Vector(moveSpeed,0,0)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_UP) || input->GetKeyDown('w') || (input->mouseAbsolute.y <= 30)) {
+				camera->MoveRelative(Vector(0,0,moveSpeed)*timer->frameScalar);
+			}
+			if (input->GetKeyDown(SDLK_DOWN) || input->GetKeyDown('s') || (input->mouseAbsolute.y >= 570)) {
+				camera->MoveRelative(Vector(0,0,-moveSpeed)*timer->frameScalar);
+			}
+
 			if (input->GetKeyReleased(SDLK_F1)) {
 				input->inputContext = EditMode;
 			}
@@ -226,7 +261,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				if (selector->SelectedEntities.size() > 0) {
 					for (int i=0;i<(int)selector->SelectedEntities.size();i++) {
 						Entity *SelectedEntity = selector->SelectedEntities[i];
-						if (SelectedEntity->family == EF_UNIT) {	// anything that can move here...
+						if (SelectedEntity && SelectedEntity->family == EF_UNIT) {	// anything that can move here...
 							// if we aren't adding to the task queue, we have to clear it first.
 							if (!input->GetKeyState(SDLK_RSHIFT) && !input->GetKeyState(SDLK_LSHIFT)) {
 								SelectedEntity->ClearTasks();
@@ -338,12 +373,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 
-		if (input->mouseAbsolute.z < 1) input->mouseAbsolute.z = 1;
-		if (input->mouseAbsolute.z > 13) input->mouseAbsolute.z  = 13;
+		if (input->mouseAbsolute.z < 0) input->mouseAbsolute.z = 0;
+		if (input->mouseAbsolute.z > maxCameraZoom) input->mouseAbsolute.z  = (float)maxCameraZoom;
 
 		Vector cp = camera->GetPosition();
-		camera->SetPosition(Vector(cp.x,15,cp.z));
-		camera->SetZoom(input->mouseAbsolute.z * input->mouseAbsolute.z);
+		camera->SetPosition(Vector(cp.x,0,cp.z));
+		camera->SetZoom((input->mouseAbsolute.z * input->mouseAbsolute.z));
 
 		if (input->GetKeyDown(SDLK_LCTRL) || input->GetKeyDown(SDLK_RCTRL) || input->GetMButtonState(2)) {
 			camera->RotateView(input->mouseMovement.y/2,input->mouseMovement.x/2,0);

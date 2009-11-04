@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include "camera.h"
 #include "console.h"
+#include "unit.h"
 
 extern Graphics *renderer;
 extern Camera * camera;
@@ -30,8 +31,8 @@ void SaveWorldState(const char *filename) {
 	fwrite(&head,sizeof(MapHeader),1,fout);
 
 	for (int i=0;i<head.entityCount;i++) {
-		if (ents->entities[i] && ents->entities[i]->alive) {
-			ent.type = (ENT_TYPE)ents->entities[i]->type;
+		if (ents->entities[i] && ents->entities[i]->alive && ents->entities[i]->family > 0) {
+			strcpy(ent.entityName, ((Unit*)ents->entities[i])->classname.c_str());
 			ent.x = ents->entities[i]->position.x;
 			ent.y = ents->entities[i]->position.z;
 			fwrite(&ent,sizeof(ent),1,fout);
@@ -75,7 +76,11 @@ void LoadWorldState(const char *filename) {
 	for (int i=0;i<head.entityCount && !feof(fin);i++) {
 		fread(&e,sizeof(MapEntity),1,fin);	
 
-//		SpawnEntity(e.type,Vector(e.x,0,e.y));
+		Unit *unit = new Unit(e.entityName);
+		unit->position = Vector(e.x,0,e.y);
+		unit->completed = 100;
+		ents->AddEntity(unit);
+
 	}
 
 	fclose(fin);

@@ -1,65 +1,67 @@
 try : 
-	woman_state
+	soldier_state
 except NameError :
-	woman_state = { }
-	woman_target = { }
-	woman_mill = { }
-	woman_time = { }
+	soldier_state = { }
+	soldier_target = { }
+	soldier_mill = { }
+	soldier_time = { }
 
-def woman_onInit(curID):
-	woman_state[curID] = 0
-	woman_target[curID] = 0
-	woman_mill[curID] = 0
-	woman_time[curID] = 0
+def soldier_onInit(curID):
+	soldier_state[curID] = 0
+	soldier_target[curID] = 0
+	soldier_mill[curID] = 0
+	soldier_time[curID] = 0
 
-	setModel(curID,"data/models/villagewoman.md2","data/models/VillagerWoman.BMP")
+	setModel(curID,"data/models/villagesoldier.md2","data/models/Villagersoldier.BMP")
 
-def woman_onThink(curID):
+	initEntity(curID, 5, 1)
+
+def soldier_onThink(curID):
 
 	curTeam = getTeam(curID)
-	if woman_state[curID] == 0 : 
-		woman_mill[curID] = getNearestEntity(curID, 4, 0, curTeam)
+	if soldier_state[curID] == 0 : 
+		soldier_mill[curID] = getNearestEntity(curID, 4, 0, curTeam)
 
-	if woman_state[curID] == 2 and woman_target[curID] != 0:
-		setPosition(woman_target[curID],curID)
+	if soldier_state[curID] == 2 and soldier_target[curID] != 0:
+		setPosition(soldier_target[curID],curID)
 		
 	if getState(curID) == 2:
-		if woman_state[curID] == 0:
-			if getTime() - woman_time[curID] > 10:
-				woman_state[curID] = 1
+		if soldier_state[curID] == 0:
+			if getTime() - soldier_time[curID] > 10:
+				soldier_state[curID] = 1
 				
-		if woman_state[curID] == 1:
-			if woman_target[curID] == 0:
-				woman_target[curID] = getNearestEntity(curID, 5, 0, curTeam)
+		if soldier_state[curID] == 1:
+			if soldier_target[curID] == 0:
+				soldier_target[curID] = getNearestEntity(curID, 5, 0, curTeam)
 				
-			if woman_target[curID] != 0:
-				tempD = distance(curID,woman_target[curID])
+			if soldier_target[curID] != 0:
+				tempD = distance(curID,soldier_target[curID])
 				
 				if tempD < 3:
-					killent(woman_target[curID])
-					woman_state[curID] = 2
+					killent(soldier_target[curID])
+					soldier_state[curID] = 2
 				else:
-					pathToEnt(curID, woman_target[curID])
+					pathToEnt(curID, soldier_target[curID])
 
-		if woman_state[curID] == 2:
-			if woman_mill[curID] != 0:
-				if distance(curID,woman_mill[curID]) < 5:
-	#				UptakeResources(woman_mill[curID], woman_target[curID])
-					woman_target[curID] = 0
-					woman_state[curID] = 0
-					woman_time[curID] = getTime()
+		if soldier_state[curID] == 2:
+			if soldier_mill[curID] != 0:
+				if distance(curID,soldier_mill[curID]) < 5:
+	#				UptakeResources(soldier_mill[curID], soldier_target[curID])
+					soldier_target[curID] = 0
+					soldier_state[curID] = 0
+					soldier_time[curID] = getTime()
 					
 				else:
-					pathToEnt(curID,woman_mill[curID])
+					pathToEnt(curID,soldier_mill[curID])
  
-def woman_onAttacked(curID, attackerID):
+def soldier_onAttacked(curID, attackerID):
 	echo("onattacked()")
 	
-def woman_onDeath(curID):
+def soldier_onDeath(curID):
 	echo("death")
 	
-def woman_onSelected(curID):
+def soldier_onSelected(curID):
 	echo("selected")
 	
-def woman_onUnselected(curID):
+def soldier_onUnselected(curID):
 	echo("unselected")

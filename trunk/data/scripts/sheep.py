@@ -5,12 +5,16 @@ except NameError :
 	sheep_born = { }
 
 def sheep_onInit(curID):
+
+	#initEntity(curID, 5, 1)
+
 	sheep_state[curID] = 0
 	sheep_born[curID] = getTime()
 	
 	
 	loadMenu(curID,"data/UI/sheep.ui")
-	setSpeed(curID,1,2)
+	setSpeed(curID,1,2)	
+	setHealth(curID, 5)
 	setModel(curID,"data/models/sheep.md2","data/models/Sheep.JPG")
 	setUpdateInterval(curID,4*random())
 

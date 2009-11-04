@@ -52,14 +52,14 @@ public:
 	void SetCamera(Camera * cam);
 
 	void render();
-	void renderLand(int detail, int maxDistanceFromCamera, int minDistanceFromCamera);
+	void renderLand(int detail, int insideDetail, int maxDistanceFromCamera, int minDistanceFromCamera);
 	void renderWater();
 
 	Vector RayTest(Vector start, Vector direction, float length, float step, bool accurate);
 	unsigned char getContents(int x, int y);
 	void setContents(int x, int y, int w, int h, unsigned char contents);
 	void setContents(int x, int y, unsigned char contents);
-	float getHeight(int x,int y);
+	inline float getHeight(int x,int y);
 	Vector getNormal(int x, int y);
 	float getInterpolatedHeight(float x, float y);
 
@@ -77,6 +77,7 @@ private:
 	AS_Node *ASnodes;
 
 public:
+	Vector AmbientColor;
 	Vector SunDirection;
 	float fAvgWaterHeight;
 
@@ -89,8 +90,11 @@ private:
 	int detailTexture;
 	int waterTexture;
 	int waterReflection;
+	int displayList;
 
 	Camera *ourCamera;
+	Vector lastLODUpdatePosition;
+	
 
 	float scale;
 
