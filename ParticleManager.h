@@ -19,7 +19,13 @@ public:
 	void Process();
 
 	void Render() {
-		glVertex3f(position.x,position.y,position.z);
+		glPointSize(size);	
+		glBegin(GL_POINTS);
+			float a = 1-((timer->time - birthtime) / lifespan);
+
+			glColor4f(color.x, color.y, color.z, a);			
+			glVertex3f(position.x,position.y,position.z);
+		glEnd();
 	}
 
 	void Spawn(int t, Vector c, Vector ec, Vector sp, Vector a, Vector v, float m, float tv, float s, float gr) {

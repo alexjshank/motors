@@ -28,7 +28,10 @@ void Particle::Process() {
 			}
 		}
 */		size += growthRate * timer->frameScalar;
-		color += ((endcolor - startcolor)/lifespan) * timer->frameScalar;
+	
+		float i = (timer->time - birthtime) / lifespan;
+
+		color = startcolor + (endcolor - startcolor) * i;
 	}
 }
 
@@ -64,7 +67,7 @@ bool ParticleManager::init() {
 
 	glGetFloatv( GL_POINT_SIZE_MAX_ARB, &spriteMaxSize );
 	glPointParameterfARB( GL_POINT_FADE_THRESHOLD_SIZE_ARB, 60.0f );
-	glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 0.5f );
+	glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 0.01f );
 	glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, spriteMaxSize );
 	glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
 
@@ -80,11 +83,11 @@ void ParticleManager::run() {
 
 		glEnable(GL_POINT_SPRITE_ARB);
 
-		glDepthMask(0);
-		glDisable(GL_DEPTH_TEST);
+	//	glDepthMask(0);
+	//	glDisable(GL_DEPTH_TEST);
 
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_COLOR,GL_ONE_MINUS_SRC_COLOR);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_COLOR);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,particleTexture);
 
@@ -93,13 +96,7 @@ void ParticleManager::run() {
 			if (particles[i].size > spriteMaxSize) particles[i].size = spriteMaxSize;
 				
 			particles[i].Process();
-
-			glPointSize(particles[i].size);	
-			glBegin(GL_POINTS);
-				float a = 1-(timer->time - particles[i].birthtime) / particles[i].lifespan;
-				glColor4f(particles[i].color.x*a,particles[i].color.y*a,particles[i].color.z*a,a*0.5f);
-				particles[i].Render();		
-			glEnd();
+			particles[i].Render();	
 		}
 		
 	glPopAttrib();
@@ -112,7 +109,7 @@ void ParticleManager::Spawn(int count, Vector color, Vector endcolor, Vector pos
 		if (!particles[o].alive) {
 			float h=terrain->getInterpolatedHeight(position.x,position.z);
 			if (h > position.y) position.y = h;
-			particles[o].Spawn(particleTexture, color, endcolor, position, acceleration, iv + Vector((((float)(rand()%100)/100)-0.5f)*spread.x,(((float)(rand()%100)/100)-0.5f)*spread.y,(((float)(rand()%100)/100)-0.5f)*spread.z),1.0f,2.0f,size,gr);
+			particles[o].Spawn(particleTexture, color, endcolor, position, acceleration, iv + Vector((((float)(rand()%100)/100.0f)-0.5f)*spread.x,(((float)(rand()%100)/100.0f)-0.5f)*spread.y,(((float)(rand()%100)/100.0f)-0.5f)*spread.z),1.0f,600.0f,size,gr);
 			if (spawned++ >= count) { 
 				last_id += count % MAX_PARTICLES;			
 				break;

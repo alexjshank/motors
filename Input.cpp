@@ -44,10 +44,10 @@ void Input::run() {
 			SetKeyState(event.key.keysym.sym,0);
 			break;
 		case SDL_MOUSEMOTION:
-			mouseMovement.x = event.motion.xrel;
-			mouseMovement.y = event.motion.yrel;
-			mouseAbsolute.x = event.motion.x;
-			mouseAbsolute.y = event.motion.y + 20;
+			mouseMovement.x = (float)event.motion.xrel;
+			mouseMovement.y = (float)event.motion.yrel;
+			mouseAbsolute.x = (float)event.motion.x;
+			mouseAbsolute.y = (float)event.motion.y + 20;
 			mousePosition += mouseMovement;
 
 			glGetDoublev( GL_MODELVIEW_MATRIX, modelview );

@@ -8,6 +8,9 @@ def barracks_onInit(curID):
 	loadMenu(curID,'data/ui/barracks.ui')
 	setModel(curID,"data/models/barracks.md2","data/models/barracks.JPG")
 	setSpeed(curID, 0, 0)
+	setHealth(curID, 1000)
+
+	initEntity(curID, 3, 2)
 	
 def barracks_onThink(curID):
 	pass

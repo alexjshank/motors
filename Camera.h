@@ -1,5 +1,6 @@
 #include "task.h"
 #include "vector.h"
+#include "entity.h"
 
 #ifndef _CAMERA_
 #define _CAMERA_
@@ -67,7 +68,10 @@ public:
 		target = ft;
 		targetPosition = position;
 	}
-
+	void Follow(Entity *ft, int fm) { 
+		followmode = fm;
+		targetEnt = ft;
+	}
 	// moving stuff:
 
 	void MoveRelative(Vector relativeMovement);
@@ -75,20 +79,22 @@ public:
 
 	void SetPosition(Vector p) { position = p; }
 	Vector GetPosition() { return position; }
-	Vector GetActualPosition() { return position - (view*zoom); }
+	Vector GetActualPosition() { return actualCameraPosition; }
 
 	void SetZoom(float z) { zoom = z; }
 
-	enum FollowModes { NotFollowing = 0, Seek, HoverAbove };
+	enum FollowModes { NotFollowing = 0, Seek, HoverAbove, ThirdPerson };
 
 	Frustum frustum;
 private:
 	void CalculateView();
 	void setProjectionMatrix(float zoomFactor, int width, int height);
 
+	Entity *targetEnt;
 	Vector *target;
 	Vector targetPosition;
 	Vector idealRotation;
+	Vector actualCameraPosition;
 	int followmode;	
 	
 	Vector position,  up, view, side;

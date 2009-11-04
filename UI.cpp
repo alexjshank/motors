@@ -67,7 +67,8 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 		char *preadpos = buffer;
 		fgets(buffer,8192,uifile);
 
-		for (int i=0; buffer[i]==' ' || buffer[i]=='\t'; i++);
+		int i;
+		for (i=0; buffer[i]==' ' || buffer[i]=='\t'; i++);
 		preadpos = &buffer[i];
 		
 		for (i=0;i<(int)strlen(buffer);i++) {
@@ -93,7 +94,7 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 
 			sscanf(buffer,"%s\t%s\t%d\t%d\t%d\t%d\t%s",objectType,objectName,&objectX,&objectY,&objectW,&objectH,objectScript);
 
-			if (stricmp(objectType,"window") == 0) {
+			if (_stricmp(objectType,"window") == 0) {
 				UIWindow *window = new UIWindow;
 				root = window;
 
@@ -102,7 +103,7 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 				window->width = (float)objectW;
 				window->height = (float)objectH;
 				window->title = objectName;
-			} else if (stricmp(objectType,"somethingelse") == 0) {
+			} else if (_stricmp(objectType,"somethingelse") == 0) {
 
 			} else {
 				console->Printf("Warning: unknown UI root object specified in UI file %s",uifilename);
@@ -117,7 +118,7 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 
 			sscanf(preadpos,"%s\t%s\t%d\t%d\t%d\t%d\t%s",objectType,objectName,&objectX,&objectY,&objectW,&objectH,objectScript);
 
-			if (stricmp(objectType,"button") == 0) {
+			if (_stricmp(objectType,"button") == 0) {
 				UIButton *button = new UIButton;
 
 				button->position = Vector((float)objectX,(float)objectY,0);
@@ -126,7 +127,7 @@ UIObject * UI::CreateFromFile(const char *uifilename) {
 				button->loadButtonTextures(objectName);
 				button->pressedCommand = objectScript;
 				root->AttachChild(button);
-			} else if (stricmp(objectType,"text") == 0) {
+			} else if (_stricmp(objectType,"text") == 0) {
 				UIText *text = new UIText;
 
 				text->position = Vector((float)objectX,(float)objectY,0);

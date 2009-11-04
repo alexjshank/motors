@@ -40,14 +40,14 @@ void Building::onSelected() {
 		currentID = id;
 		toolWindow->closeButton.pressed = false;
 		toolWindow->visible = true;
-//		input->inputContext = BuildMenu;
+		input->inputContext = BuildMenu;
 	}
 }
 
 void Building::onUnSelected() {
 	if (toolWindow) {
 		toolWindow->closeButton.pressed = true;
-//		input->inputContext = NormalInput;
+		input->inputContext = NormalInput;
 	}
 }
 

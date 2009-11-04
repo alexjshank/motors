@@ -8,12 +8,15 @@ def peasant_onInit(curID):
 	peasant_state[curID] = 0
 	peasant_building[curID] = 0
 
+	setTeam(curID,1)
+
+	setHealth(curID, 100)
 	setModel(curID,"data/models/peasant.md2","data/models/peasant.JPG")
 	loadMenu(curID,"data/UI/peasant.ui")
 
 def peasant_onThink(curID):
 	if peasant_state[curID] == 0:
-	
+		
 		pass
 	
 	if peasant_state[curID] == 1: 

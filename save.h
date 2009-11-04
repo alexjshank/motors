@@ -31,7 +31,7 @@ struct MapHeader {
 
 
 struct MapEntity {
-	ENT_TYPE type;	
+	char entityName[32];	
 	float x,y;
 };
 

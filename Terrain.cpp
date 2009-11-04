@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "console.h"
 
+//#define USE_PROCEDURAL_TERRAIN_INSTEAD
 
 extern Graphics *renderer;
 extern Console *console;
@@ -16,6 +17,7 @@ Terrain::~Terrain(void) {
 	if (bTerrainContents) {
 		delete [] bTerrainContents;
 	}
+	glDeleteLists(displayList,1);
 }
 
 
@@ -46,13 +48,14 @@ bool Terrain::LoadHeightMap(const char * filename) {
 
 	std::string fullpath = "data/topographical/"; fullpath += filename; fullpath += ".top";
 
-	FILE *fmap = fopen(fullpath.c_str(),"rb");
 
 	fAvgWaterHeight = 4;
-	SunDirection = Vector(0.65f,0.35f,0);
+	SunDirection = Vector(0.75f,0.25f,0);
 
-	if (!fmap) {
-		// errrror
+	AmbientColor = Vector(24,24,48); // dark bluish
+
+	FILE *fmap;
+	if (fopen_s(&fmap,fullpath.c_str(),"rb") != 0) {
 		console->Printf("Error opening terrain file '%s'",filename);
 		return false;
 	}
@@ -116,7 +119,7 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	fclose(fmap);
 	for (int y=0;y<height;y++) {
 		for (int x=0;x<width;x++) {
-			fHeightData[x+(y*width)] = (float)bHeightData[x+(y*width)] / 4;	// and load it into the float array
+			fHeightData[x+(y*width)] = (float)bHeightData[x+(y*width)] / 8;	// and load it into the float array
 		}
 	}
 	delete [] bHeightData;
@@ -125,11 +128,9 @@ bool Terrain::LoadHeightMap(const char * filename) {
 	CalculateNormals();
 	CalculateColorData();
 
-	SmootheTerrain();
-	SmootheTerrain();
-	SmootheTerrain();	
-
 	waterReflection = renderer->LoadTexture("data/topographical/reflection.JPG");
+
+	displayList = glGenLists(1);
 
 	// set up the terrain contents (this should probably be its own file, but for now we're just generating it and checking for water
 
@@ -153,14 +154,16 @@ bool Terrain::LoadHeightMap(const char * filename) {
 
 void Terrain::SmootheTerrain() {
 	float * sourceData = fHeightData;
-
-	for (int y=1;y<height-1;y++) {
-		for (int x=1;x<width-1;x++) {
-			float blocksum = (float)(	(float)sourceData[((y-1)*height)+(x-1)]	+ (float)sourceData[((y-1)*height)+x]		+ (float)sourceData[((y-1)*height)+(x+1)] + 
-										(float)sourceData[(y*height)+(x-1)]		+ (float)sourceData[(y*height)+x]			+ (float)sourceData[(y*height)+(x+1)] + 
-										(float)sourceData[((y+1)*height)+x-1]	+ (float)sourceData[((y+1)*height)+x]		+ (float)sourceData[((y+1)*height)+(x+1)]);
-			int pos = (y*height)+x;
-			fHeightData[pos] = (blocksum/9);
+	
+	for (int samples = 0; samples < 3; samples++) {
+		for (int y=1;y<height-1;y++) {
+			for (int x=1;x<width-1;x++) {
+				float blocksum = (float)(	(float)sourceData[((y-1)*height)+(x-1)]	+ (float)sourceData[((y-1)*height)+x]		+ (float)sourceData[((y-1)*height)+(x+1)] + 
+											(float)sourceData[(y*height)+(x-1)]		+ (float)sourceData[(y*height)+x]			+ (float)sourceData[(y*height)+(x+1)] + 
+											(float)sourceData[((y+1)*height)+x-1]	+ (float)sourceData[((y+1)*height)+x]		+ (float)sourceData[((y+1)*height)+(x+1)]);
+				int pos = (y*height)+x;
+				fHeightData[pos] = (blocksum/9);
+			}
 		}
 	}
 }
@@ -176,6 +179,10 @@ void Terrain::CalculateNormals() {
 	}
 }
 
+#define MAX(x,y) ((x>y)?x:y)
+#define MIN(x,y) ((x<y)?x:y)
+
+
 void Terrain::CalculateColorData() {
 	SunDirection.normalize();
 	Vector nd = SunDirection;
@@ -190,15 +197,51 @@ void Terrain::CalculateColorData() {
 			Vector normal = getNormal(x,y);
 			float angle = normal.Dot(SunDirection);
 			if (angle > 1) angle = 1;
-			ucColorData[0][index] = ucColorData[1][index] = ucColorData[2][index] = 127+((unsigned char)(angle * 127));
+			
+			int AngleColor = 127+((unsigned char)(angle * 127));
 
-			Vector test = RayTest(sp,nd,30,1,false);
-			Vector end = sp+(nd*30);
-			if ( (end - test).len() > 1) {
-				// shaded
-				ucColorData[0][index] = 64;
-				ucColorData[1][index] = 64;
-				ucColorData[2][index] = 64;
+			ucColorData[0][index] = (unsigned char)MAX(AmbientColor.x, AngleColor);
+			ucColorData[1][index] = (unsigned char)MAX(AmbientColor.y, AngleColor);
+			ucColorData[2][index] = (unsigned char)MAX(AmbientColor.z, AngleColor);
+
+		
+
+			int numPasses = 8;
+			int blockSize = 255 / numPasses;
+			Vector Ray = (nd*30);
+
+			for (int i=numPasses; i>0; i--) {
+				Vector origin = sp+Vector(0,2.0f * i,0);
+
+				Vector test = RayTest(origin,nd,30,1,false);
+
+				if ( ((origin + Ray) - test).len2() > 2) {
+
+					int ShadeValue = (i * blockSize);
+
+					ucColorData[0][index] = (unsigned char)MAX(AmbientColor.x, (ucColorData[0][index] - MAX(ShadeValue,ucColorData[0][index])));
+					ucColorData[1][index] = (unsigned char)MAX(AmbientColor.y, (ucColorData[1][index] - MAX(ShadeValue,ucColorData[1][index])));
+					ucColorData[2][index] = (unsigned char)MAX(AmbientColor.z, (ucColorData[2][index] - MAX(ShadeValue,ucColorData[2][index])));
+					break;
+				}
+			}
+		}
+	}
+
+	// smoothe it out
+	for (int smoothePass=0; smoothePass < 4; smoothePass++) {
+		for (int y=0;y<height-1;y++) {
+			for (int x=0;x<width-1;x++) {
+				int indicies[] = {(y*width)+x,
+								  ((y+1)*width)+x,
+								  (y*width)+x+1,
+								  ((y+1)*width)+x+1};
+
+				ucColorData[0][indicies[0]] = (ucColorData[0][indicies[0]] + ucColorData[0][indicies[1]] + ucColorData[0][indicies[2]] + ucColorData[0][indicies[3]]) / 4;
+				ucColorData[1][indicies[0]] = (ucColorData[1][indicies[0]] + ucColorData[1][indicies[1]] + ucColorData[1][indicies[2]] + ucColorData[1][indicies[3]]) / 4;
+				ucColorData[2][indicies[0]] = (ucColorData[2][indicies[0]] + ucColorData[2][indicies[1]] + ucColorData[2][indicies[2]] + ucColorData[2][indicies[3]]) / 4;
+
+
 			}
 		}
 	}
@@ -228,7 +271,7 @@ void Terrain::CalculateWaveData() {
 				int testStep = 10;
 				float testDist = 2;
 
-				for (int angle = 0;angle<360; angle+= testStep) {
+				for (int angle = 0;angle<180; angle+= testStep) {
 					Vector tp = Vector((float)xi,fAvgWaterHeight,(float)yi) + (Vector(sinf((float)angle),0,cosf((float)angle)) * testDist);
 					float h = getInterpolatedHeight(tp.x,tp.z);
 					if (h > highestHeight) {
@@ -254,71 +297,393 @@ void Terrain::render() {
 	glEnable(GL_DEPTH_TEST);	
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D,mainTexture);
-	
-	renderLand(20,1000,290);
-	renderLand(8,300,90);
-	renderLand(4,100,40);
-	renderLand(2,50,0);
+
+	Vector delta = (lastLODUpdatePosition - ourCamera->GetPosition());
+	if (delta.len2() > 5*5) {
+		lastLODUpdatePosition = ourCamera->GetPosition();
+
+		glNewList(displayList, GL_COMPILE);
+		renderLand(16,16, 256,128);
+		renderLand(8,16,128,64);
+		renderLand(4,8,64,32);
+		renderLand(2,4,32,16);
+		renderLand(1,2,16,0);
+		glEndList();
+	}
+		
+	glCallList(displayList);
+
 	renderWater();
 }
 
-void Terrain::renderLand(int step, int maxd, int mind) {
+#if !defined USE_PROCEDURAL_TERRAIN_INSTEAD // procedural terrain
+/*
+void Terrain::renderLand(int step, int insideStep,  int maxd, int mind) {
 	int i,j;
 	float xsize=(float)width;
 	float ysize=(float)height;
 	
-	Vector cp = RayTest(ourCamera->GetPosition(),ourCamera->GetView(),70,4,false);
+	Vector cp = ourCamera->GetActualPosition() + (ourCamera->GetView() * 10.0f);
 	int startX=(int)cp.x - maxd,startY=(int)cp.z - maxd,endX=(int)cp.x + maxd,endY=(int)cp.z + maxd;	
-	if (startX < 1) startX = 1;
-	if (startY < 1) startY = 1;
-	if (endX > width-1) endX = width-1;
-	if (endY > height-1) endY = height-1;
-
-	startX -= (startX%step);
-	startY -= (startY%step);
-		
-	glBegin(GL_QUADS);
-	for(i=startY; i<endY-step; i+=step)
-	{
-		for(j=startX; j<endX-step; j+=step)
-		{
-			if (getContents(j,i) == TC_WATER && getContents(j+step,i+step) == TC_WATER && getContents(j+step,i) == TC_WATER && getContents(j,i+step) == TC_WATER) {
-				continue;
-			}
 	
-			if (mind != 0 && j > cp.x-mind && j < cp.x+mind && i > cp.z-mind && i < cp.z+mind) {
-				continue;
+	startX = startX - (startX % 16);
+	startY = startY - (startY % 16);
+		
+	
+	for(i=startY; i<=endY-step; i+=step)
+	{
+		if (i < 0 || i > height-1) continue;
+
+		for(j=startX; j<=endX-step; j+=step)
+		{
+			if (j < 0 || j > width-1) continue;
+
+			glBegin(GL_QUADS);
+			
+		//	if (getContents(j,i) == TC_WATER && getContents(j+step,i+step) == TC_WATER && getContents(j+step,i) == TC_WATER && getContents(j,i+step) == TC_WATER) {
+		//		continue;
+		//	}
+	
+			bool onLeftEdge = false;
+			bool onRightEdge = false;
+			bool onTopEdge = false;
+			bool onBottomEdge = false;
+				if (j < endX && j+step >= endX) { 
+					onRightEdge = true;
+				}
+				if (j == startX) { 
+					onLeftEdge = true;
+				}				
+				if (i < endY && i+step >= endY) { 
+					onTopEdge = true;
+				}
+				if (i == startY) { 
+					onBottomEdge = true;
+				}
+
+			if (mind != 0) {
+				if (j+step > cp.x-mind && 
+					j+step      < cp.x+mind && 
+					i+step > cp.z-mind && 
+					i+step      < cp.z+mind) {
+					continue;
+				}
 			}
+
+			
 
 			float i_d_xsize = i / xsize;
 			float iStepped_d_xsize = (i+step) / xsize;
 			float j_d_ysize = j / ysize;
 			float jStepped_d_ysize = (j+step) / ysize;
 
+			int floorX = ((j-startX) - ((j-startX)%insideStep)+startX);
+			int ceilX = floorX + insideStep;
+			int floorZ = (i - (i%insideStep));
+			int ceilZ = floorZ + insideStep;
+
 			int index = ((i*height)+j);
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-i_d_xsize,(float)j_d_ysize); 
-			glVertex3f((float)j,	fHeightData[index],		(float)i);
+			if (onBottomEdge && j != floorX) {
+				glVertex3f((float)j,	(fHeightData[(i*height)+(floorX)]+fHeightData[(i*height)+(ceilX)])/2 ,		(float)i);
+			} else {
+				if (onRightEdge) {
+					glVertex3f((float)j,	(fHeightData[(i*height)+(floorX)]+fHeightData[(i*height)+(ceilX)])/2 ,		(float)i);
+				} else {
+					glVertex3f((float)j,	fHeightData[index],		(float)i);
+				}
+			} 
+
+			
 
 			index = ((i*height)+(j+step));
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-i_d_xsize,(float)jStepped_d_ysize); 
-			glVertex3f((float)j+step,	fHeightData[index],		(float)i);
-			
+			if (onBottomEdge && j+step != ceilX) {
+				glVertex3f((float)j+step,	(fHeightData[(i*height)+(floorX)]+fHeightData[(i*height)+(ceilX)])/2 ,		(float)i);
+			} else {
+				glVertex3f((float)j+step,	fHeightData[index],		(float)i);
+			}
+
 			index = (((i+step)*height)+(j+step));
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
-			glTexCoord2f((float)1-iStepped_d_xsize,(float)jStepped_d_ysize); 
-			glVertex3f((float)j+step,	fHeightData[index],		(float)i+step);
-			
+			glTexCoord2f((float)1-iStepped_d_xsize,(float)jStepped_d_ysize);
+			if (onTopEdge && j+step != floorX && j+step != ceilX) {
+				glVertex3f((float)j+step,	(fHeightData[((i+step)*height)+(floorX)]+fHeightData[((i+step)*height)+(ceilX)])/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j+step,	fHeightData[index],		(float)i+step);
+			}	
+
 			index = (((i+step)*height)+j);
 			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
 			glTexCoord2f((float)1-iStepped_d_xsize,(float)j_d_ysize); 
-			glVertex3f((float)j,	fHeightData[index],		(float)i+step);
+			if (onTopEdge && j != floorX && j != ceilX) {
+				glVertex3f((float)j,	(fHeightData[((i+step)*height)+(floorX)]+fHeightData[((i+step)*height)+(ceilX)])/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j,	fHeightData[index],		(float)i+step);
+			}
+
+			
+			
+	glEnd();
 		}
 	}
-	glEnd();
 }
+*/
 
+void Terrain::renderLand(int step, int insideStep,  int maxd, int mind) {
+	int i,j;
+	float xsize=(float)width;
+	float ysize=(float)height;
+	
+	Vector cp = ourCamera->GetPosition();
+	cp = Vector((float)(floor(cp.x) - ((int)cp.x % 16)), 
+				cp.y, 
+				(float)(floor(cp.z) - ((int)cp.z % 16)));
+
+	int startX = (int)cp.x - maxd; 
+	int endX = (int)cp.x + maxd; 
+	int startZ = (int)cp.z - maxd; 
+	int endZ = (int)cp.z + maxd;
+	
+		
+	
+	for(i=startZ; i<endZ; i+=step)
+	{
+		if (i < 0 || i > height-1) continue;
+
+		for(j=startX; j<endX; j+=step)
+		{
+			if (j < 0 || j > width-1) continue;
+
+			//
+			glBegin(GL_QUADS);			
+			//glBegin(GL_LINE_STRIP);
+			
+			/*
+			if (getContents(j,i) == TC_WATER && getContents(j+step,i+step) == TC_WATER && getContents(j+step,i) == TC_WATER && getContents(j,i+step) == TC_WATER) {
+				continue;
+			}
+			*/
+
+			bool onLeftEdge = false;
+			bool onRightEdge = false;
+			bool onTopEdge = false;
+			bool onBottomEdge = false;
+			
+				if (j < endX && j+step >= endX) { 
+					onRightEdge = true;
+				}
+				if (j == startX) { 
+					onLeftEdge = true;
+				}				
+				if (i < endZ && i+step >= endZ) { 
+					onTopEdge = true;
+				}
+				if (i == startZ) { 
+					onBottomEdge = true;
+				}
+			
+
+			if (mind != 0) {
+				if (j+step > cp.x-mind && 
+					j+step <= cp.x+mind && 
+					i+step > cp.z-mind && 
+					i+step <= cp.z+mind) {
+					continue;
+				}
+			}
+
+			
+
+			float i_d_xsize = i / xsize;
+			float iStepped_d_xsize = (i+step) / xsize;
+			float j_d_ysize = j / ysize;
+			float jStepped_d_ysize = (j+step) / ysize;
+
+			int floorX = ((j-startX) - ((j-startX)%insideStep)+startX);
+			int ceilX = floorX + insideStep;
+			int floorZ = (i - (i%insideStep));
+			int ceilZ = floorZ + insideStep;
+
+			int index = ((i*height)+j);
+			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-i_d_xsize,(float)j_d_ysize); 
+			if (onBottomEdge && j != floorX) {
+				glVertex3f((float)j,	(getHeight(floorX,i)+getHeight(ceilX,i))/2 ,		(float)i);
+			} else if (onLeftEdge && i != ceilZ && i != floorZ) {
+				glVertex3f((float)j,	(getHeight(j,floorZ)+getHeight(j,ceilZ))/2 ,		(float)i);
+			} else {
+				glVertex3f((float)j,	getHeight(j,i),		(float)i);
+			}
+
+			
+
+			index = ((i*height)+(j+step));
+			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-i_d_xsize,(float)jStepped_d_ysize); 
+			if (onBottomEdge && j+step != ceilX) {
+				glVertex3f((float)j+step,	(getHeight(floorX,i)+getHeight(ceilX,i))/2 ,		(float)i);
+			} else if (onRightEdge && i != floorZ) {
+				glVertex3f((float)j+step,	(getHeight(j+step,floorZ)+getHeight(j+step,ceilZ))/2 ,		(float)i);
+			} else {
+				glVertex3f((float)j+step,	getHeight(j+step,i),		(float)i);
+			}
+
+			index = (((i+step)*height)+(j+step));
+			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-iStepped_d_xsize,(float)jStepped_d_ysize);
+			if (onTopEdge && j+step != ceilX) {
+				glVertex3f((float)j+step,	(getHeight(floorX,i+step)+getHeight(ceilX,i+step))/2 ,		(float)i+step);
+			} else if (onRightEdge && i+step != ceilZ) {
+				glVertex3f((float)j+step,	(getHeight(j+step,floorZ)+getHeight(j+step,ceilZ))/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j+step,	getHeight(j+step,i+step),		(float)i+step);
+			}	
+
+			index = (((i+step)*height)+j);
+			glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-iStepped_d_xsize,(float)j_d_ysize); 
+			if (onTopEdge && j != floorX) {
+				glVertex3f((float)j,	(getHeight(floorX,i+step)+getHeight(ceilX,i+step))/2 ,		(float)i+step);
+			} else if (onLeftEdge && i+step != ceilZ && i+step != floorZ) {
+				glVertex3f((float)j,	(getHeight(j,floorZ)+getHeight(j,ceilZ))/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j,	getHeight(j,i+step),		(float)i+step);
+			}
+
+			
+			
+	glEnd();
+		}
+	}
+}
+#else
+void Terrain::renderLand(int step, int insideStep,  int maxd, int mind) {
+	int i,j;
+	float xsize=(float)width;
+	float ysize=(float)height;
+	
+	Vector cp = ourCamera->GetActualPosition();
+	cp = Vector((int)cp.x - ((int)cp.x % 16), cp.y, (int)cp.z - ((int)cp.z % 16));
+
+	int startX = (int)cp.x - maxd; 
+	int endX = (int)cp.x + maxd; 
+	int startZ = (int)cp.z - maxd; 
+	int endZ = (int)cp.z + maxd;
+	
+		
+	
+	for(i=startZ; i<endZ; i+=step)
+	{
+	//	if (i < 0 || i > height-1) continue;
+
+		for(j=startX; j<endX; j+=step)
+		{
+	//		if (j < 0 || j > width-1) continue;
+
+			//
+			glBegin(GL_QUADS);			
+			//glBegin(GL_LINE_STRIP);
+			
+			/*
+			if (getContents(j,i) == TC_WATER && getContents(j+step,i+step) == TC_WATER && getContents(j+step,i) == TC_WATER && getContents(j,i+step) == TC_WATER) {
+				continue;
+			}
+			*/
+
+			bool onLeftEdge = false;
+			bool onRightEdge = false;
+			bool onTopEdge = false;
+			bool onBottomEdge = false;
+				if (j < endX && j+step >= endX) { 
+					onRightEdge = true;
+				}
+				if (j == startX) { 
+					onLeftEdge = true;
+				}				
+				if (i < endZ && i+step >= endZ) { 
+					onTopEdge = true;
+				}
+				if (i == startZ) { 
+					onBottomEdge = true;
+				}
+
+			if (mind != 0) {
+				if (j+step > cp.x-mind && 
+					j+step < cp.x+mind && 
+					i+step > cp.z-mind && 
+					i+step < cp.z+mind) {
+					continue;
+				}
+			}
+
+			
+
+			float i_d_xsize = i / xsize;
+			float iStepped_d_xsize = (i+step) / xsize;
+			float j_d_ysize = j / ysize;
+			float jStepped_d_ysize = (j+step) / ysize;
+
+			int floorX = ((j-startX) - ((j-startX)%insideStep)+startX);
+			int ceilX = floorX + insideStep;
+			int floorZ = (i - (i%insideStep));
+			int ceilZ = floorZ + insideStep;
+
+			//int index = ((i*height)+j);
+			//glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-i_d_xsize,(float)j_d_ysize); 
+			if (onBottomEdge && j != floorX) {
+				glVertex3f((float)j,	(getHeight(floorX,i)+getHeight(ceilX,i))/2 ,		(float)i);
+			} else if (onLeftEdge && i != floorZ) {
+				glVertex3f((float)j,	(getHeight(j,floorZ)+getHeight(j,ceilZ))/2 ,		(float)i);
+			} else {
+				glVertex3f((float)j,	getHeight(j,i),		(float)i);
+			}
+
+			
+
+			//index = ((i*height)+(j+step));
+			//glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-i_d_xsize,(float)jStepped_d_ysize); 
+			if (onBottomEdge && j+step != ceilX) {
+				glVertex3f((float)j+step,	(getHeight(floorX,i)+getHeight(ceilX,i))/2 ,		(float)i);
+			} else if (onRightEdge && i != floorZ) {
+				glVertex3f((float)j+step,	(getHeight(j+step,floorZ)+getHeight(j+step,ceilZ))/2 ,		(float)i);
+			} else {
+				glVertex3f((float)j+step,	getHeight(j+step,i),		(float)i);
+			}
+
+			//index = (((i+step)*height)+(j+step));
+			//glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-iStepped_d_xsize,(float)jStepped_d_ysize);
+			if (onTopEdge && j+step != ceilX) {
+				glVertex3f((float)j+step,	(getHeight(floorX,i+step)+getHeight(ceilX,i+step))/2 ,		(float)i+step);
+			} else if (onRightEdge && i != ceilZ) {
+				glVertex3f((float)j+step,	(getHeight(j+step,floorZ)+getHeight(j+step,ceilZ))/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j+step,	getHeight(j+step,i+step),		(float)i+step);
+			}	
+
+			//index = (((i+step)*height)+j);
+			//glColor3ub((GLubyte)ucColorData[0][index],(GLubyte)ucColorData[1][index],(GLubyte)ucColorData[2][index]);
+			glTexCoord2f((float)1-iStepped_d_xsize,(float)j_d_ysize); 
+			if (onTopEdge && j != floorX) {
+				glVertex3f((float)j,	(getHeight(floorX,i+step)+getHeight(ceilX,i+step))/2 ,		(float)i+step);
+			} else if (onLeftEdge && i != ceilZ) {
+				glVertex3f((float)j,	(getHeight(j,floorZ)+getHeight(j,ceilZ))/2 ,		(float)i+step);
+			} else {
+				glVertex3f((float)j,	getHeight(j,i+step),		(float)i+step);
+			}
+
+			
+			
+	glEnd();
+		}
+	}
+}
+#endif 
 
 void Terrain::renderWater() {
 	Vector p = ourCamera->GetPosition();
@@ -340,7 +705,7 @@ void Terrain::renderWater() {
 		float b=cos(timer->time/25);
 		float c = timer->time*2;
 
-		glColor4f(1,1,1,1);
+		glColor4f(1,1,1,0.75f);
 
 		int tilesize = 50;
 		for (int xi=-500 + (int)p.x;xi<500  + p.x;xi+=tilesize) { 
@@ -370,17 +735,18 @@ void Terrain::renderWater() {
 		Vector d =- waves[i].waveBreakDirection;
 
 		float b = timer->time+(waves[i].waveBreakPosition.x+waves[i].waveBreakPosition.z)/30;
-		float amt = -1 + sin(b);
+		float amt = -7 + (sin(b) * 5);
 
 		p += (d*amt);
+
 		glTranslatef(p.x,0.1f,p.z);
-		glRotatef(atan2f(d.x,d.z)/(3.1415926f/180),0,1,0);
+		glRotatef(atan2f(d.x,d.z)/(3.1415926f/180.0f),0,1,0);
 		glBegin(GL_QUADS);	
-			glColor4f(1.0f,1.0f,1.0f,0.5f+(cos(b)+1)/4);			
-			glTexCoord2f(0,0);			glVertex3f((float)-tilesize,	fAvgWaterHeight,	0);
-			glTexCoord2f(0,1.0f);		glVertex3f((float)-tilesize,	fAvgWaterHeight,	(float)tilesize);
-			glTexCoord2f(1.0f,1.0f);	glVertex3f((float)tilesize,	fAvgWaterHeight,	(float)tilesize);
-			glTexCoord2f(1.0f,0);		glVertex3f((float)tilesize,	fAvgWaterHeight,	0);
+			glColor4f(1.0f,1.0f,1.0f,((sin(b)+1)*(cos(b)+1))/4);			
+			glTexCoord2f(0,1.0f);			glVertex3f((float)-tilesize,	fAvgWaterHeight,	0);
+			glTexCoord2f(0,0);		glVertex3f((float)-tilesize,	fAvgWaterHeight,	(float)tilesize);
+			glTexCoord2f(1.0f,0);	glVertex3f((float)tilesize,	fAvgWaterHeight,	(float)tilesize);
+			glTexCoord2f(1.0f,1.0f);		glVertex3f((float)tilesize,	fAvgWaterHeight,	0);
 		glEnd();
 	glPopMatrix();
 	}	
@@ -446,10 +812,14 @@ Vector Terrain::getNormal(int x, int y) {
 }
 
 float Terrain::getHeight(int x, int y) {
+#if !defined USE_PROCEDURAL_TERRAIN_INSTEAD
 	if (x < 0 || x >= width || y < 0 || y >= height) 
 		return 0;
-
+	
 	return fHeightData[(y*height)+x];
+#else
+	return ((sinf(x / 24.0f) * cosf(x / 14.0f) * sinf(x / 9.0f)) * (cosf(y / 24.0f) * sinf(y / 14.0f) * cosf(y / 9.0f))) * 32;
+#endif
 }
 
 
@@ -469,6 +839,7 @@ float Terrain::getInterpolatedHeight(float xReal, float yReal) {
 
 	if (result < fAvgWaterHeight)
 		return fAvgWaterHeight;
+	
 	return result;
 }
 

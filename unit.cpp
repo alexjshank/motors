@@ -3,6 +3,7 @@
 #include "library.h"
 #include "terrain.h"
 #include "graphics.h"
+#include "lassoselector.h"
 #include "camera.h"
 #include "console.h"
 #include "variables.h"
@@ -12,6 +13,7 @@
 extern gamevars *vars;
 extern Console *console;
 extern Graphics *renderer;
+extern LassoSelector *selector;
 extern Camera *camera;
 extern Terrain *terrain;
 extern Library *library;
@@ -22,6 +24,7 @@ void Unit::Construct() {
 	model = NULL;
 	menu = 0;
 	state = Stopped;
+	type = (ENT_TYPE)0;
 	family = EF_UNIT;
 	alive = true;
 	frame = 0;
@@ -30,12 +33,12 @@ void Unit::Construct() {
 	blood.init(0.2f,1,position,Vector(0,0,0),Vector(0,0,0),Vector(0,0,0),Vector(1,0,0),20,2);
 	blood.on = false;
 	foot = 0;
-	footprints = false;
+	footprints = true;
 	completed = 0;
 
 	size=Vector(1,2,1);
-	runspeed = 10.0f;
-	walkspeed = 8.5f;
+	runspeed = 7.0f;
+	walkspeed = 5.5f;
 	scale = 0.05f;
 	
 	calibratedModelPosition.y = 1;
@@ -107,12 +110,12 @@ void Unit::WalkTo(Vector t) {
 void Unit::process() {
 //	assert (this && terrain);
 
-	blood.position = position;
-	blood.Run();
-
 	if (Attached && AttachedTo) {
 		position = AttachedTo->position;
 	}
+
+	blood.position = position;
+	blood.Run();
 
 	if (alive) {
 		if (terrain && (position.x < 0 || position.z < 0 || position.x > terrain->width || position.z > terrain->height)) {
@@ -236,12 +239,15 @@ void Unit::process() {
 void Unit::render() {
 	if (camera->frustum.pointInFrustum(position)) {
 		if (model) {
-			if (this->completed < 100) {
-//				glBindTexture(GL_TEXTURE_2D,buildTexture);
-				DrawCube(position+Vector(0,100-completed,0),Vector(size.x,(size.x+size.z)/2,size.z));
-			}
 
-			if (completed < 1 || completed > 99) {
+			
+			if (this->completed < 1) {
+				glBindTexture(GL_TEXTURE_2D,texture);
+				DrawCube(position,Vector(size.x,(size.x+size.z)/2,size.z));
+			}
+			
+
+			if (completed > 1) {
 				model->setScale(scale);
 				glBindTexture(GL_TEXTURE_2D,texture);
 				glColor3f(1,1,1);
@@ -269,27 +275,42 @@ void Unit::render() {
 				if (alive) {
 					frame += modelAnimations.fps*timer->frameDifference;
 					if ((frame > animationEnd) || (frame < animationStart)) frame = (float)animationStart;
-					glPushAttrib(GL_ALL_ATTRIB_BITS);
-					glDisable(GL_DEPTH_TEST);
-					glLineWidth(5);
-					glDisable(GL_TEXTURE_2D);
-					glBegin(GL_LINES);
-						glColor3f(1,0,0);
-						glVertex3f(position.x,position.y+size.y,position.z);
-						glVertex3f(position.x,position.y+size.y + 1,position.z);
-					
-						glColor3f(0,1,0);
-						glVertex3f(position.x,position.y+size.y,position.z);
-						glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
-					glEnd();
-					glPopAttrib();
+
+					if (dist2(position,selector->LassoPosition) < 15) {
+		
+						glPushAttrib(GL_ALL_ATTRIB_BITS);
+						glDisable(GL_DEPTH_TEST);
+						glLineWidth(5);
+						glDisable(GL_TEXTURE_2D);
+						glBegin(GL_LINES);
+							glColor3f(1,0,0);
+							glVertex3f(position.x,position.y+size.y,position.z);
+							glVertex3f(position.x,position.y+size.y + (((float)maxhealth/100.0f)),position.z);
+						
+							glColor3f(0,1,0);
+							glVertex3f(position.x,position.y+size.y,position.z);
+							glVertex3f(position.x,position.y+size.y + (((float)health/100)),position.z);
+						glEnd();
+						glPopAttrib();
+
+					}
 				}
+
 				if (completed < 100) {
-					glColor4f(1,1,1,0.4f);
+					glColor4f(1,1,1,completed/100.0f);
 					glEnable(GL_BLEND);
+					glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+					glPushMatrix();
+					glTranslatef(0,((100.0f-completed) * -0.01f) * (float)this->size.len(), 0);
+	
+					model->drawObjectFrame(frame,model->kDrawImmediate);
+	
+					glPopMatrix();					
+					glDisable(GL_BLEND);
+				} else {
+					model->drawObjectFrame(frame,model->kDrawImmediate);
 				}
-				model->drawObjectFrame(frame,model->kDrawImmediate);
-				glDisable(GL_BLEND);
+				
 			}
 		}
 	}
@@ -316,8 +337,28 @@ void Unit::render() {
 void Unit::interact(Entity *source, int type) {
 	switch (type) {
 	case EI_ATTACK:
-		particles->Spawn(20,Vector(1,0,0),Vector(1,0,0),position,Vector(0,0,0),Vector(0,2,0),Vector(2,1,2),10,0);
+
+		particles->Spawn(25,
+						Vector(1,0,0),
+						Vector(1,0,0),
+						source->position,
+						Vector(0,0,0),
+						Normalize(position - source->position) * 10.0f,
+						Vector(0.5f,0.5f,0.5f),
+						10,
+						0.1f);
+		particles->Spawn(25,
+						Vector(1,0,0),
+						Vector(1,0,0),
+						position,
+						Vector(0,-4,0),
+						Vector(0,2,0),
+						Vector(1.2f,1.1f,1.2f),
+						10,
+						0.1f);
+
 		health -= source->damage;
+
 		if (health <= 0) {
 			onDeath();
 			Kill();
