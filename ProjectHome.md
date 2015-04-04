@@ -1,0 +1,1 @@
+MOTORS aims to be a portable 3D Real-Time Strategy Engine based on SDL and OpenGL. MOTORS' goal is to provide an easy-to-use framework for rapid development of RTS games.
